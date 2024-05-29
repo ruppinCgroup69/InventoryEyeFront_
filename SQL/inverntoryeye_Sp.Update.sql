@@ -133,3 +133,27 @@ BEGIN
 
     RETURN 1;
 END;
+
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <25/04/2024>
+-- Description:	<Update Post>
+-- =============================================
+CREATE PROCEDURE [dbo].[SP_InEye_UpdateCommentScore]
+
+	@commentId INT, 
+	@publishedBy INT, 
+	@ratedBy INT,
+	@content NVARCHAR(MAX)
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE CommentScore SET [Content] = @content
+    
+    WHERE [PublishedBy] = @publishedBy and  [RatedBy]= @ratedBy and [CommentId] = @commentId;
+
+    RETURN 1;
+END;

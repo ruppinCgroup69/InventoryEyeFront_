@@ -89,9 +89,11 @@ Alter PROCEDURE [dbo].[SP_InEye_DeletePost]
 
 @id int
 
+
 AS
 BEGIN
 	SET NOCOUNT ON;
     -- Insert statements for procedure here
 	Delete from Post where Id=@id
+	Delete from Comments where PostId = @id
 END
