@@ -89,11 +89,85 @@ Alter PROCEDURE [dbo].[SP_InEye_DeletePost]
 
 @id int
 
-
 AS
 BEGIN
 	SET NOCOUNT ON;
     -- Insert statements for procedure here
 	Delete from Post where Id=@id
 	Delete from Comments where PostId = @id
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Delete Category>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteCategory]
+
+@id int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	Delete from Category where Id=@id
+	Delete from StoreCategories where CategoryId = @id
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Delete Store>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteStore]
+
+@id int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	Delete from Store where Id=@id
+	Delete from StoreCategories where StoreId = @id
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Delete StoreCategories>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteStoreCategories]
+
+@storeId int,
+@categoryId int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	Delete from StoreCategories where [StoreId]=@storeId and [CategoryId]=@categoryId
 END

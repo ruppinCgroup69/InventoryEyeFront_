@@ -137,9 +137,9 @@ END;
 -- =============================================
 -- Author:		<Yarden and Sharon>
 -- Create date: <25/04/2024>
--- Description:	<Update Post>
+-- Description:	<Update Comment Score>
 -- =============================================
-CREATE PROCEDURE [dbo].[SP_InEye_UpdateCommentScore]
+Alter PROCEDURE [dbo].[SP_InEye_UpdateCommentScore]
 
 	@commentId INT, 
 	@publishedBy INT, 
@@ -154,6 +154,180 @@ BEGIN
     UPDATE CommentScore SET [Content] = @content
     
     WHERE [PublishedBy] = @publishedBy and  [RatedBy]= @ratedBy and [CommentId] = @commentId;
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update Category>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_UpdateCategory]
+
+	@id int,
+	@categoryDesc nvarchar
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE Category SET [CategoryDesc] = @categoryDesc
+    WHERE [Id] = @id
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update User Email>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_UpdateUserEmail]
+
+	@id int,
+	@emailAddress nvarchar
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT [Id] FROM Users WHERE [Id] = @id)
+    BEGIN
+        RETURN 0;
+    END;
+
+    -- Update statements for procedure here
+    UPDATE Users SET [EmailAddress] = @emailAddress
+    WHERE [Id] = @id
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update Stock Level>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_UpdateStockLevel]
+
+	@id int,
+	@stockDesc nvarchar
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE StockLevel SET StockDesc = @stockDesc
+    WHERE [Id] = @id
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update Store>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateStore]
+
+	@id int,
+	@storeName nvarchar
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE Store SET StoreName = @storeName
+    WHERE [Id] = @id
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update StoreCategories>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateStoreCategories]
+
+@storeId int,
+@categoryId int,
+@isActive nvarchar
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE StoreCategories SET IsActive = @isActive
+    WHERE StoreId = @storeId and CategoryId=@categoryId
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update Weights>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateWeights]
+
+@generalWeight int,
+@boughtWeight int,
+@credibilityWeight int
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update statements for procedure here
+    UPDATE Weights SET GeneralWeight=@generalWeight, BoughtWeight=@boughtWeight, CredibilityWeight=@credibilityWeight
 
     RETURN 1;
 END;

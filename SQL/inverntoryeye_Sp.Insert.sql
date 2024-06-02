@@ -144,4 +144,83 @@ return 1
 
 END
 
+-- =============================================
 
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Insert Category>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertCategory]
+
+@categoryDesc nvarchar
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO Category(CategoryDesc)
+VALUES (@categoryDesc);
+return 1
+
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Insert Store>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertStore]
+
+@storeName nvarchar (max)
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO Store(StoreName)
+VALUES (@storeName);
+return 1
+
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Insert Store Categories>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertStoreCategories]
+
+@isActive nvarchar (max)
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO StoreCategories(IsActive)
+VALUES (@isActive);
+return 1
+
+END
