@@ -21,7 +21,8 @@ Alter PROCEDURE [dbo].[SP_InEye_UpdateUser]
 	@lng float(53),
 	@address nvarchar(max) ,
 	@image nvarchar(max),
-	@createdAt date
+	@createdAt date,
+	@password nvarchar(max)
 
 AS
 BEGIN
@@ -33,7 +34,7 @@ BEGIN
 	end
 
     -- update statements for procedure here
-	update Users set [Role]=@role,[LastSeen]=@lastSeen,[FullName]=@fullName,[EmailAddress]=@emailAddress,[BirthDate]=@birthDate,[Lat]=@lat,[Lng]=@lng,[Address]=@address,[Image]=@image,[CreatedAt]=@createdAt
+	update Users set [Role]=@role,[LastSeen]=@lastSeen,[FullName]=@fullName,[EmailAddress]=@emailAddress,[BirthDate]=@birthDate,[Lat]=@lat,[Lng]=@lng,[Address]=@address,[Image]=@image,[CreatedAt]=@createdAt, [Password]=@password
 	where [EmailAddress] = @emailAddress	   
 	return 1
 	
@@ -62,7 +63,7 @@ Alter PROCEDURE [dbo].[SP_InEye_UpdateComments]
 	@storeId int,
 	@stockId int,
 	@storeLocation nvarchar(max),
-	@bought nvarchar(max),
+	@bought bit ,
 	@boughtDate date,
 	@productQuality int
 

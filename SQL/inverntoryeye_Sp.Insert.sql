@@ -23,7 +23,8 @@ Alter PROCEDURE [dbo].[SP_InEye_InsertUser]
 @lng float(53),
 @address nvarchar(max) ,
 @image nvarchar(max),
-@createdAt date
+@createdAt date,
+@password nvarchar(max)
 
 AS
 BEGIN
@@ -34,8 +35,8 @@ BEGIN
 		return 0
 	end
 
-INSERT INTO Users ([Role],[LastSeen],[FullName],[EmailAddress],[BirthDate],[Lat],[Lng],[Address],[Image],[CreatedAt])
-VALUES (@role,@lastSeen,@fullName,@emailAddress,@birthDate,@lat,@lng,@address,@image,@createdAt);
+INSERT INTO Users ([Role],[LastSeen],[FullName],[EmailAddress],[BirthDate],[Lat],[Lng],[Address],[Image],[CreatedAt],[Password])
+VALUES (@role,@lastSeen,@fullName,@emailAddress,@birthDate,@lat,@lng,@address,@image,@createdAt,@password);
 return 1
 END
 
@@ -62,7 +63,7 @@ Alter PROCEDURE [dbo].[SP_InEye_InsertComments]
 @storeId int,
 @stockId int,
 @storeLocation nvarchar(max),
-@bought nvarchar(max),
+@bought bit,
 @boughtDate date,
 @productQuality int
 
@@ -93,7 +94,7 @@ Alter PROCEDURE [dbo].[SP_InEye_InsertCommentScore]
 
 @generalScore int,
 @credibility int,
-@bought nvarchar(max),
+@bought bit,
 @content nvarchar(max)
 
 AS

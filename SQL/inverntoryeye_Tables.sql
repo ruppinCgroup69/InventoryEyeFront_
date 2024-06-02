@@ -1,9 +1,10 @@
-CREATE TABLE [Users] (
+Create TABLE [Users] (
 	[Id] int IDENTITY(1,1) NOT NULL UNIQUE,
 	[Role] int NOT NULL,
 	[LastSeen] date NOT NULL,
 	[FullName] nvarchar(max) NOT NULL,
 	[EmailAddress] nvarchar(255) NOT NULL UNIQUE,
+	[Password] nvarchar (max) NOT NULL,
 	[BirthDate] date NOT NULL,
 	[Lat] float(53) NOT NULL,
 	[Lng] float(53) NOT NULL,
@@ -53,7 +54,7 @@ CREATE TABLE [Comments] (
 	[StoreId] int,
 	[StockId] int,
 	[StoreLocation] nvarchar(max),
-	[Bought] nvarchar(max),
+	[Bought] bit,
 	[BoughtDate] date,
 	[ProductQuality] int,
 	PRIMARY KEY ([PostId], [Id])
@@ -84,7 +85,7 @@ CREATE TABLE [CommentScore] (
 	[RatedBy] int NOT NULL,
 	[GeneralScore] int NOT NULL,
 	[Credibility] int NOT NULL,
-	[Bought] nvarchar(max) NOT NULL DEFAULT 0,
+	[Bought] bit NOT NULL DEFAULT 0,
 	[Content] nvarchar(max),
 	PRIMARY KEY ([CommentId], [PublishedBy], [RatedBy])
 );
