@@ -128,7 +128,7 @@ Alter PROCEDURE [dbo].[SP_InEye_InsertPost]
 	@name nvarchar(max),
 	@content nvarchar(max) ,
 	@image nvarchar(max) ,
-	@tags nvarchar,
+	@tags nvarchar (max),
 	@category int ,
 	@pickUpFromUser nvarchar(max),
 	@pickUpLat float(53),
@@ -160,7 +160,7 @@ GO
 -- =============================================
 Alter PROCEDURE [dbo].[SP_InEye_InsertCategory]
 
-@categoryDesc nvarchar
+@categoryDesc nvarchar (max)
 
 AS
 BEGIN

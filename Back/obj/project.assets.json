@@ -2324,11 +2324,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack\\InventoryEyeBack.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
       "projectName": "InventoryEyeBack",
-      "projectPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack\\InventoryEyeBack.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",

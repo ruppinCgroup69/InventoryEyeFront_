@@ -6,41 +6,57 @@ namespace InventoryEyeBack.Users
     [ApiController]
     public class UsersController : ControllerBase
     {
-        // GET: api/<UsersController>
+        // GET all users api/<UsersController>/5
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<UsersModel> Get()
         {
-            return new string[] { "value1", "value2" };
+            UsersModel user = new UsersModel();
+            return user.Read();
         }
 
-        // GET api/<UsersController>/5
+        // GET User by id api/<UsersController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public UsersModel Get(int id)
         {
-
-            return "value";
+            UsersModel user = new UsersModel();
+            return user.ReadUserById(id);
         }
 
         // POST Insert User>
         [HttpPost]
-        public IActionResult Post([FromBody] UsersRegisterModel user)
+        public IActionResult Post([FromBody] UsersModel user)
         {
             int status = user.InsertUser(user);
-                if (status == 1)
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest();
-                }
+            if (status == 1)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] UsersModel user)
+        // POST Login>
+        [HttpPost("/api/Users/login")]
+        public IActionResult PostLogin([FromBody] UsersModel user)
         {
-            int status = user.UpdateUser();
+            UserLoginModel u = user.LoginUser(user);
+            if (u != null)
+            {
+                return Ok(u);
+            }
+            else
+            {
+                return BadRequest(u);
+            }
+        }
+
+        // PUT Update user api/<UsersController>/5
+        [HttpPut("{email}")]
+        public IActionResult Put([FromBody] UsersModel user)
+        {
+            int status = user.UpdateUser(user);
             if (status == 1)
             {
                 return Ok(user);
@@ -51,10 +67,28 @@ namespace InventoryEyeBack.Users
             }
         }
 
-        // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // PUT Update user email api/<UsersController>/5
+        [HttpPut]
+        public IActionResult PutEmail([FromBody] UsersModel user)
         {
+            int status = user.UpdateUserEmail();
+            if (status == 1)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        // DELETE api/<UsersController>/5
+        [HttpDelete("{email}")]
+        public IActionResult Delete(string email)
+        {
+            UsersModel user = new UsersModel();
+            user.DeleteUser(email);
+            return Ok();
         }
     }
 }

@@ -174,7 +174,7 @@ GO
 ALTER PROCEDURE [dbo].[SP_InEye_UpdateCategory]
 
 	@id int,
-	@categoryDesc nvarchar
+	@categoryDesc nvarchar (max)
 
 AS
 BEGIN
@@ -202,7 +202,7 @@ GO
 ALTER PROCEDURE [dbo].[SP_InEye_UpdateUserEmail]
 
 	@id int,
-	@emailAddress nvarchar
+	@emailAddress nvarchar (max)
 
 AS
 BEGIN
@@ -235,7 +235,7 @@ GO
 ALTER PROCEDURE [dbo].[SP_InEye_UpdateStockLevel]
 
 	@id int,
-	@stockDesc nvarchar
+	@stockDesc nvarchar (max)
 
 AS
 BEGIN
@@ -263,7 +263,7 @@ GO
 Alter PROCEDURE [dbo].[SP_InEye_UpdateStore]
 
 	@id int,
-	@storeName nvarchar
+	@storeName nvarchar (max)
 
 AS
 BEGIN
@@ -292,7 +292,7 @@ Alter PROCEDURE [dbo].[SP_InEye_UpdateStoreCategories]
 
 @storeId int,
 @categoryId int,
-@isActive nvarchar
+@isActive nvarchar (max)
 
 AS
 BEGIN
