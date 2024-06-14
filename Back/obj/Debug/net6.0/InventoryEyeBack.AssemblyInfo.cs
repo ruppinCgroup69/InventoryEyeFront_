@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5046ba45051b97374b73e50386511302c52b47e5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cdf65429947dc6de3530ff5707d1d48a2d04d4be")]
 [assembly: System.Reflection.AssemblyProductAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {}
+    "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\inventoryEyeBack\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {
+    "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\inventoryEyeBack\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
+        "projectUniqueName": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\inventoryEyeBack\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
         "projectName": "InventoryEyeBack",
-        "projectPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
-        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\obj\\",
+        "projectPath": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\inventoryEyeBack\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
+        "packagesPath": "C:\\Users\\sharo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\inventoryEyeBack\\InventoryEyeProj\\Back\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sharo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
