@@ -18,6 +18,7 @@ namespace InventoryEyeBack.Users
             con.Open();
             return con;
         }
+
         //-------------Insert User-------------//
         public int InsertUserDBS(UsersModel user)
         {

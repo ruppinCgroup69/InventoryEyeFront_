@@ -209,3 +209,268 @@ BEGIN
 	SELECT * from StockLevel
 END
 
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read comments by comment Id>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_ReadCommentsBycommentId]
+
+@id int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentWiew]
+WHERE [Id] = @id;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read all Comments>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAllComments]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	SELECT * from [CommentWiew] 
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Comments by PostId>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadCommentsByPostId]
+
+@postId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentWiew]
+WHERE [PostId] = @postId;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Comment Score by Comment Id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadCommentsByUserId]
+
+@userId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentWiew]
+WHERE  [UserId]= @userId ;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Comments by userId>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadCommentScoreByCommentId]
+
+@commentId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentScore]
+WHERE [CommentId] = @commentId ;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Comments by Published User Id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadCommentScoreByPublishedUserId]
+
+@publishedBy int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentScore]
+WHERE [PublishedBy] = @publishedBy ;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Comments by Rated By User Id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadCommentScoreByRatedByUserId]
+
+@ratedBy int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[CommentScore]
+WHERE [RatedBy] = @ratedBy ;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read all Weights>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAllWeights]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	SELECT * from  [dbo].[Weights]
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read all Store Categories>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAllStoreCategories]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	SELECT * from  [dbo].[StoresWithCategoriesView]
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Store Categories By Category>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadStoreCategoriesByCategory]
+
+@categoryId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[StoresWithCategoriesView]
+WHERE [CategoryId] = @categoryId;
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Store Categories By Store id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadStoreCategoriesByStoreId]
+
+@storeId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[StoresWithCategoriesView]
+WHERE [StoreId] = @storeId;
+END

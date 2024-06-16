@@ -26,7 +26,7 @@ namespace InventoryEyeBack.Posts
 
 
         // GET: Read Posts by category api/<PostsController>/5
-        [HttpGet("category/{category}")]
+        [HttpGet("Category/{category}")]
         public List<PostsModel> GetByCategory(int category)
         {
             PostsModel post = new PostsModel();
@@ -34,7 +34,7 @@ namespace InventoryEyeBack.Posts
         }
 
         // GET: Read Posts by userId api/<PostsController>/5
-        [HttpGet("userId/{userId}")]
+        [HttpGet("UserId/{userId}")]
         public List<PostsModel> GetByUserId(int userId)
         {
             PostsModel post = new PostsModel();

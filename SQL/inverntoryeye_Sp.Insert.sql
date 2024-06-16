@@ -90,21 +90,31 @@ GO
 -- Create date: <24/05/2024>
 -- Description:	<Insert CommentScore>
 -- =============================================
-Alter PROCEDURE [dbo].[SP_InEye_InsertCommentScore]
+ALTER PROCEDURE [dbo].[SP_InEye_InsertCommentScore]
 
+@commentId int,
 @generalScore int,
 @credibility int,
 @bought bit,
-@content nvarchar(max)
+@content nvarchar(max),
+@publishdBy int
 
 AS
 BEGIN
 	SET NOCOUNT ON;
-
-INSERT INTO CommentScore ([GeneralScore],[Credibility],[Bought],[Content])
-VALUES (@generalScore,@credibility,@bought,@content);
+declare @ratedBy int = (
+	select [UserId] from [dbo].[Post] where [Id] = (
+		select PostId from [dbo].[Comments] where [Id] = @commentId
+	)
+)
+if(@ratedBy!=@publishdBy)
+Begin
+INSERT INTO CommentScore ([GeneralScore],[Credibility],[Bought],[Content],[PublishedBy],[RatedBy],[CommentId])
+VALUES (@generalScore,@credibility,@bought,@content,@publishdBy,@ratedBy,@commentId);
 return 1
-
+End
+else 
+return -1
 END
 
 -- =============================================
@@ -214,14 +224,16 @@ GO
 -- =============================================
 Alter PROCEDURE [dbo].[SP_InEye_InsertStoreCategories]
 
+@storeId int,
+@categoryId int,
 @isActive nvarchar (max)
 
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-INSERT INTO StoreCategories(IsActive)
-VALUES (@isActive);
+INSERT INTO StoreCategories([StoreId],[CategoryId],IsActive)
+VALUES (@storeId,@categoryId,@isActive);
 return 1
 
 END

@@ -20,8 +20,6 @@ namespace InventoryEyeBack.Posts
             return con;
         }
 
-
-
         //-------------Insert Post-------------//
         public int InsertPostDBS(PostsModel post)
         {
@@ -89,7 +87,6 @@ namespace InventoryEyeBack.Posts
             cmd.Parameters.AddWithValue("@pickUpAddress", post.PickUpAddress);
             return cmd;
         }
-
 
         //-------------Update Post-------------//
         public int UpdatePostDBS(PostsModel post)
@@ -159,7 +156,6 @@ namespace InventoryEyeBack.Posts
             return cmd;
         }
 
-
         //-------------Delete Post -------------//
         public int DeletePostDBS(int postId)
         {
@@ -217,8 +213,6 @@ namespace InventoryEyeBack.Posts
 
             return cmd;
         }
-
-
 
         //-------------Read all Posts -------------//
         public List<PostsModel> ReadAllPostsDBS()
@@ -296,8 +290,6 @@ namespace InventoryEyeBack.Posts
 
         }
 
-
-
         //-------------Read Post by post id -------------//
         public PostsModel ReadPostByPostIdDBS(int id)
         {
@@ -369,7 +361,6 @@ namespace InventoryEyeBack.Posts
             cmd.Parameters.AddWithValue("@id", id);
             return cmd;
         }
-
 
         //-------------Read Post by category -------------//
         public List <PostsModel> ReadPostByCategoryDBS(int category)
@@ -444,7 +435,6 @@ namespace InventoryEyeBack.Posts
             cmd.Parameters.AddWithValue("@categoryId", category);
             return cmd;
         }
-
 
         //-------------Read Post by userId -------------//
         public List<PostsModel> ReadPostByUserIdDBS(int userId)

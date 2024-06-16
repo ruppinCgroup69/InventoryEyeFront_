@@ -1,4 +1,5 @@
 ﻿using InventoryEyeBack.Posts;
+using InventoryEyeBack.Users;
 using System.Data;
 
 namespace InventoryEyeBack.Comments
@@ -70,10 +71,32 @@ namespace InventoryEyeBack.Comments
             CommentsDBS dbs = new CommentsDBS();
             return dbs.DeleteCommentDBS(id);
         }
-        public CommentsModel ReadCommentByCommentId(int id)
+        public CommentsModel ReadCommentByCommentId(int commentId)
         {
             CommentsDBS dbs = new CommentsDBS();
-            return dbs.ReadCommentByCommentIdDBS(id);
+            return dbs.ReadCommentByCommentIdDBS(commentId);
+        }
+
+        public List<CommentsModel> ReadAllComments()
+        {
+            CommentsDBS dbs = new CommentsDBS();
+            return dbs.ReadAllCommentsdDBS();
+        }
+         public List<CommentsModel> ReadCommentsByPostId(int postId)
+         {
+            CommentsDBS dbs = new CommentsDBS();
+            return dbs.ReadCommentsByPostIdDBS(postId);
+        }
+
+        public List<CommentsModel> ReadCommentstByUserId(int userId)
+    {
+            CommentsDBS dbs = new CommentsDBS();
+            return dbs.ReadCommentsByUserIdDBS(userId);
+        }
+        public int UpdateComment(CommentsModel comment)
+        {
+            CommentsDBS dbs = new CommentsDBS();
+            return dbs.UpdateCommentDBS(comment);
         }
     }
 }

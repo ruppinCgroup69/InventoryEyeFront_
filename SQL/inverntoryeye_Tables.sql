@@ -69,7 +69,7 @@ CREATE TABLE [Store] (
 CREATE TABLE [StoreCategories] (
 	[StoreId] int NOT NULL,
 	[CategoryId] int NOT NULL,
-	[IsActive] nvarchar(max) NOT NULL DEFAULT 1,
+	[IsActive] bit NOT NULL DEFAULT 1,
 	PRIMARY KEY ([StoreId], [CategoryId])
 );
 
@@ -80,7 +80,7 @@ CREATE TABLE [StockLevel] (
 );
 
 CREATE TABLE [CommentScore] (
-	[CommentId] int IDENTITY(1,1) NOT NULL UNIQUE,
+	[CommentId] int NOT NULL,
 	[PublishedBy] int NOT NULL,
 	[RatedBy] int NOT NULL,
 	[GeneralScore] int NOT NULL,

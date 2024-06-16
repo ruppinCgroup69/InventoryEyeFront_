@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InventoryEyeBack.CommentScore;
+using InventoryEyeBack.Users;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +10,28 @@ namespace InventoryEyeBack.Weights
     [ApiController]
     public class WeightsController : ControllerBase
     {
-        // GET: api/<WeightsController>
+        // GET: Read All Weights api/<WeightsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<WeightsModel> Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<WeightsController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<WeightsController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
+            WeightsModel weight = new WeightsModel();
+            return weight.ReadWeights();
         }
 
         // PUT api/<WeightsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public IActionResult Put([FromBody] WeightsModel weights)
         {
+            int status = weights.UpdateWeight(weights);
+            if (status == 1)
+            {
+                return Ok(weights);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
-        // DELETE api/<WeightsController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
