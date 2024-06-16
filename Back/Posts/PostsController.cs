@@ -54,7 +54,6 @@ namespace InventoryEyeBack.Posts
             {
                 return BadRequest();
             }
-
         }
 
         // PUT api/<PostsController>/5
@@ -77,7 +76,7 @@ namespace InventoryEyeBack.Posts
         public IActionResult Delete(int id)
         {
             PostsModel post = new PostsModel();
-            post.DeletePostDBS(id);
+            post.DeletePost(id);
             return Ok();
         }
     }

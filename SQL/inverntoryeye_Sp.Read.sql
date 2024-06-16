@@ -164,3 +164,48 @@ SELECT *
 FROM [PostView]
 WHERE  [UserId]= @userId ;
 END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read All Stores>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_ReadAllStores]
+
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+	SELECT * from Store
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read All Stock Levels>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_ReadAllStockLevel]
+
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+	SELECT * from StockLevel
+END
+

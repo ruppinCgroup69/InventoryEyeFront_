@@ -67,12 +67,12 @@ namespace InventoryEyeBack.Posts
         }
 
         public int UpdatePost(PostsModel post)
-    {
+        {
             PostsDBS dbs = new PostsDBS();
             return dbs.UpdatePostDBS(post);
         }
 
-        public int DeletePostDBS(int postId)
+        public int DeletePost(int postId)
         {
             PostsDBS dbs = new PostsDBS();
             return dbs.DeletePostDBS(postId);

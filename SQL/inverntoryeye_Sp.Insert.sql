@@ -225,3 +225,32 @@ VALUES (@isActive);
 return 1
 
 END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Insert StockLevel>
+-- =============================================
+ALTER PROCEDURE [dbo].[SP_InEye_InsertStockLevel]
+
+@stockDesc nvarchar (max)
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO StockLevel(StockDesc)
+VALUES (@stockDesc);
+return 1
+
+END
+
+-- =============================================
