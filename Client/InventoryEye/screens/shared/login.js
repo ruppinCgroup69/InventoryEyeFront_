@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput,KeyboardAvoidingView,Platform   } from 'react-native'
+import { StyleSheet, Text, View, TextInput,KeyboardAvoidingView,Platform    } from 'react-native'
 import React from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
@@ -26,7 +26,6 @@ export default function Login() {
           style={styles.textInput}
           placeholder='Enter your password'
           secureTextEntry={true} />
-          
       </View>
       <View style={styles.forgot}>
         <Text>I forgot my password</Text>

@@ -1,12 +1,49 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
-export default function search() {
+export default function Search() {
   return (
-    <View>
-      <Text>search</Text>
+    <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Search"
+          placeholderTextColor="#888"
+        />
+        <TouchableOpacity>
+        <MaterialIcons name="image-search" size={20} color="#888" style={styles.searchImage} />
+        </TouchableOpacity>
+      </View>
     </View>
-  )
+  );
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#31a1e5',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchImage: {
+   marginLeft: 10,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: '#333',
+  },
+});
