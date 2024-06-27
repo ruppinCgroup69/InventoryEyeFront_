@@ -10,11 +10,12 @@ import SuccessResetPassword from './screens/shared/succesResetPassword';
 import Loading from './screens/shared/loading';
 import C_header from './components/c_home/c_header';
 import C_home from './screens/customer/c_home';
+import EditOrCreatePost from './screens/customer/editOrCreatePost';
 
 export default function App() {
   return (
     <View style={styles.container}>
-    <C_home/>
+    <EditOrCreatePost fullName = "Sharon Tebul" source={'./images/profileImage.jpg'}/>
     </View>
   );
 }

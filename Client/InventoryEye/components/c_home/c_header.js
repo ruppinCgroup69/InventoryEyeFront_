@@ -9,14 +9,14 @@ export default function C_header({ fullName, profileImage, userScore, notiNum })
   return (
     <View style={styles.container}>
       <View style={styles.profileleft}>
-      <View style={styles.imageContainer}>
+        <View style={styles.imageContainer}>
           <Image source={profileImage} style={styles.image} />
         </View>
         <View style={styles.scoreContainer}>
           <AntDesign name="star" size={26} color="#31A1E5" style={styles.starIcon} />
           <Text style={styles.scoreText}>{userScore}</Text>
         </View>
-        </View>
+      </View>
       <TouchableOpacity style={styles.notileft} >
         <View style={styles.noti}>
           <Ionicons name="notifications-outline" size={35} color="#111851" />
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     borderColor: '#111851',
     borderWidth: 1,
-    margin:7,
+    margin: 7,
   },
   imageContainer: {
     //borderWidth:1,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   profileleft: {
     width: '25%',
     alignItems: 'center',
-    position:'relative',
+    position: 'relative',
   },
   right: {
     width: '25%',
@@ -131,13 +131,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    top: 7, 
-    left: 68, 
+    top: 7,
+    left: 68,
     zIndex: 1,
   },
   scoreText: {
     position: 'absolute',
-    top:8,
+    top: 8,
     color: 'white',
     fontSize: 10,
   },
