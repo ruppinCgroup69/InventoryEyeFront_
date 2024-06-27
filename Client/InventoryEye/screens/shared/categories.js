@@ -10,17 +10,14 @@ export default function Categories() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Sharon' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName='Sharon Tebul' notiNum={12} profileImage={profileImage} userScore={70} />
       </View>
-
       <View style={styles.middleContainer}>
         <Search />
       </View>
-
       <View style={styles.inEye}>
           <Text style={styles.keepEyeText}>Keep an eye on ... </Text>
         </View>
-
       <ScrollView contentContainerStyle={styles.bottomContainer}>
         <View style={styles.categLeft}>
           <TouchableOpacity>
@@ -77,7 +74,6 @@ const styles = StyleSheet.create({
     height: '15%',
   },
   middleContainer: {
-
   },
   bottomContainer: {
     //backgroundColor: 'yellow',
@@ -101,19 +97,17 @@ const styles = StyleSheet.create({
     paddingHorizontal:28
   },
   inEye: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: '15%',
-    paddingVertical: 10,
-    //backgroundColor: 'red'
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#111851',
+    marginLeft:'25%',
   },
   keepEyeText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#111851',
-    marginLeft: '25%',
+    marginLeft: '13%',
+    marginBottom:'4%',
   },
   image: {
     width: 120,
@@ -128,7 +122,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     paddingTop: 10,
-    paddingHorizontal: 8,
     textAlign: 'left'
   }
 

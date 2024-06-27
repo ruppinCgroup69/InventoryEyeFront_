@@ -62,8 +62,9 @@ const styles = StyleSheet.create({
   },
   center: {
     justifyContent: 'center',
-    //borderWidth:1,
     width: '35%',
+    //borderColor:'black',
+   // borderWidth:1,
   },
   hello: {
     color: '#111851',

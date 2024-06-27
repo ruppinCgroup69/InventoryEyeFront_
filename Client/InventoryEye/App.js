@@ -16,7 +16,7 @@ import Categories from './screens/shared/categories';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Categories></Categories>
+      <EditOrCreatePost/>
     </View>
   );
 }

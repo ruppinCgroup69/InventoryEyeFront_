@@ -44,7 +44,7 @@ export default function C_Register() {
             testID="dateTimePicker"
             value={new Date()}
             mode="date"
-            disabled="deafault"
+            disabled="default"
             minimumDate={minDate}
             maximumDate={maxDate}
           />
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
     paddingHorizontal: 15,
-    height: '80%',
+    height: '80%',// לתת ערך קבוע
   },
   dateInput: {
     width: '60%',
