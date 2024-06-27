@@ -2,8 +2,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Welcome() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,6 +28,7 @@ export default function Welcome() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold' }}
+          onPress={() => navigation.navigate('Login')}
         />
       </View>
       <View style={styles.register}>

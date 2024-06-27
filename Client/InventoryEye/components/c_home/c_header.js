@@ -2,10 +2,13 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 
 //recives props (name, profile image, score, number of notifications)
 export default function C_header({ fullName, profileImage, userScore, notiNum }) {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.profileleft}>
@@ -30,7 +33,7 @@ export default function C_header({ fullName, profileImage, userScore, notiNum })
       </View>
       <View style={styles.right}>
         <Text style={styles.inEye}>InventoryEye</Text>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditOrCreatePost', { stam: 11 })}>
           <AntDesign name="pluscircle" size={35} color="#111851" />
         </TouchableOpacity>
       </View>
@@ -64,7 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '35%',
     //borderColor:'black',
-   // borderWidth:1,
+    // borderWidth:1,
   },
   hello: {
     color: '#111851',

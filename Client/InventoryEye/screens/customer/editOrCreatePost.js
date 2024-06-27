@@ -10,6 +10,7 @@ import { Octicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import profileImage from '../../images/profileImage.jpg';
 
+import { useRoute } from '@react-navigation/native';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -19,13 +20,15 @@ const DismissKeyboard = ({ children }) => (
 
 
 export default function EditOrCreatePost() {
-  return (
+  const route = useRoute();
+  const {stam} = route.params;
 
+  return (
     <View style={styles.container}>
       <View style={styles.top}>
         <View style={styles.exit}>
           <TouchableOpacity>
-            <Feather name="x" size={30} color="#111851" />
+            <Feather name="x" size={30} color="#111851" onPress={()=> alert(stam)}/>
           </TouchableOpacity>
         </View>
         <View style={styles.title}>
