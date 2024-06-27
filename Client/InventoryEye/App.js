@@ -11,11 +11,12 @@ import Loading from './screens/shared/loading';
 import C_header from './components/c_home/c_header';
 import C_home from './screens/customer/c_home';
 import EditOrCreatePost from './screens/customer/editOrCreatePost';
+import Categories from './screens/shared/categories';
 
 export default function App() {
   return (
     <View style={styles.container}>
-    <EditOrCreatePost fullName = "Sharon Tebul" source={'./images/profileImage.jpg'}/>
+      <Categories></Categories>
     </View>
   );
 }

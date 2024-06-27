@@ -1,20 +1,39 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React from 'react'
 import { Feather } from '@expo/vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
+import { Octicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
+import profileImage from '../../images/profileImage.jpg';
 
-export default function EditOrCreatePost({ fullName, profileImage }) {
+
+const DismissKeyboard = ({ children }) => (
+  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    {children}
+  </TouchableWithoutFeedback>
+);
+
+
+export default function EditOrCreatePost() {
   return (
+
     <View style={styles.container}>
       <View style={styles.top}>
-        <View style={styles.uploadIcon}>
-          <Feather name="upload" size={30} color="#111851" />
+        <View style={styles.exit}>
+          <TouchableOpacity>
+            <Feather name="x" size={30} color="#111851" />
+          </TouchableOpacity>
         </View>
         <View style={styles.title}>
           <Text style={styles.createHeader}>Create New Post</Text>
         </View>
-        <View style={styles.exit}>
+        <View style={styles.uploadIcon}>
           <TouchableOpacity>
-            <Feather name="x" size={30} color="#111851" />
+            <Feather name="upload" size={30} color="#111851" />
           </TouchableOpacity>
         </View>
       </View>
@@ -22,35 +41,36 @@ export default function EditOrCreatePost({ fullName, profileImage }) {
       <View style={styles.center}>
         <View style={styles.profile}>
           <View style={styles.imageContainer}>
-            <Image source={profileImage} style={styles.image} />
+            <Image profileImage={profileImage} style={styles.image} />
           </View>
           <View>
-            <Text style={styles.userName}>{fullName}</Text>
-            <Text style={styles.question}>What product are you looking for ?</Text>
+            <Text style={styles.userName}>Sharon Tebul</Text>
           </View>
         </View>
 
-        <View style={styles.content}>
-          <Text style={styles.contentText}>
-            Lorem Ipsum is simply dummy text of the printing and
-            typesetting industry. Lorem Ipsum has been the industry's standard dummy
-            text ever since the 1500s, when an unknown printer took a galley of type and
-            scrambled it to make a type specimen book. It has survived not only five centuries,
-            but also the leap into electronic typesetting, remaining essentially unchanged.
-            It was popularised in the 1960s with the release of Letraset sheets containing Lorem
-            Ipsum passages, and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-          </Text>
-        </View>
+        <DismissKeyboard>
+        <ScrollView style={styles.content}>
+          <TextInput multiline style={styles.contentText} placeholder='What product are you looking for ?' />
+        </ScrollView>
+        </DismissKeyboard>
       </View>
 
       <View style={styles.bottom}>
-        <View style={styles.IconsList}>
-
+        <View style={styles.iconItem}>
+          <FontAwesome5 name="image" size={24} color="#111851" />
+          <MaterialIcons name="category" size={24} color="#111851" />
+          <FontAwesome name="pencil" size={24} color="#111851" />
+          <Ionicons name="color-palette-outline" size={24} color="#111851" />
+          <FontAwesome name="building-o" size={24} color="#111851" />
+          <Octicons name="search" size={24} color="#111851" />
         </View>
-
-        <View style={styles.selectList}>
-
+        <View style={styles.inputItem}>
+          <Text style={styles.imgText}>Image</Text>
+          <Text style={styles.imgText}>category</Text>
+          <TextInput style={styles.input} placeholder='product name' />
+          <TextInput style={styles.input} placeholder='color' />
+          <TextInput style={styles.input} placeholder='company' />
+          <TextInput style={styles.input} placeholder='location' />
         </View>
       </View>
     </View>
@@ -100,16 +120,15 @@ const styles = StyleSheet.create({
   },
   center: {
     position: 'absolute',
-    flex: 1, //
     top: '12%',
     flexDirection: 'column',
-    alignItems: 'flex-start',
     height: '44%',
     width: '100%',
     marginTop: 40,
     alignItems: 'center',
-    borderBottomColor: '#BCB7B7',
-    borderBottomWidth: '2'
+    borderBottomColor: '#D4D1D0',
+    borderBottomWidth: '2',
+
   },
   profile: {
     flexDirection: 'row',
@@ -124,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
     borderColor: '#111851',
     borderWidth: 1,
-    margin: 10,
+    margin: 7,
   },
   imageContainer: {
     alignItems: 'center',
@@ -145,6 +164,56 @@ const styles = StyleSheet.create({
   contentText: {
     fontSize: '18',
     color: 'black',
+    paddingTop: 10,
+    paddingHorizontal: 8,
+    textAlign: 'left'
+  },
+  bottom: {
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    alignItems: 'stretch',
+    height: '39.5%', // Adjust as needed
+    //backgroundColor: '#f0f0f0', // Add a background color to distinguish it
+    //backgroundColor: '#E8EFF7',
+    backgroundColor: 'F0F6FE',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  iconItem: {
+    flexDirection: 'column', // Arrange icons horizontally
+    justifyContent: 'space-around', // Distribute icons evenly
+    alignItems: 'left',
+    width: '20%', // Take full width of the bottom view
+    height: '100%',
+    //backgroundColor: 'red',
+    paddingHorizontal: 20
+  },
+  inputItem: {
+    flexDirection: 'column', // Arrange icons horizontally
+    justifyContent: 'space-around', // Distribute icons evenly
+    alignItems: 'left',
+    width: '90%', // Take full width of the bottom view
+    height: '100%',
+    // backgroundColor: 'yellow',
+    paddingHorizontal: 15,
+  },
+  input: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderColor: '#31a1e5',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    height: '10%',
+  },
+  imgText: {
+    fontSize: '18',
+    color: '#111851',
     paddingTop: 10,
     paddingHorizontal: 8
   }
