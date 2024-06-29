@@ -49,6 +49,7 @@ export default function Welcome() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851' }}
+          onPress={() => navigation.navigate('RegisterType')}
         />
       </View>
       </View>
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#EAF0F3',
   },
   header:{
     marginBottom:10,

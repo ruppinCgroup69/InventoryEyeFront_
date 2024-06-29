@@ -3,14 +3,11 @@ import React from 'react'
 import { Feather } from '@expo/vector-icons'
 import { FontAwesome5 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { Octicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
-import profileImage from '../../images/profileImage.jpg';
-
-import { useRoute } from '@react-navigation/native';
+import profileImage from '../../images/profileImage.jpg'
+import { useNavigation } from '@react-navigation/native';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -18,17 +15,18 @@ const DismissKeyboard = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
-
 export default function EditOrCreatePost() {
-  const route = useRoute();
-  const {stam} = route.params;
+  const navigation = useNavigation();
+  const handleExit = () => {
+    navigation.goBack();//לא מחזיר אותי למסך האחרון אלא רק לדף הבית
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <View style={styles.exit}>
-          <TouchableOpacity>
-            <Feather name="x" size={30} color="#111851" onPress={()=> alert(stam)}/>
+          <TouchableOpacity  onPress={handleExit}>
+            <Feather name="x" size={30} color="#111851" />
           </TouchableOpacity>
         </View>
         <View style={styles.title}>
@@ -44,7 +42,7 @@ export default function EditOrCreatePost() {
       <View style={styles.center}>
         <View style={styles.profile}>
           <View style={styles.imageContainer}>
-            <Image profileImage={profileImage} style={styles.image} />
+            <Image source={profileImage} style={styles.image} />
           </View>
           <View>
             <Text style={styles.userName}>Sharon Tebul</Text>
@@ -83,6 +81,7 @@ export default function EditOrCreatePost() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#EAF0F3',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
   contentText: {
     fontSize: '18',
     color: 'black',
-    paddingTop: 10,
+    paddingTop: 13,
     paddingHorizontal: 8,
     textAlign: 'left'
   },

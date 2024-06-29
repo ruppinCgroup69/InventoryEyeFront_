@@ -6,11 +6,15 @@ import profileImage from '../../images/profileImage.jpg'
 import toiletteAndHygiene from '../../images/Toiletries&hygiene.jpg'
 import clothingAndfashion from '../../images/clothing&fashion.jpg'
 import sportsAndtraining from '../../images/sports&training.jpg'
+
+
 export default function Categories() {
+
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Sharon Tebul' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName='Sharon' notiNum={12} profileImage={profileImage} userScore={70} />
       </View>
       <View style={styles.middleContainer}>
         <Search />
@@ -68,12 +72,11 @@ export default function Categories() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#EAF0F3',
   },
   topContainer: {
     paddingTop: 40,
     height: '15%',
-  },
-  middleContainer: {
   },
   bottomContainer: {
     //backgroundColor: 'yellow',
@@ -123,6 +126,9 @@ const styles = StyleSheet.create({
     color: 'black',
     paddingTop: 10,
     textAlign: 'left'
+  },
+  middleContainer:{
+    //backgroundColor:'yellow'
   }
 
 })

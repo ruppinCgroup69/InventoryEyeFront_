@@ -8,10 +8,11 @@ import { Feather } from '@expo/vector-icons';
 import Post from '../../components/c_home/post'
 
 export default function C_home() {
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Sharon Tebul' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName='Sharon' notiNum={12} profileImage={profileImage} userScore={70} />
       </View>
       <View style={styles.searchView}>
         <Search />
@@ -59,6 +60,7 @@ export default function C_home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#EAF0F3',
   },
   topContainer: {
     paddingTop: 40,
@@ -67,6 +69,9 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
+  searchView:{
+//backgroundColor:'yellow',
+  },
   middle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -74,6 +79,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     paddingVertical: 10,
+    //backgroundColor:'red'
   },
   inEye: {
     fontSize: 16,
@@ -81,6 +87,7 @@ const styles = StyleSheet.create({
     color: '#111851',
     marginLeft:'25%',
   },
+  
   filterContainer: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
+import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native'
 import React from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ResetPassword() {
+  const navigation = useNavigation();
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -43,10 +46,13 @@ export default function ResetPassword() {
               marginVertical: 10,
             }}
             titleStyle={{ color: '#111851', fontSize: 23 }}
+            onPress={() => navigation.navigate('SuccessResetPassword')}
           />
         </View>
         <View style={styles.login}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text>Back to Login</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -58,6 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#EAF0F3',
   },
   header: {
     marginBottom: 10,

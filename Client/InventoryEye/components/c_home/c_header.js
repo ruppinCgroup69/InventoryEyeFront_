@@ -12,9 +12,11 @@ export default function C_header({ fullName, profileImage, userScore, notiNum })
   return (
     <View style={styles.container}>
       <View style={styles.profileleft}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
         <View style={styles.imageContainer}>
           <Image source={profileImage} style={styles.image} />
         </View>
+        </TouchableOpacity>
         <View style={styles.scoreContainer}>
           <AntDesign name="star" size={26} color="#31A1E5" style={styles.starIcon} />
           <Text style={styles.scoreText}>{userScore}</Text>
@@ -33,7 +35,7 @@ export default function C_header({ fullName, profileImage, userScore, notiNum })
       </View>
       <View style={styles.right}>
         <Text style={styles.inEye}>InventoryEye</Text>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('EditOrCreatePost', { stam: 11 })}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('New Post')}>
           <AntDesign name="pluscircle" size={35} color="#111851" />
         </TouchableOpacity>
       </View>

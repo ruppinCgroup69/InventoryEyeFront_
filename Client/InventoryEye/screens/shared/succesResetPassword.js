@@ -2,8 +2,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SuccessResetPassword() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -48,6 +51,7 @@ export default function SuccessResetPassword() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
+          onPress={() => navigation.navigate('Login')}
         />
       </View>
       </View>
@@ -59,6 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#EAF0F3',
   },
   header:{
     marginBottom:10,

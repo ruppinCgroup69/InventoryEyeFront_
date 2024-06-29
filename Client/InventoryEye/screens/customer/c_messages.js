@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Profile() {
+export default function C_Messages() {
   return (
     <View>
-      <Text>profile</Text>
+      <Text>Messages</Text>
     </View>
   )
 }

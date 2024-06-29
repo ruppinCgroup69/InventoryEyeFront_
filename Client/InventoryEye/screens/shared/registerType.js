@@ -2,8 +2,13 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
 
 export default function RegisterType() {
+
+  const navigation = useNavigation();
+
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,7 +30,8 @@ export default function RegisterType() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
-        />
+          onPress={() => navigation.navigate('C_Register', {UserType:1})}>
+            </Button>
       </View>
       <View style={styles.buttonsContainer}>
         <Button
@@ -43,7 +49,8 @@ export default function RegisterType() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
-        />
+          onPress={() => navigation.navigate('S_Register', {UserType:2})}>
+          </Button>
       </View>
       </View>
   )
@@ -52,6 +59,7 @@ export default function RegisterType() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'#EAF0F3',
     alignItems: 'center',
     justifyContent: 'center',
   },
