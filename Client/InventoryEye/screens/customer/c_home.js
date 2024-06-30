@@ -12,7 +12,7 @@ export default function C_home() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Sharon' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName='Nelly' notiNum={12} profileImage={profileImage} userScore={70} />
       </View>
       <View style={styles.searchView}>
         <Search />
