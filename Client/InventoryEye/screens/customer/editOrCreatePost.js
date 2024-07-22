@@ -8,6 +8,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Octicons } from '@expo/vector-icons';
 import profileImage from '../../images/profileImage.jpg'
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -22,59 +23,68 @@ export default function EditOrCreatePost() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <View style={styles.exit}>
-          <TouchableOpacity  onPress={handleExit}>
-            <Feather name="x" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.title}>
-          <Text style={styles.createHeader}>Create New Post</Text>
-        </View>
-        <View style={styles.uploadIcon}>
-          <TouchableOpacity>
-            <Feather name="upload" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.center}>
-        <View style={styles.profile}>
-          <View style={styles.imageContainer}>
-            <Image source={profileImage} style={styles.image} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={styles.container}>
+        <View style={styles.top}>
+          <View style={styles.exit}>
+            <TouchableOpacity onPress={handleExit}>
+              <Feather name="x" size={30} color="#111851" />
+            </TouchableOpacity>
           </View>
-          <View>
-            <Text style={styles.userName}>Sharon Tebul</Text>
+          <View style={styles.title}>
+            <Text style={styles.createHeader}>Create New Post</Text>
+          </View>
+          <View style={styles.uploadIcon}>
+            <TouchableOpacity>
+              <Feather name="upload" size={30} color="#111851" />
+            </TouchableOpacity>
           </View>
         </View>
 
-        <DismissKeyboard>
-        <ScrollView style={styles.content}>
-          <TextInput multiline style={styles.contentText} placeholder='What product are you looking for ?' />
-        </ScrollView>
-        </DismissKeyboard>
-      </View>
+        <View style={styles.center}>
+          <View style={styles.profile}>
+            <View style={styles.imageContainer}>
+              <Image source={profileImage} style={styles.image} />
+            </View>
+            <View>
+              <Text style={styles.userName}>Sharon Tebul</Text>
+            </View>
+          </View>
 
-      <View style={styles.bottom}>
-        <View style={styles.iconItem}>
-          <FontAwesome5 name="image" size={24} color="#111851" />
-          <MaterialIcons name="category" size={24} color="#111851" />
-          <FontAwesome name="pencil" size={24} color="#111851" />
-          <Ionicons name="color-palette-outline" size={24} color="#111851" />
-          <FontAwesome name="building-o" size={24} color="#111851" />
-          <Octicons name="search" size={24} color="#111851" />
+          <DismissKeyboard>
+            <ScrollView
+              style={styles.content}
+              contentContainerStyle={{ flexGrow: 1 }}
+            >
+              <TextInput multiline style={styles.contentText} placeholder='What product are you looking for ?' />
+            </ScrollView>
+          </DismissKeyboard>
         </View>
-        <View style={styles.inputItem}>
-          <Text style={styles.imgText}>Image</Text>
-          <Text style={styles.imgText}>category</Text>
-          <TextInput style={styles.input} placeholder='product name' />
-          <TextInput style={styles.input} placeholder='color' />
-          <TextInput style={styles.input} placeholder='company' />
-          <TextInput style={styles.input} placeholder='location' />
+        
+        <View style={styles.bottom}>
+          <View style={styles.iconItem}>
+            <FontAwesome5 name="image" size={24} color="#111851" />
+            <MaterialIcons name="category" size={24} color="#111851" />
+            <FontAwesome name="pencil" size={24} color="#111851" />
+            <Ionicons name="color-palette-outline" size={24} color="#111851" />
+            <FontAwesome name="building-o" size={24} color="#111851" />
+            <Octicons name="search" size={24} color="#111851" />
+          </View>
+          <View style={styles.inputItem}>
+            <Text style={styles.imgText}>Image</Text>
+            <Text style={styles.imgText}>category</Text>
+            <TextInput style={styles.input} placeholder='product name' />
+            <TextInput style={styles.input} placeholder='color' />
+            <TextInput style={styles.input} placeholder='company' />
+            <TextInput style={styles.input} placeholder='location' />
+          </View>
         </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -130,14 +140,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: '#D4D1D0',
     borderBottomWidth: '2',
-
   },
   profile: {
     flexDirection: 'row',
-    width: '100%', // Take full width
+    width: '100%',
     paddingTop: 10,
     alignItems: 'center',
-    height: '20%', //
+    height: 100, 
   },
   image: {
     width: 70,
@@ -160,8 +169,8 @@ const styles = StyleSheet.create({
     color: '#111851',
   },
   content: {
-    height: '80%',
-    width: '100%'
+    height: '80%',//300
+    width: '100%'//400
   },
   contentText: {
     fontSize: '18',
@@ -178,40 +187,37 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'stretch',
     height: '39.5%', // Adjust as needed
-    //backgroundColor: '#f0f0f0', // Add a background color to distinguish it
-    //backgroundColor: '#E8EFF7',
-    backgroundColor: 'F0F6FE',
+    backgroundColor: '#F0F6FE',
     paddingVertical: 10,
     paddingHorizontal: 15,
+
   },
   iconItem: {
-    flexDirection: 'column', // Arrange icons horizontally
-    justifyContent: 'space-around', // Distribute icons evenly
+    flexDirection: 'column', 
+    justifyContent: 'space-around', 
     alignItems: 'left',
-    width: '20%', // Take full width of the bottom view
+    width: '20%', 
     height: '100%',
-    //backgroundColor: 'red',
     paddingHorizontal: 20
   },
   inputItem: {
-    flexDirection: 'column', // Arrange icons horizontally
-    justifyContent: 'space-around', // Distribute icons evenly
+    flexDirection: 'column', 
+    justifyContent: 'space-around',
     alignItems: 'left',
-    width: '90%', // Take full width of the bottom view
+    width: '90%', 
     height: '100%',
-    // backgroundColor: 'yellow',
     paddingHorizontal: 15,
   },
   input: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: 300,
     borderColor: '#31a1e5',
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: 'white',
     paddingHorizontal: 15,
-    height: '10%',
+    height: 30,
   },
   imgText: {
     fontSize: '18',

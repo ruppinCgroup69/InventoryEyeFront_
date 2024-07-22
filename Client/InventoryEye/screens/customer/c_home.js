@@ -22,35 +22,35 @@ export default function C_home() {
           <Text style={styles.inEye}>Keep an eye on...</Text>
           <TouchableOpacity style={styles.filterContainer}>
             <Text style={styles.filterBy}>Filter by</Text>
-            <Feather name="filter" size={20} color="rgba(17, 24, 81, 0.6)"  />
+            <Feather name="filter" size={20} color="rgba(17, 24, 81, 0.6)" />
           </TouchableOpacity>
         </View>
         <View style={styles.postsView}>
           <TouchableOpacity>
-        <View style={styles.postContainer}>
-          <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24'/>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-        <View style={styles.postContainer}>
-          <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24'/>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-        <View style={styles.postContainer}>
-          <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24'/>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-        <View style={styles.postContainer}>
-          <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24'/>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity>
-        <View style={styles.postContainer}>
-          <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24'/>
-        </View>
-        </TouchableOpacity>
+            <View style={styles.postContainer}>
+              <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View style={styles.postContainer}>
+              <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View style={styles.postContainer}>
+              <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View style={styles.postContainer}>
+              <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View style={styles.postContainer}>
+              <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
-  searchView:{
-//backgroundColor:'yellow',
+  searchView: {
+    //backgroundColor:'yellow',
   },
   middle: {
     flexDirection: 'row',
@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#111851',
-    marginLeft:'25%',
+    marginLeft: '25%',
   },
-  
+
   filterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
   filterBy: {
     fontSize: 12,
     color: '#111851',
-    marginRight: 5, 
+    marginRight: 5,
   },
-  postContainer:{
-    width:'100%',
+  postContainer: {
+    width: '100%',
     //borderWidth:1,
-    height:130,
-    marginBottom:7,
+    height: 130,
+    marginBottom: 7,
   },
 })
