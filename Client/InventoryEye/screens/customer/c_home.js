@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { useEffect, useState } from 'react';
 import C_header from '../../components/c_home/c_header'
 import profileImage from '../../images/profileImage.jpg'
 import Yarden from '../../images/yarden.jpg'
@@ -13,9 +13,20 @@ import Search from '../../components/c_home/search'
 import { Feather } from '@expo/vector-icons';
 import Post from '../../components/c_home/post'
 import { useNavigation } from '@react-navigation/native';
+import { GET } from '../../api';
+import { formatDate , formatTime} from '../../utils';
 
 export default function C_home() {
   const navigation = useNavigation();
+
+  const [posts, setPosts] = useState([]);
+  async function getAllPosts() {
+    let allPosts = await GET('Posts');
+    console.log(allPosts);
+    setPosts(allPosts);
+  }
+
+  useEffect(() => { getAllPosts() }, [])
 
   return (
     <View style={styles.container}>
@@ -34,7 +45,15 @@ export default function C_home() {
           </TouchableOpacity>
         </View>
         <View style={styles.postsView}>
-          <TouchableOpacity onPress={() => navigation.navigate('Post_Det')}>
+          {
+            posts.length == 0 ? <Text>No posts were found </Text> :
+              posts.map((post) => <TouchableOpacity onPress={() => navigation.navigate('Post_Det', {state:post})}>
+                <View style={styles.postContainer}>
+                  <Post style={styles.posts} content={post.content} productName={post.productName} category={post.categoryDesc} productImage={post.image} profileImage={post.userImage} fullName={post.userName} score={post.score} publishedDate={formatDate(new Date(post.createAt))} publishedHour={formatTime(new Date(post.createAt))} />
+                </View>
+              </TouchableOpacity>)
+          }
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Post_Det')}>
             <View style={styles.postContainer}>
               <Post style={styles.posts} content='In the search for this headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
             </View>
@@ -58,7 +77,7 @@ export default function C_home() {
             <View style={styles.postContainer}>
               <Post style={styles.posts} content='In the search for these headphones, anyone who knows where they can be purchased will be very helpful!' productName='Headphones' category='Electronics' productImage={productImage} profileImage={profileImage} fullName='Gal Cohen' score={5} publishedDate='21/06/2024' publishedHour='17:24' />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
     </View>

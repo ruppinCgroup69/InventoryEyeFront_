@@ -1,4 +1,4 @@
-import React from 'react';
+import {useEffect, useState} from 'react';
 import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
@@ -8,8 +8,11 @@ import Sharon from '../../images/sharon.jpg';
 import Adar from '../../images/ADAR.jpeg';
 import profileImage from '../../images/profileImage.jpg';
 import Lipstick from '../../images/Lipstic.jpeg';
+import { GET } from '../../api';
+
 
 export default function Post() {
+
   return (
     <View style={styles.container}>
       <ScrollView
