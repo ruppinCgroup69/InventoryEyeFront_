@@ -1,14 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native'
-import React from 'react'
-import { Feather } from '@expo/vector-icons'
-import { FontAwesome5 } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-import { Octicons } from '@expo/vector-icons';
-import profileImage from '../../images/profileImage.jpg'
-import { useNavigation } from '@react-navigation/native';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
+import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
+import profileImage from '../../images/profileImage.jpg';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -18,8 +12,23 @@ const DismissKeyboard = ({ children }) => (
 
 export default function EditOrCreatePost() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const [previousScreen, setPreviousScreen] = useState('Home'); // Default value
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Update `previousScreen` when `EditOrCreatePost` gains focus
+      const fromScreen = route.params?.fromScreen || 'Home';
+      setPreviousScreen(fromScreen);
+    }, [route.params?.fromScreen])
+  );
+
   const handleExit = () => {
-    navigation.goBack();//לא מחזיר אותי למסך האחרון אלא רק לדף הבית
+    if (previousScreen) {
+      navigation.navigate(previousScreen);
+    } else {
+      navigation.navigate('Home'); // Fallback
+    }
   };
 
   return (

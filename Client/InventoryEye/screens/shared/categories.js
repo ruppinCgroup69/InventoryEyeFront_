@@ -51,7 +51,7 @@ export default function Categories() {
 
           <TouchableOpacity>
             <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Home Forniture</Text>
+              <Text style={styles.categoryText}>Home Furniture</Text>
               <Image source={HomeForniture} style={styles.image} />
             </View>
           </TouchableOpacity>

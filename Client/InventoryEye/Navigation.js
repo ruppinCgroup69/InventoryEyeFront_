@@ -21,6 +21,7 @@ import EditOrCreatePost from './screens/customer/editOrCreatePost';
 import Profile from './screens/customer/profile';
 import C_Messages from './screens/customer/c_messages';
 import ChooseCupons from './screens/customer/chooseCupons';
+import Post from './screens/shared/post';
 
 
 //create the default Stack
@@ -82,7 +83,7 @@ function UserTabs() {
                     tabBarActiveTintColor:"#111851",
                 }}
             />
-            <Tab.Screen name="New Post" component={EditOrCreatePost} options={{ headerShown: false,tabBarButton: props => null, }} />
+            <Tab.Screen name="New Post" component={EditOrCreatePost} options={{ headerShown: false,tabBarButton: () => null }} />
             <Tab.Screen
                 name="Categories"
                 component={Categories}
@@ -138,6 +139,7 @@ export default function Navigation() {
                     <Stack.Screen name="SupplierTabs" component={SupplierTabs} options={{ headerShown: false }} />
                     <Stack.Screen name="C_Register" component={C_Register} options={{ headerShown: false }} />
                     <Stack.Screen name="S_Register" component={S_Register} options={{ headerShown: false }} />
+                    <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} />
                 </Stack.Navigator>
             </NavigationContainer>
         </>
