@@ -1,5 +1,7 @@
-﻿using InventoryEyeBack.Users;
+﻿using InventoryEyeBack.Posts;
+using InventoryEyeBack.Users;
 using Microsoft.Extensions.Hosting;
+using System.Net;
 
 namespace InventoryEyeBack.Posts
 {
@@ -103,6 +105,37 @@ namespace InventoryEyeBack.Posts
             PostsDBS dbs = new PostsDBS();
             return dbs.ReadPostByUserIdDBS(userId);
         }
+
+        public List<PostsModel> SearchPostsByFullName(string fullName)
+        {  
+        PostsDBS dbs = new PostsDBS();
+        return dbs.SearchPostsByFullNameDBS(fullName);
+        }
+  
+        public List<PostsModel> SearchPostsByContent(string content)  
+        { 
+            PostsDBS dbs = new PostsDBS(); 
+            return dbs.SearchPostsByContentDBS(content);  
+        }
+        public List<PostsModel> SearchPostsByTags(string tags)
+        {
+            PostsDBS dbs = new PostsDBS();
+            return dbs.SearchPostsByTagsDBS(tags);
+        }
+        public List<PostsModel> SearchPostsByProductName(string name)
+        {
+            PostsDBS dbs = new PostsDBS();
+            return dbs.SearchPostsByProductNameDBS(name);
+        }
+
+
+
+
+
+
+
+
+
 
     }
 }

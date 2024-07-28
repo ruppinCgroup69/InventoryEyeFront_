@@ -41,6 +41,38 @@ namespace InventoryEyeBack.Posts
             return post.ReadPostByUserId(userId);
         }
 
+        // GET: Search Posts by fullName api/<PostsController>/5
+        [HttpGet("FullName/{fullName}")] 
+        public List<PostsModel> GetByFullName(string fullName) 
+        { 
+            PostsModel post = new PostsModel();
+            return post.SearchPostsByFullName(fullName);
+
+        }
+
+        // GET: Search Posts by Content api/<PostsController>/5
+        [HttpGet("Content/{content}")]
+        public List<PostsModel> GetByContent(string content)
+        {
+            PostsModel post = new PostsModel();
+            return post.SearchPostsByContent(content);
+        }
+        // GET: Search Posts by Content api/<PostsController>/5
+        [HttpGet("Tags/{tags}")]
+        public List<PostsModel> GetByTag(string tags)
+        {
+            PostsModel post = new PostsModel();
+            return post.SearchPostsByTags(tags);
+        }
+          
+        // GET: Search Posts by Product api/<PostsController>/5
+        [HttpGet("Name/{name}")]
+        public List<PostsModel> GetByProduct(string name)
+        {
+            PostsModel post = new PostsModel();
+            return post.SearchPostsByProductName(name);
+        }
+
         // POST api/<PostsController>
         [HttpPost]
         public IActionResult Post([FromBody] PostsModel post)
