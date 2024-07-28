@@ -106,26 +106,10 @@ namespace InventoryEyeBack.Posts
             return dbs.ReadPostByUserIdDBS(userId);
         }
 
-        public List<PostsModel> SearchPostsByFullName(string fullName)
-        {  
-        PostsDBS dbs = new PostsDBS();
-        return dbs.SearchPostsByFullNameDBS(fullName);
-        }
-  
-        public List<PostsModel> SearchPostsByContent(string content)  
-        { 
-            PostsDBS dbs = new PostsDBS(); 
-            return dbs.SearchPostsByContentDBS(content);  
-        }
-        public List<PostsModel> SearchPostsByTags(string tags)
+        public List<PostsModel> SearchPostsBySearch(string search)
         {
             PostsDBS dbs = new PostsDBS();
-            return dbs.SearchPostsByTagsDBS(tags);
-        }
-        public List<PostsModel> SearchPostsByProductName(string name)
-        {
-            PostsDBS dbs = new PostsDBS();
-            return dbs.SearchPostsByProductNameDBS(name);
+            return dbs.SearchPostsBySearchDBS(search);
         }
 
 

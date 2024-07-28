@@ -474,3 +474,21 @@ SELECT *
 FROM [dbo].[StoresWithCategoriesView]
 WHERE [StoreId] = @storeId;
 END
+
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Post by Search>
+-- =============================================
+CREATE PROCEDURE [dbo].[SP_InEye_ReadPostBySearch]
+
+@string nvarchar(max)
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM PostView
+WHERE [FullName] like CONCAT('%',@string,'%') or [Name] like CONCAT('%',@string,'%') or [Content]  like CONCAT('%',@string,'%') or [Tags] like CONCAT('%',@string,'%')
+END
