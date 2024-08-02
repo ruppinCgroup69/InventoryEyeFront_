@@ -94,7 +94,7 @@ export default function C_Register() {
 
       console.log('Sending user data to the server:', updatedUser);
       const response = await POST('Users', updatedUser);
-      if (!response) {
+      if (response != "good") {
         alert('Failed to register user: No response from server');
         return;
       }

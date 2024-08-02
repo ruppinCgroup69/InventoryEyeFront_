@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99fef8d0b1c6458c2751068af26abfb534bc9a65")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd455ae8abd36d2f1f7448fdb28d145b180bd221")]
 [assembly: System.Reflection.AssemblyProductAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InventoryEyeBack")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

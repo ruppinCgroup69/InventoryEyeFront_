@@ -1,27 +1,18 @@
+import axios from 'axios';
+
 const BASE_URL = "https://proj.ruppin.ac.il/cgroup69/prod/api";
 
 export async function POST(url, obj) {
     try {
-        let res = await fetch(`${BASE_URL}/${url}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(obj)
-        });
+        let { data } = await axios.post(`${BASE_URL}/${url}`, obj,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        //הסטטוס הוא לא מקבוצת 200
-        if (!res.ok) {
-            console.log({ res });
-            return;
-        }
-        
-        try {
-            return await res.json();
-        }
-        catch {
-            return res
-        }
+        console.log('data ==> ', data);
+        return data;
 
     } catch (error) {
         console.error({ error });
