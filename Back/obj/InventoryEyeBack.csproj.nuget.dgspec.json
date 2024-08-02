@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {}
+    "/Users/shaykos/Documents/GitHub/InventoryEyeProj/Back/InventoryEyeBack.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj": {
+    "/Users/shaykos/Documents/GitHub/InventoryEyeProj/Back/InventoryEyeBack.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
+        "projectUniqueName": "/Users/shaykos/Documents/GitHub/InventoryEyeProj/Back/InventoryEyeBack.csproj",
         "projectName": "InventoryEyeBack",
-        "projectPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
-        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\obj\\",
+        "projectPath": "/Users/shaykos/Documents/GitHub/InventoryEyeProj/Back/InventoryEyeBack.csproj",
+        "packagesPath": "/Users/shaykos/.nuget/packages/",
+        "outputPath": "/Users/shaykos/Documents/GitHub/InventoryEyeProj/Back/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/shaykos/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -34,6 +32,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -60,6 +63,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.32, 6.0.32]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[6.0.32, 6.0.32]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.32, 6.0.32]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -68,7 +85,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.303/RuntimeIdentifierGraph.json"
         }
       }
     }
