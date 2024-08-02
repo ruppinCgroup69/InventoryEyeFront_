@@ -1,57 +1,142 @@
-import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native'
-import React from 'react'
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
+import * as yup from 'yup';
+
+const SupplierSchema = yup.object({
+  fullName: yup.string().required('Store Name is required'),
+  emailAddress: yup 
+    .string()
+    .email('Invalid email format')
+    .required('Email is required'),
+  password: yup
+    .string()
+    .required('Password is required')
+    .min(8, 'Password must be at least 8 characters long')
+    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
+    rePassword: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .required('Please confirm your password'),  
+  address: yup.string().required('Address is required'),
+});
 
 export default function S_Register() {
   const navigation = useNavigation();
-  const route=useRoute();
-  const {UserType}=route.params;
+  const route = useRoute();
+  const { UserType } = route.params;
+  const currentDate = new Date();
+  const [user, setUser] = useState({
+    fullName: '',
+    emailAddress: '',
+    password: '',
+    lat: 0,
+    lng: 0,
+    address: '',
+    image: 'string',
+    createdAt: '',
+    lastSeen: '',
+    role: ''
+  });
 
-  const handleSupplierRegister = () => {
-    alert(UserType);
-    navigation.navigate('Login');
+  const [rePassword, setRePassword] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const handleSupplierRegister = async () => {
+    setErrors({});
+
+    const updatedUser = {
+      ...user,
+      role: UserType,
+      createdAt: currentDate,
+      lastSeen:currentDate
+    };
+
+    try {
+      await SupplierSchema.validate(updatedUser, { abortEarly: false });
+      setUser(updatedUser);
+      alert(`User Details: ${JSON.stringify(updatedUser)}`);
+      navigation.navigate('Login');
+    }
+    catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const newErrors = {};
+        err.inner.forEach((error) => {
+          newErrors[error.path] = error.message;
+        });
+        setErrors(newErrors);
+        console.log("Validation errors:", newErrors);
+      } else {
+        console.log("Unexpected error:", err);
+      }
+    }
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <MyHeader imageSize={120} title='Supplier Register' titleSize={33} />
         </View>
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Store Name:</Text>
-          <TextInput style={styles.input} />
-        </View>
-        <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Email:</Text>
-          <TextInput style={styles.input}
-            keyboardType="email-address" />
-        </View>
-        <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Password:</Text>
-          <TextInput style={styles.input}
-            secureTextEntry={true} />
-        </View>
-        <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Re Password:</Text>
-          <TextInput style={styles.input}
-            secureTextEntry={true} />
-        </View>
-        <View style={styles.fieldContainer} > 
-          <Text style={styles.lable}>Address:</Text>
-          <TextInput style={styles.input}
+          <TextInput
+            style={styles.input}
+            value={user.fullName}
+            onChangeText={(text) => setUser({ ...user, fullName: text })}
           />
         </View>
+        {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.lable}>Email:</Text>
+          <TextInput
+            style={styles.input}
+            value={user.emailAddress}
+            onChangeText={(text) => setUser({ ...user, emailAddress: text })}
+            keyboardType="email-address"
+          />
+        </View>
+        {errors.emailAddress && <Text style={styles.errorText}>{errors.emailAddress}</Text>}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.lable}>Password:</Text>
+          <TextInput
+            style={styles.input}
+            value={user.password}
+            onChangeText={(text) => setUser({ ...user, password: text })}
+            secureTextEntry={true}
+          />
+        </View>
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.lable}>Re Password:</Text>
+          <TextInput
+            style={styles.input}
+            value={rePassword}
+            onChangeText={(text) => setRePassword(text)}
+            secureTextEntry={true}
+          />
+        </View>
+        {errors.rePassword && <Text style={styles.errorText}>{errors.rePassword}</Text>}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.lable}>Address:</Text>
+          <TextInput
+            style={styles.input}
+            value={user.address}
+            onChangeText={(text) => setUser({ ...user, address: text })}
+          />
+        </View>
+        {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
         <View style={styles.buttom}>
           <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
-            <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{marginTop: '150%' }} />
+            <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
           </TouchableOpacity>
 
           <View style={styles.buttonsContainer}>
@@ -70,13 +155,13 @@ export default function S_Register() {
                 marginVertical: 10,
               }}
               titleStyle={{ color: '#111851', fontSize: 23 }}
-              onPress={handleSupplierRegister}>
-              </Button>
+              onPress={handleSupplierRegister}
+            />
           </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -124,6 +209,13 @@ const styles = StyleSheet.create({
   },
   buttom: {
     flexDirection: 'row',
-
   },
-})
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: -20,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+  },
+});

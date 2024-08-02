@@ -29,11 +29,11 @@ namespace InventoryEyeBack.Users
             int status = user.InsertUser(user);
             if (status == 1)
             {
-                return Ok();
+                return Ok("good");
             }
             else
             {
-                return BadRequest();
+                return BadRequest("bad");
             }
         }
 

@@ -2319,19 +2319,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\sharo\\.nuget\\packages\\": {}
+    "C:\\Users\\User\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
       "projectName": "InventoryEyeBack",
-      "projectPath": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
-      "packagesPath": "C:\\Users\\sharo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\sharo\\OneDrive\\מסמכים\\לימודים\\תשפד\\פרויקט גמר\\InventoryEyeProj\\Back\\obj\\",
+      "projectPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\InventoryEyeBack.csproj",
+      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\InventoryEyeProj\\Back\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\sharo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
