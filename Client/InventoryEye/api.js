@@ -16,6 +16,7 @@ export async function POST(url, obj) {
 
     } catch (error) {
         console.error({ error });
+        throw error;
     }
 }
 

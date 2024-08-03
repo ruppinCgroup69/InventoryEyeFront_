@@ -1,11 +1,33 @@
 import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { useState } from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import { POST } from '../../api';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigation = useNavigation();
+
+  const handleLogin = async () => {
+    navigation.navigate('UserTabs');
+    // if (!email || !password) {
+    //   alert( 'Please enter both email and password.');
+    //   return;
+    // }
+    // try {
+    //   const user = await POST('Users/login', { emailAddress: email, password });
+    //   if (user) {
+    //     navigation.navigate('UserTabs', { user });
+    //   } else {
+    //     alert('Error', 'Invalid email or password.');
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    //   alert('Error', 'An error occurred during login.');
+    // }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -21,14 +43,18 @@ export default function Login() {
           <TextInput
             style={styles.textInput}
             placeholder='Enter your email'
-            keyboardType="email-address" />
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail} />
         </View>
         <View style={styles.password}>
           <Text style={styles.lable}>Password:</Text>
           <TextInput
             style={styles.textInput}
             placeholder='Enter your password'
-            secureTextEntry={true} />
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword} />
         </View>
         <View style={styles.forgot}>
           <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')}>
@@ -51,7 +77,7 @@ export default function Login() {
               marginVertical: 10,
             }}
             titleStyle={{ color: '#111851', fontSize: 23 }}
-            onPress={() => navigation.navigate('UserTabs')} 
+            onPress={handleLogin}
           />
         </View>
         <View style={styles.registerTextContainer}>

@@ -6,10 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import * as yup from 'yup';
+import { POST } from '../../api';
 
-const SupplierSchema = yup.object({
-  fullName: yup.string().required('Store Name is required'),
-  emailAddress: yup 
+const ReviewSchema = yup.object({
+  fullName: yup.string().required('Full Name is required'),
+  emailAddress: yup
     .string()
     .email('Invalid email format')
     .required('Email is required'),
@@ -20,11 +21,11 @@ const SupplierSchema = yup.object({
     .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
     .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
-    rePassword: yup
+  rePassword: yup
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
-    .required('Please confirm your password'),  
-  address: yup.string().required('Address is required'),
+    .required('Please confirm your password'),
+    address: yup.string().required('Address is required'),
 });
 
 export default function S_Register() {
@@ -32,36 +33,57 @@ export default function S_Register() {
   const route = useRoute();
   const { UserType } = route.params;
   const currentDate = new Date();
+
   const [user, setUser] = useState({
+    id:0,
     fullName: '',
     emailAddress: '',
     password: '',
+    birthdate: '',
     lat: 0,
     lng: 0,
     address: '',
     image: 'string',
     createdAt: '',
     lastSeen: '',
+    score: 0,
     role: ''
   });
-
+  
   const [rePassword, setRePassword] = useState('');
   const [errors, setErrors] = useState({});
 
   const handleSupplierRegister = async () => {
     setErrors({});
-
-    const updatedUser = {
-      ...user,
-      role: UserType,
-      createdAt: currentDate,
-      lastSeen:currentDate
-    };
-
     try {
-      await SupplierSchema.validate(updatedUser, { abortEarly: false });
-      setUser(updatedUser);
-      alert(`User Details: ${JSON.stringify(updatedUser)}`);
+      const updatedUser = {
+        id:user.id,
+        fullName: user.fullName,
+        emailAddress: user.emailAddress,
+        password: user.password,
+        birthdate: currentDate, 
+        lat: user.lat,
+        lng: user.lng,
+        address: user.address,
+        image: user.image,
+        createdAt: currentDate,
+        lastSeen: currentDate,
+        score: user.score,
+        role: UserType,
+      };
+
+      await ReviewSchema.validate({
+        ...updatedUser,
+        rePassword: rePassword,
+      }, { abortEarly: false });
+
+      console.log('Sending user data to the server:', updatedUser);
+      const response = await POST('Users', updatedUser);
+      if (response != "good") {
+        alert('Failed to register user: No response from server');
+        return;
+      }
+      alert('User registered successfully!');
       navigation.navigate('Login');
     }
     catch (err) {
@@ -86,7 +108,7 @@ export default function S_Register() {
         <View style={styles.header}>
           <MyHeader imageSize={120} title='Supplier Register' titleSize={33} />
         </View>
-        <View style={styles.fieldContainer}>
+        <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Store Name:</Text>
           <TextInput
             style={styles.input}
@@ -95,7 +117,7 @@ export default function S_Register() {
           />
         </View>
         {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
-        <View style={styles.fieldContainer}>
+        <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Email:</Text>
           <TextInput
             style={styles.input}
@@ -105,17 +127,16 @@ export default function S_Register() {
           />
         </View>
         {errors.emailAddress && <Text style={styles.errorText}>{errors.emailAddress}</Text>}
-        <View style={styles.fieldContainer}>
+        <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Password:</Text>
           <TextInput
             style={styles.input}
             value={user.password}
             onChangeText={(text) => setUser({ ...user, password: text })}
-            secureTextEntry={true}
-          />
+            secureTextEntry={true} />
         </View>
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-        <View style={styles.fieldContainer}>
+        <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Re Password:</Text>
           <TextInput
             style={styles.input}
@@ -125,10 +146,9 @@ export default function S_Register() {
           />
         </View>
         {errors.rePassword && <Text style={styles.errorText}>{errors.rePassword}</Text>}
-        <View style={styles.fieldContainer}>
+        <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Address:</Text>
-          <TextInput
-            style={styles.input}
+          <TextInput style={styles.input}
             value={user.address}
             onChangeText={(text) => setUser({ ...user, address: text })}
           />
@@ -138,7 +158,6 @@ export default function S_Register() {
           <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
             <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
           </TouchableOpacity>
-
           <View style={styles.buttonsContainer}>
             <Button
               title="Register"
@@ -155,13 +174,13 @@ export default function S_Register() {
                 marginVertical: 10,
               }}
               titleStyle={{ color: '#111851', fontSize: 23 }}
-              onPress={handleSupplierRegister}
-            />
+              onPress={handleSupplierRegister}>
+            </Button>
           </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({

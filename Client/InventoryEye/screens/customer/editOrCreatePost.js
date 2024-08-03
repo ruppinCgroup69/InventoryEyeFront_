@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View,FlatList, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
 import profileImage from '../../images/profileImage.jpg';
+import { GET } from '../../api';
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -11,6 +12,8 @@ const DismissKeyboard = ({ children }) => (
 );
 
 export default function EditOrCreatePost() {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const navigation = useNavigation();
   const route = useRoute();
   const [previousScreen, setPreviousScreen] = useState('Home'); // Default value
@@ -23,11 +26,42 @@ export default function EditOrCreatePost() {
     }, [route.params?.fromScreen])
   );
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await GET('Categories');
+        setCategories(response);
+        if (response.length > 0) {
+          setSelectedCategory(response[0].categoryDesc);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const renderCategoryItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.categoryItem,
+        selectedCategory === item.categoryDesc && styles.selectedCategoryItem
+      ]}
+      onPress={() => setSelectedCategory(item.categoryDesc)}
+    >
+      <Text style={[
+        styles.categoryText,
+        selectedCategory === item.categoryDesc && styles.selectedCategoryText
+      ]}>{item.categoryDesc}</Text>
+    </TouchableOpacity>
+  );
+
   const handleExit = () => {
     if (previousScreen) {
       navigation.navigate(previousScreen);
     } else {
-      navigation.navigate('Home'); // Fallback
+      navigation.navigate('Home');
     }
   };
 
@@ -73,7 +107,7 @@ export default function EditOrCreatePost() {
             </ScrollView>
           </DismissKeyboard>
         </View>
-        
+
         <View style={styles.bottom}>
           <View style={styles.iconItem}>
             <FontAwesome5 name="image" size={24} color="#111851" />
@@ -86,6 +120,13 @@ export default function EditOrCreatePost() {
           <View style={styles.inputItem}>
             <Text style={styles.imgText}>Image</Text>
             <Text style={styles.imgText}>category</Text>
+            <FlatList
+              data={categories}
+              renderItem={renderCategoryItem}
+              keyExtractor={(item) => item.categoryId.toString()}
+              style={styles.categoryList}
+              showsVerticalScrollIndicator={false}
+            />
             <TextInput style={styles.input} placeholder='product name' />
             <TextInput style={styles.input} placeholder='color' />
             <TextInput style={styles.input} placeholder='company' />
@@ -155,7 +196,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 10,
     alignItems: 'center',
-    height: 100, 
+    height: 100,
   },
   image: {
     width: 70,
@@ -202,18 +243,18 @@ const styles = StyleSheet.create({
 
   },
   iconItem: {
-    flexDirection: 'column', 
-    justifyContent: 'space-around', 
+    flexDirection: 'column',
+    justifyContent: 'space-around',
     alignItems: 'left',
-    width: '20%', 
+    width: '20%',
     height: '100%',
     paddingHorizontal: 20
   },
   inputItem: {
-    flexDirection: 'column', 
+    flexDirection: 'column',
     justifyContent: 'space-around',
     alignItems: 'left',
-    width: '90%', 
+    width: '90%',
     height: '100%',
     paddingHorizontal: 15,
   },
@@ -233,6 +274,28 @@ const styles = StyleSheet.create({
     color: '#111851',
     paddingTop: 10,
     paddingHorizontal: 8
-  }
-
-})
+  },
+  categoryList: {
+    maxHeight: 150, // Adjust this value based on how many items you want to show without scrolling
+    marginBottom: 10,
+  },
+  categoryItem: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginBottom: 5,
+    borderRadius: 20,
+    backgroundColor: '#F0F6FE',
+    borderWidth: 1,
+    borderColor: '#31a1e5',
+  },
+  selectedCategoryItem: {
+    backgroundColor: '#31a1e5',
+  },
+  categoryText: {
+    color: '#111851',
+    fontSize: 16,
+  },
+  selectedCategoryText: {
+    color: '#FFFFFF',
+  },
+});
