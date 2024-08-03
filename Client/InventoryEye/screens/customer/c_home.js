@@ -39,6 +39,8 @@ export default function C_home() {
         </View>
         <View style={styles.postsView}>
           {
+
+            
             posts.length == 0 ? <Text>No posts were found </Text> :
               posts.map((post) => <TouchableOpacity key={post.postId} onPress={() => navigation.navigate('Post_Det', {state:post})}>
                 <View style={styles.postContainer}>

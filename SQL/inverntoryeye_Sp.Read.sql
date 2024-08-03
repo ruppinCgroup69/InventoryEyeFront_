@@ -480,7 +480,7 @@ END
 -- Create date: <13-06-2024>
 -- Description:	<Read Post by Search>
 -- =============================================
-CREATE PROCEDURE [dbo].[SP_InEye_ReadPostBySearch]
+ALTER PROCEDURE [dbo].[SP_InEye_ReadPostBySearch]
 
 @string nvarchar(max)
 
