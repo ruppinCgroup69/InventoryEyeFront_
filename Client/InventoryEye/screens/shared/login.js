@@ -6,27 +6,23 @@ import { useNavigation } from '@react-navigation/native';
 import { POST } from '../../api';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
   const handleLogin = async () => {
-    navigation.navigate('UserTabs');
-    // if (!email || !password) {
-    //   alert( 'Please enter both email and password.');
-    //   return;
-    // }
-    // try {
-    //   const user = await POST('Users/login', { emailAddress: email, password });
-    //   if (user) {
-    //     navigation.navigate('UserTabs', { user });
-    //   } else {
-    //     alert('Error', 'Invalid email or password.');
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   alert('Error', 'An error occurred during login.');
-    // }
+    console.log(`User: ${emailAddress}, Password: ${password}`);
+    try {
+      const response = await POST('Users/login', { emailAddress, password });
+      if (response.ok) {
+        const user = await response.json();
+        navigation.navigate('UserTabs', { user });
+      } else {
+        alert('Login failed. Please check your email and password.');
+      }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -44,8 +40,8 @@ export default function Login() {
             style={styles.textInput}
             placeholder='Enter your email'
             keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail} />
+            value={emailAddress}
+            onChangeText={setEmailAddress} />
         </View>
         <View style={styles.password}>
           <Text style={styles.lable}>Password:</Text>
