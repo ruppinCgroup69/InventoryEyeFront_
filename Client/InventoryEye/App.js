@@ -7,8 +7,8 @@ import Comment from './components/post/comment';
 
 export default function App() {
   return (
-      //<Navigation />
-      <CommentPost />
+      <Navigation />
+      //<CommentPost />
      
   );
 }

@@ -67,7 +67,7 @@ namespace InventoryEyeBack.Users
             }
         }
 
-        // PUT Update user email api/<UsersController>/5
+        //PUT Update user email api/<UsersController>/5
         [HttpPut]
         public IActionResult PutEmail([FromBody] UsersModel user)
         {

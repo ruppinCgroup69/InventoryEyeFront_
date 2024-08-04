@@ -13,10 +13,9 @@ export default function Login() {
   const handleLogin = async () => {
     console.log(`User: ${emailAddress}, Password: ${password}`);
     try {
-      const response = await POST('Users/login', { emailAddress, password });
-      if (response.ok) {
-        const user = await response.json();
-        navigation.navigate('UserTabs', { user });
+      const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image:'' });
+      if (response) {
+        navigation.navigate('UserTabs', { user : response});
       } else {
         alert('Login failed. Please check your email and password.');
       }

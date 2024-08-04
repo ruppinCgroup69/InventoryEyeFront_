@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import * as yup from 'yup';
 import { POST } from '../../api';
+import axios from 'axios';
 
 const ReviewSchema = yup.object({
   fullName: yup.string().required('Full Name is required'),
@@ -27,8 +28,8 @@ const ReviewSchema = yup.object({
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Please confirm your password'),
-    birthdate: yup.string().required('Birthdate is required'),
-    address: yup.string().required('Address is required'),
+  birthdate: yup.string().required('Birthdate is required'),
+  address: yup.string().required('Address is required'),
 });
 
 export default function C_Register() {
@@ -39,7 +40,7 @@ export default function C_Register() {
   const maxDate = new Date(currentDate.getFullYear() - 16, currentDate.getMonth(), currentDate.getDate());
   const minDate = new Date(currentDate.getFullYear() - 120, currentDate.getMonth(), currentDate.getDate());
   const [user, setUser] = useState({
-    id:0,
+    id: 0,
     fullName: '',
     emailAddress: '',
     password: '',
@@ -53,32 +54,70 @@ export default function C_Register() {
     score: 0,
     role: ''
   });
-  
+
   const [rePassword, setRePassword] = useState('');
   const [birthdate, setBirthdate] = useState(maxDate);
   const [errors, setErrors] = useState({});
+
+  const getCoordinates = async (address) => {
+    try {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json`;
+      console.log('Fetching coordinates for address:', address);
+
+      const response = await axios.get(url, {
+        params: {
+          address: address,
+          key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M'
+        }
+      });
+
+      console.log('API Response:', JSON.stringify(response.data, null, 2));
+
+      if (response.data.results && response.data.results.length > 0) {
+        const { lat, lng } = response.data.results[0].geometry.location;
+        console.log('Coordinates found:', { lat, lng });
+        return { lat, lng };
+      } else {
+        console.log('No results found in API response');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error.response ? error.response.data : error.message);
+      return null;
+    }
+  };
+
 
   const onDateChange = (event, selectedDate) => {
     if (event.type === 'set' && selectedDate) {
       const currentDate = selectedDate;
       if (currentDate instanceof Date && !isNaN(currentDate.getTime())) {
         setBirthdate(currentDate);
-        setUser({ ...user, birthdate: currentDate.toISOString() }); 
+        setUser({ ...user, birthdate: currentDate.toISOString() });
       }
     }
-  };  
+  };
 
   const handleCustomerRegister = async () => {
     setErrors({});
     try {
+      console.log('Attempting to get coordinates for address:', user.address);
+      const coordinates = await getCoordinates(user.address);
+      if (!coordinates) {
+        console.log('Failed to get coordinates, coordinates object is null');
+        alert('Failed to get coordinates for the provided address. Please check the address and try again.');
+        return;
+      }
+
+      console.log('Successfully retrieved coordinates:', coordinates);
       const updatedUser = {
-        id:user.id,
+        id: user.id,
         fullName: user.fullName,
         emailAddress: user.emailAddress,
         password: user.password,
-        birthdate: birthdate instanceof Date && !isNaN(birthdate.getTime()) ? birthdate.toISOString() : null, 
-        lat: user.lat,
-        lng: user.lng,
+        birthdate: birthdate instanceof Date && !isNaN(birthdate.getTime()) ? birthdate.toISOString() : null,
+        lat: coordinates.lat,
+        lng: coordinates.lng,
         address: user.address,
         image: user.image,
         createdAt: currentDate,
@@ -102,6 +141,8 @@ export default function C_Register() {
       navigation.navigate('Login');
     }
     catch (err) {
+      console.error('Error in handleCustomerRegister:', err);
+      alert('An error occurred during registration. Please try again.');
       if (err instanceof yup.ValidationError) {
         const newErrors = {};
         err.inner.forEach((error) => {
@@ -178,12 +219,16 @@ export default function C_Register() {
         {errors.birthdate && <Text style={styles.errorText}>{errors.birthdate}</Text>}
         <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Address:</Text>
-          <TextInput style={styles.input}
+          <TextInput
+            style={styles.input}
             value={user.address}
-            onChangeText={(text) => setUser({ ...user, address: text })}
+            onChangeText={(text) => setUser(prevUser => ({ ...prevUser, address: text }))}
+            placeholder="Enter full address"
           />
         </View>
         {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+
+
         <View style={styles.buttom}>
           <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
             <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
