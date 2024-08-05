@@ -30,7 +30,7 @@ export default function RegisterType() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
-          onPress={() => navigation.navigate('C_Register', {UserType:1})}>
+          onPress={() => navigation.navigate('C_Register', {UserType:2})}>
             </Button>
       </View>
       <View style={styles.buttonsContainer}>
@@ -49,7 +49,7 @@ export default function RegisterType() {
             marginVertical: 10,
           }}
           titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
-          onPress={() => navigation.navigate('S_Register', {UserType:2})}>
+          onPress={() => navigation.navigate('S_Register', {UserType:3})}>
           </Button>
       </View>
       </View>

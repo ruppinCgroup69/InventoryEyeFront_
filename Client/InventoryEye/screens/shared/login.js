@@ -4,6 +4,7 @@ import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { POST } from '../../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [emailAddress, setEmailAddress] = useState('');
@@ -13,10 +14,16 @@ export default function Login() {
   const handleLogin = async () => {
     console.log(`User: ${emailAddress}, Password: ${password}`);
     try {
-      const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image:'' });
+      const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image: '' });
       if (response) {
-        navigation.navigate('UserTabs', { user : response});
-      } else {
+        try {
+          await AsyncStorage.setItem("logged user", JSON.stringify(response));
+          navigation.navigate('UserTabs', { screen: 'Home', params: { user: response } });
+        } catch (storageError) {
+          console.error('AsyncStorage error:', storageError);
+        }
+      }
+      else {
         alert('Login failed. Please check your email and password.');
       }
     } catch (error) {

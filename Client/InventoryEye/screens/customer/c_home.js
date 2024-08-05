@@ -8,9 +8,12 @@ import Post from '../../components/c_home/post'
 import { useNavigation } from '@react-navigation/native';
 import { GET } from '../../api';
 import { formatDate , formatTime} from '../../utils';
+import { useRoute } from '@react-navigation/native';
 
 export default function C_home() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { user } = route.params;
 
   const [posts, setPosts] = useState([]);
   async function getAllPosts() {
@@ -24,7 +27,7 @@ export default function C_home() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Nelly' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName= {user.fullName} notiNum={12} profileImage={profileImage} userScore={user.score} />
       </View>
       <View style={styles.searchView}>
         <Search />

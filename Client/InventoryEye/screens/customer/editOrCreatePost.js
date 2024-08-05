@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { StyleSheet, Text, View,FlatList, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform , Alert} from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
 import profileImage from '../../images/profileImage.jpg';
 import { GET } from '../../api';
@@ -42,20 +42,51 @@ export default function EditOrCreatePost() {
     fetchCategories();
   }, []);
 
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryItem,
-        selectedCategory === item.categoryDesc && styles.selectedCategoryItem
-      ]}
-      onPress={() => setSelectedCategory(item.categoryDesc)}
-    >
-      <Text style={[
-        styles.categoryText,
-        selectedCategory === item.categoryDesc && styles.selectedCategoryText
-      ]}>{item.categoryDesc}</Text>
-    </TouchableOpacity>
-  );
+  /*const showActionSheet = () => {
+    const options = categories.map(cat => cat.categoryDesc).concat(['Cancel']);
+    const cancelButtonIndex = options.length - 1;
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex,
+        },
+        (buttonIndex) => {
+          if (buttonIndex !== cancelButtonIndex) {
+            setSelectedCategory(categories[buttonIndex].categoryDesc);
+          }
+        }
+      );
+    } else {
+      ActionSheet.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex,
+        },
+        (buttonIndex) => {
+          if (buttonIndex !== cancelButtonIndex) {
+            setSelectedCategory(categories[buttonIndex].categoryDesc);
+          }
+        }
+      );
+    }
+  };*/
+
+  const showActionSheet = () => {
+    const options = categories.map(cat => cat.categoryDesc);
+    
+    Alert.alert(
+      "Select Category",
+      "",
+      options.map(option => ({
+        text: option,
+        onPress: () => setSelectedCategory(option)
+      })).concat([
+        { text: "Cancel", style: "cancel" }
+      ])
+    );
+  };
 
   const handleExit = () => {
     if (previousScreen) {
@@ -120,13 +151,14 @@ export default function EditOrCreatePost() {
           <View style={styles.inputItem}>
             <Text style={styles.imgText}>Image</Text>
             <Text style={styles.imgText}>category</Text>
-            <FlatList
-              data={categories}
-              renderItem={renderCategoryItem}
-              keyExtractor={(item) => item.categoryId.toString()}
-              style={styles.categoryList}
-              showsVerticalScrollIndicator={false}
-            />
+            <TouchableOpacity 
+              style={styles.categoryButton}
+              onPress={showActionSheet}
+            >
+              <Text style={styles.categoryButtonText}>
+                {selectedCategory || 'Select Category'}
+              </Text>
+            </TouchableOpacity>
             <TextInput style={styles.input} placeholder='product name' />
             <TextInput style={styles.input} placeholder='color' />
             <TextInput style={styles.input} placeholder='company' />
@@ -275,27 +307,17 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 8
   },
-  categoryList: {
-    maxHeight: 150, // Adjust this value based on how many items you want to show without scrolling
-    marginBottom: 10,
-  },
-  categoryItem: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginBottom: 5,
-    borderRadius: 20,
+  categoryButton: {
     backgroundColor: '#F0F6FE',
     borderWidth: 1,
     borderColor: '#31a1e5',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
   },
-  selectedCategoryItem: {
-    backgroundColor: '#31a1e5',
-  },
-  categoryText: {
+  categoryButtonText: {
     color: '#111851',
     fontSize: 16,
-  },
-  selectedCategoryText: {
-    color: '#FFFFFF',
+    textAlign: 'center',
   },
 });

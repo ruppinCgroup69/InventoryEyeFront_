@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Platform, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
@@ -7,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import * as yup from 'yup';
 import { POST } from '../../api';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const ReviewSchema = yup.object({
   fullName: yup.string().required('Full Name is required'),
@@ -25,7 +27,7 @@ const ReviewSchema = yup.object({
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Please confirm your password'),
-    address: yup.string().required('Address is required'),
+  address: yup.string().required('Address is required'),
 });
 
 export default function S_Register() {
@@ -35,7 +37,7 @@ export default function S_Register() {
   const currentDate = new Date();
 
   const [user, setUser] = useState({
-    id:0,
+    id: 0,
     fullName: '',
     emailAddress: '',
     password: '',
@@ -57,7 +59,7 @@ export default function S_Register() {
     setErrors({});
     try {
       const updatedUser = {
-        id:user.id,
+        id: user.id,
         fullName: user.fullName,
         emailAddress: user.emailAddress,
         password: user.password,
@@ -101,14 +103,17 @@ export default function S_Register() {
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      contentContainerStyle={styles.scrollContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.formContainer}>
         <View style={styles.header}>
           <MyHeader imageSize={120} title='Supplier Register' titleSize={33} />
         </View>
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Store Name:</Text>
           <TextInput
             style={styles.input}
@@ -117,7 +122,7 @@ export default function S_Register() {
           />
         </View>
         {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Email:</Text>
           <TextInput
             style={styles.input}
@@ -127,7 +132,7 @@ export default function S_Register() {
           />
         </View>
         {errors.emailAddress && <Text style={styles.errorText}>{errors.emailAddress}</Text>}
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Password:</Text>
           <TextInput
             style={styles.input}
@@ -136,7 +141,7 @@ export default function S_Register() {
             secureTextEntry={true} />
         </View>
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Re Password:</Text>
           <TextInput
             style={styles.input}
@@ -146,40 +151,77 @@ export default function S_Register() {
           />
         </View>
         {errors.rePassword && <Text style={styles.errorText}>{errors.rePassword}</Text>}
-        <View style={styles.fieldContainer} >
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Address:</Text>
-          <TextInput style={styles.input}
-            value={user.address}
-            onChangeText={(text) => setUser({ ...user, address: text })}
+          <GooglePlacesAutocomplete
+            placeholder='Enter address'
+            onPress={(data, details = null) => {
+              if (details && details.geometry && details.geometry.location) {
+                setUser(prevUser => ({
+                  ...prevUser,
+                  address: data.description,
+                  lat: details.geometry.location.lat,
+                  lng: details.geometry.location.lng
+                }));
+              } else {
+                setUser(prevUser => ({
+                  ...prevUser,
+                  address: data.description,
+                }));
+              }
+            }}
+            fetchDetails={true}  
+            query={{
+              key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+              language: 'en',
+            }}
+            styles={{
+              textInput: styles.input,
+              container: {
+                flex: 0,
+                width: 250,
+                zIndex: 1
+              },
+              listView: {
+                position: 'absolute',
+                top: 40,
+                left: 0,
+                right: 0,
+                backgroundColor: 'white',
+                borderRadius: 5,
+                elevation: 3,
+                zIndex: 2, 
+              },
+            }}
           />
         </View>
         {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
-        <View style={styles.buttom}>
-          <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
-            <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
-          </TouchableOpacity>
-          <View style={styles.buttonsContainer}>
-            <Button
-              title="Register"
-              buttonStyle={{
-                height: 50,
-                backgroundColor: 'white',
-                borderWidth: 1,
-                borderColor: '#31a1e5',
-                borderRadius: 30,
-              }}
-              containerStyle={{
-                width: 200,
-                marginHorizontal: 50,
-                marginVertical: 10,
-              }}
-              titleStyle={{ color: '#111851', fontSize: 23 }}
-              onPress={handleSupplierRegister}>
-            </Button>
-          </View>
+      </View>
+      <View style={styles.buttom}>
+        <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
+          <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
+        </TouchableOpacity>
+        <View style={styles.buttonsContainer}>
+          <Button
+            title="Register"
+            buttonStyle={{
+              height: 50,
+              backgroundColor: 'white',
+              borderWidth: 1,
+              borderColor: '#31a1e5',
+              borderRadius: 30,
+            }}
+            containerStyle={{
+              width: 200,
+              marginHorizontal: 50,
+              marginVertical: 10,
+            }}
+            titleStyle={{ color: '#111851', fontSize: 23 }}
+            onPress={handleSupplierRegister}>
+          </Button>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </KeyboardAwareScrollView>
   )
 }
 
@@ -187,17 +229,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#EAF0F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    marginBottom: 30,
   },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: 100 
+  },
+  header: {
+    marginBottom: 30,
   },
   fieldContainer: {
     flexDirection: 'row',
@@ -225,6 +266,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     marginTop: 15,
+    zIndex: 0 
   },
   buttom: {
     flexDirection: 'row',
@@ -236,5 +278,9 @@ const styles = StyleSheet.create({
     marginTop: -20,
     marginBottom: 10,
     alignSelf: 'flex-start',
+  },
+  formContainer: {
+    zIndex: 1,
+    width: '100%',
   },
 });
