@@ -10,6 +10,8 @@ import { useRoute } from '@react-navigation/native';
 import * as yup from 'yup';
 import { POST } from '../../api';
 import axios from 'axios';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const ReviewSchema = yup.object({
   fullName: yup.string().required('Full Name is required'),
@@ -59,35 +61,6 @@ export default function C_Register() {
   const [birthdate, setBirthdate] = useState(maxDate);
   const [errors, setErrors] = useState({});
 
-  const getCoordinates = async (address) => {
-    try {
-      const url = `https://maps.googleapis.com/maps/api/geocode/json`;
-      console.log('Fetching coordinates for address:', address);
-
-      const response = await axios.get(url, {
-        params: {
-          address: address,
-          key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M'
-        }
-      });
-
-      console.log('API Response:', JSON.stringify(response.data, null, 2));
-
-      if (response.data.results && response.data.results.length > 0) {
-        const { lat, lng } = response.data.results[0].geometry.location;
-        console.log('Coordinates found:', { lat, lng });
-        return { lat, lng };
-      } else {
-        console.log('No results found in API response');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching coordinates:', error.response ? error.response.data : error.message);
-      return null;
-    }
-  };
-
-
   const onDateChange = (event, selectedDate) => {
     if (event.type === 'set' && selectedDate) {
       const currentDate = selectedDate;
@@ -101,23 +74,14 @@ export default function C_Register() {
   const handleCustomerRegister = async () => {
     setErrors({});
     try {
-      console.log('Attempting to get coordinates for address:', user.address);
-      const coordinates = await getCoordinates(user.address);
-      if (!coordinates) {
-        console.log('Failed to get coordinates, coordinates object is null');
-        alert('Failed to get coordinates for the provided address. Please check the address and try again.');
-        return;
-      }
-
-      console.log('Successfully retrieved coordinates:', coordinates);
       const updatedUser = {
         id: user.id,
         fullName: user.fullName,
         emailAddress: user.emailAddress,
         password: user.password,
         birthdate: birthdate instanceof Date && !isNaN(birthdate.getTime()) ? birthdate.toISOString() : null,
-        lat: coordinates.lat,
-        lng: coordinates.lng,
+        lat: user.lat,
+        lng: user.lng,
         address: user.address,
         image: user.image,
         createdAt: currentDate,
@@ -157,10 +121,14 @@ export default function C_Register() {
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAwareScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      contentContainerStyle={styles.scrollContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardShouldPersistTaps="handled"
+    >
+
+      <View style={styles.formContainer}>
         <View style={styles.header}>
           <MyHeader imageSize={120} title='Customer Register' titleSize={33} />
         </View>
@@ -173,6 +141,7 @@ export default function C_Register() {
           />
         </View>
         {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+
         <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Email:</Text>
           <TextInput
@@ -183,6 +152,7 @@ export default function C_Register() {
           />
         </View>
         {errors.emailAddress && <Text style={styles.errorText}>{errors.emailAddress}</Text>}
+
         <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Password:</Text>
           <TextInput
@@ -192,6 +162,7 @@ export default function C_Register() {
             secureTextEntry={true} />
         </View>
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
         <View style={styles.fieldContainer} >
           <Text style={styles.lable}>Re Password:</Text>
           <TextInput
@@ -201,6 +172,7 @@ export default function C_Register() {
             secureTextEntry={true}
           />
         </View>
+
         {errors.rePassword && <Text style={styles.errorText}>{errors.rePassword}</Text>}
         <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Birthdate:</Text>
@@ -217,44 +189,80 @@ export default function C_Register() {
           </View>
         </View>
         {errors.birthdate && <Text style={styles.errorText}>{errors.birthdate}</Text>}
-        <View style={styles.fieldContainer} >
+
+        <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Address:</Text>
-          <TextInput
-            style={styles.input}
-            value={user.address}
-            onChangeText={(text) => setUser(prevUser => ({ ...prevUser, address: text }))}
-            placeholder="Enter full address"
+          <GooglePlacesAutocomplete
+            placeholder='Enter address'
+            onPress={(data, details = null) => {
+              if (details && details.geometry && details.geometry.location) {
+                setUser(prevUser => ({
+                  ...prevUser,
+                  address: data.description,
+                  lat: details.geometry.location.lat,
+                  lng: details.geometry.location.lng
+                }));
+              } else {
+                setUser(prevUser => ({
+                  ...prevUser,
+                  address: data.description,
+                }));
+              }
+            }}
+            fetchDetails={true}  
+            query={{
+              key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+              language: 'en',
+            }}
+            styles={{
+              textInput: styles.input,
+              container: {
+                flex: 0,
+                width: 250,
+                zIndex: 1
+              },
+              listView: {
+                position: 'absolute',
+                top: 40,
+                left: 0,
+                right: 0,
+                backgroundColor: 'white',
+                borderRadius: 5,
+                //flex: 1,
+                elevation: 3,
+                zIndex: 2, 
+              },
+            }}
           />
         </View>
         {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+      </View>
 
-
-        <View style={styles.buttom}>
-          <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
-            <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
-          </TouchableOpacity>
-          <View style={styles.buttonsContainer}>
-            <Button
-              title="Register"
-              buttonStyle={{
-                height: 50,
-                backgroundColor: 'white',
-                borderWidth: 1,
-                borderColor: '#31a1e5',
-                borderRadius: 30,
-              }}
-              containerStyle={{
-                width: 200,
-                marginHorizontal: 50,
-                marginVertical: 10,
-              }}
-              titleStyle={{ color: '#111851', fontSize: 23 }}
-              onPress={handleCustomerRegister}>
-            </Button>
-          </View>
+      <View style={styles.buttom}>
+        <TouchableOpacity onPress={() => navigation.navigate('RegisterType')}>
+          <Ionicons name="arrow-back-circle-outline" size={26} color="#111851" style={{ marginTop: '150%' }} />
+        </TouchableOpacity>
+        <View style={styles.buttonsContainer}>
+          <Button
+            title="Register"
+            buttonStyle={{
+              height: 50,
+              backgroundColor: 'white',
+              borderWidth: 1,
+              borderColor: '#31a1e5',
+              borderRadius: 30,
+            }}
+            containerStyle={{
+              width: 200,
+              marginHorizontal: 50,
+              marginVertical: 10,
+            }}
+            titleStyle={{ color: '#111851', fontSize: 23 }}
+            onPress={handleCustomerRegister}>
+          </Button>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </KeyboardAwareScrollView>
   )
 }
 
@@ -262,17 +270,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#EAF0F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    marginBottom: 30,
   },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: 100 
+  },
+  autocompleteContainer: {
+    zIndex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    height: 40,
+    marginBottom: 30,
+  },
+  header: {
+    marginBottom: 30,
   },
   fieldContainer: {
     flexDirection: 'row',
@@ -310,7 +326,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     marginTop: 15,
-
+    zIndex: 0 
   },
   date: {
     width: '70%',
@@ -325,5 +341,9 @@ const styles = StyleSheet.create({
     marginTop: -20,
     marginBottom: 10,
     alignSelf: 'flex-start',
+  },
+  formContainer: {
+    zIndex: 1,
+    width: '100%',
   },
 })
