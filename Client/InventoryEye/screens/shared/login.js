@@ -11,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
+
   const handleLogin = async () => {
     console.log(`User: ${emailAddress}, Password: ${password}`);
     try {

@@ -24,6 +24,7 @@ export default function C_home() {
 
   useEffect(() => { getAllPosts() }, [])
 
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>

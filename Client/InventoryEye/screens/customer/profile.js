@@ -9,9 +9,21 @@ import productImage from '../../images/productImage.jpg';
 import bonusImage from '../../images/bonusImage.png';
 import { AntDesign } from '@expo/vector-icons';
 import Post from '../shared/post';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Profile() {
+  const navigation = useNavigation();
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("logged user");
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -37,29 +49,34 @@ export default function Profile() {
         </View>
         <View style={styles.postsHistory}>
           <View style={styles.postsText}>
-          <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
-          Post's History </Text>
+            <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
+              Post's History </Text>
           </View>
           <View style={styles.postsList}>
-          <PostsHistory Post={productImage}></PostsHistory>
-          <PostsHistory Post={productImage}></PostsHistory>
-          <PostsHistory Post={productImage}></PostsHistory>
-          <PostsHistory Post={productImage}></PostsHistory>
+            <PostsHistory Post={productImage}></PostsHistory>
+            <PostsHistory Post={productImage}></PostsHistory>
+            <PostsHistory Post={productImage}></PostsHistory>
+            <PostsHistory Post={productImage}></PostsHistory>
           </View>
         </View>
 
         <View style={styles.bonusHistory}>
           <View style={styles.bonusText}>
-          <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
-          Bonus History </Text>
+            <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
+              Bonus History </Text>
           </View>
           <View style={styles.bonusList} >
-              <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-              <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-              <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-              <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
+            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
+            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
+            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
+            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
           </View>
         </View>
+      </View>
+      <View style={styles.logoutButtonContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </View>
 
@@ -152,5 +169,21 @@ const styles = StyleSheet.create({
   bonusList: {
     flexDirection: 'row',
     marginLeft: '5%'
+  },
+  logoutButtonContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  logoutButton: {
+    backgroundColor: '#FF6347',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

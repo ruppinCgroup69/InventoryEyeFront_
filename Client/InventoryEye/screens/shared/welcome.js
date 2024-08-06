@@ -1,11 +1,29 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import {useEffect} from 'react';
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Welcome() {
   const navigation = useNavigation();
+  useEffect(() => {
+    checkForSavedUser();
+  }, []);
+
+  const checkForSavedUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("logged user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        navigation.navigate('UserTabs', { screen: 'Home', params: { user: user } });
+      }
+    } catch (error) {
+      console.error('Error checking for saved user:', error);
+    }
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -16,7 +34,7 @@ export default function Welcome() {
         <Button
           title="LOG IN"
           buttonStyle={{
-            height:50,
+            height: 50,
             backgroundColor: '#31a1e5',
             borderWidth: 2,
             borderColor: '#31a1e5',
@@ -32,26 +50,26 @@ export default function Welcome() {
         />
       </View>
       <View style={styles.register}>
-      <View style={styles.buttonsContainer}>
-        <Text style={styles.question}>Not registerd yet?</Text>
-        <Button
-          title="REGISTER"
-          buttonStyle={{
-            height:50,
-            backgroundColor: 'white',
-            borderWidth: 2,
-            borderColor: '#31a1e5',
-            borderRadius: 30,
-          }}
-          containerStyle={{
-            width: 230,
-            marginHorizontal: 50,
-            marginVertical: 10,
-          }}
-          titleStyle={{ fontWeight: 'bold', color: '#111851' }}
-          onPress={() => navigation.navigate('RegisterType')}
-        />
-      </View>
+        <View style={styles.buttonsContainer}>
+          <Text style={styles.question}>Not registerd yet?</Text>
+          <Button
+            title="REGISTER"
+            buttonStyle={{
+              height: 50,
+              backgroundColor: 'white',
+              borderWidth: 2,
+              borderColor: '#31a1e5',
+              borderRadius: 30,
+            }}
+            containerStyle={{
+              width: 230,
+              marginHorizontal: 50,
+              marginVertical: 10,
+            }}
+            titleStyle={{ fontWeight: 'bold', color: '#111851' }}
+            onPress={() => navigation.navigate('RegisterType')}
+          />
+        </View>
       </View>
     </View>
   )
@@ -64,8 +82,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#EAF0F3',
   },
-  header:{
-    marginBottom:10,
+  header: {
+    marginBottom: 10,
   },
   buttonsContainer: {
     marginTop: 10,
@@ -73,7 +91,7 @@ const styles = StyleSheet.create({
   question: {
     textAlign: 'center',
   },
-  register:{
-    marginTop:11,
+  register: {
+    marginTop: 11,
   },
 })
