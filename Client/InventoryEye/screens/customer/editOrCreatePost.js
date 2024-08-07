@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, Keyboard, ScrollView } from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
-import profileImage from '../../images/profileImage.jpg';
-import { GET } from '../../api';
+import { GET, POST } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import * as yup from 'yup';
+import Entypo from '@expo/vector-icons/Entypo';
 
-const DismissKeyboard = ({ children }) => (
-  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    {children}
-  </TouchableWithoutFeedback>
-);
+// const DismissKeyboard = ({ children }) => (
+//   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+//     {children}
+//   </TouchableWithoutFeedback>
+// );
 
 export default function EditOrCreatePost() {
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const route = useRoute();
@@ -28,7 +28,10 @@ export default function EditOrCreatePost() {
   const [userData, setUserData] = useState(null);
   const [color, setColor] = useState('');
   const [company, setCompany] = useState('');
-
+  const googlePlacesRef = useRef();
+  const [overallError, setOverallError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [size, setSize] = useState('');
   const [postData, setPostData] = useState({
     postId: 0,
     userId: 0,
@@ -48,15 +51,41 @@ export default function EditOrCreatePost() {
     categoryDesc: "",
     score: 0
   });
+  const PostSchema = yup.object({
+    productName: yup.string().required('Product name is required'),
+    content: yup.string().required('Content is required'),
+    color: yup.string().required('Color is required'),
+    company: yup.string().required('Company is required'),
+    image: yup.string().required('Please select an image'),
+  });
 
+
+  useEffect(() => {
+    console.log('userData updated:', userData);
+  }, [userData]);
+
+  useEffect(() => {
+    if (postData.pickUpAddress && googlePlacesRef.current) {
+      googlePlacesRef.current.setAddressText(postData.pickUpAddress);
+    }
+  }, [postData.pickUpAddress]);
 
 
   const fetchUserData = async () => {
+    // console.log('Fetching user data');
     try {
       const jsonValue = await AsyncStorage.getItem('logged user');
       if (jsonValue != null) {
         const user = JSON.parse(jsonValue);
+        console.log('Fetched user data:', user);
         setUserData(user);
+        setPostData(prevData => ({
+          ...prevData,
+          pickUpFromUser: user.address,
+          pickUpLat: user.lat,
+          pickUpLng: user.lng,
+          pickUpAddress: user.address,
+        }));
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -68,19 +97,6 @@ export default function EditOrCreatePost() {
   useEffect(() => {
     fetchUserData();
   }, []);
-
-  useEffect(() => {
-    if (userData) {
-      setPostData(prevData => ({
-        ...prevData,
-        userId: userData.id,
-        userName: userData.fullName,
-        userImage: userData.image,
-        pickUpFromUser: userData.address,
-        score: userData.score
-      }));
-    }
-  }, [userData]);
 
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -142,9 +158,6 @@ export default function EditOrCreatePost() {
       try {
         const response = await GET('Categories');
         setCategories(response);
-        if (response.length > 0) {
-          setSelectedCategory(response[0].categoryDesc);
-        }
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -154,24 +167,54 @@ export default function EditOrCreatePost() {
   }, []);
 
   const showActionSheet = () => {
-    const options = categories.map(cat => cat.categoryDesc);
-
     Alert.alert(
       "Select Category",
       "",
-      options.map(option => ({
-        text: option,
-        onPress: () => setSelectedCategory(option)
-      })).concat([
-        { text: "Cancel", style: "cancel" }
-      ])
+      [
+        ...categories.map(category => ({
+          text: category.categoryDesc,
+          onPress: () => {
+            setSelectedCategory(category)
+            isFashionCategorySelected()
+          }
+        })),
+        {
+          text: "Cancel",
+          style: "cancel"
+        }
+      ]
     );
   };
 
+  const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => (
+    <View style={[styles.iconTextInputContainer, style]}>
+      {icon}
+      <TextInput
+        style={[styles.iconTextInput, { flex: 1 }]} // Ensures input takes the remaining space
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+      />
+    </View>
+  );
+
+  const isFashionCategorySelected = () => {
+    if (!selectedCategory) {
+      return false;
+    }
+
+    const fashionCategory = categories.find(category => category.categoryDesc === 'Clothing&Fashion');
+    return fashionCategory && selectedCategory.categoryDesc === fashionCategory.categoryDesc;
+  };
+
+
   const handleExit = () => {
+    console.log('Exiting EditOrCreatePost');
     if (previousScreen) {
+      console.log('Navigating to:', previousScreen);
       navigation.navigate(previousScreen);
     } else {
+      console.log('Navigating to Home');
       navigation.navigate('Home');
     }
   };
@@ -195,162 +238,242 @@ export default function EditOrCreatePost() {
       });
   }
 
-  const handleUploadPost = () => {
-    const tagsArray = [color, company].filter(tag => tag !== '');
-    const tagsString = JSON.stringify(tagsArray);
-    setPostData(prevData => ({
-      ...prevData,
-      tags: tagsString
-    }));
+  const handleUploadPost = async () => {
+    console.log('Starting handleUploadPost');
+    if (!userData) {
+      alert('Error: User data is not available. Please try again.');
+      return;
+    }
+    setErrors({});
+    setOverallError('');
+    try {
+      const postToValidate = {
+        productName: postData.productName,
+        content: postData.content,
+        color: color,
+        company: company,
+        image: selectedPic,
+      };
+      await PostSchema.validate(postToValidate, { abortEarly: false });
+      if (!selectedCategory) {
+        throw new Error('Please select a category before uploading.');
+      }
+      const tagsArray = [color, company].filter(tag => tag !== '');
+      const tagsString = JSON.stringify(tagsArray);
+      const finalPostData = {
+        ...postData,
+        userId: userData.id,
+        userName: userData.fullName,
+        userImage: userData.image,
+        createAt: new Date(),
+        editedAt: new Date(),
+        productName: postData.productName,
+        content: postData.content,
+        image: selectedPic,
+        tags: tagsString,
+        category: selectedCategory.categoryId,
+        categoryDesc: selectedCategory.categoryDesc,
+        pickUpFromUser: userData.address,
+        score: userData.score
+      };
+      const response = await POST('Posts', finalPostData)
+      console.log('Server response:', response);
 
-    console.log('Uploading post:', postData);
-    // send postData to the API
-  }
+      if (response && response.success) {
+        navigation.navigate('Home'); 
+      }
+      else {
+      alert('An error occurred while uploading the post. Please try again.');
+      }
+    }
+    catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const newErrors = {};
+        err.inner.forEach((error) => {
+          newErrors[error.path] = error.message;
+        });
+        setErrors(newErrors);
+        setOverallError('All fields must be filled in.');
+      }
+      else if (err.message === 'Please select a category before uploading.') {
+        alert(err.message);
+      }
+      else {
+        alert('An error occurred while uploading the post. Please try again.');
+      }
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <View style={styles.exit}>
-          <TouchableOpacity onPress={handleExit}>
-            <Feather name="x" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.title}>
-          <Text style={styles.createHeader}>Create New Post</Text>
-        </View>
-        <View style={styles.uploadIcon}>
-          <TouchableOpacity onPress={handleUploadPost}>
-            <Feather name="upload" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.center}>
-        <View style={styles.profile}>
-          <View style={styles.imageContainer}>
-            <Image source={profileImage} style={styles.image} />
-          </View>
-          <View>
-            <Text style={styles.userName}>
-              {userData?.fullName}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.content}>
-          <TextInput
-            multiline
-            style={styles.contentText}
-            placeholder='What product are you looking for ?'
-            value={postData.content}
-            onChangeText={(text) => setPostData({ ...postData, content: text })}
-          />
-        </View>
-      </View>
-
-      <KeyboardAwareScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.bottom}>
-          <View style={styles.iconItem}>
-            <TouchableOpacity style={styles.modalbtn} onPress={toggleModal}>
-              <FontAwesome5 name="image" size={24} color="#111851" />
+      <View style={styles.container}>
+        <View style={styles.top}>
+          <View style={styles.exit}>
+            <TouchableOpacity onPress={handleExit}>
+              <Feather name="x" size={30} color="#111851" />
             </TouchableOpacity>
-            <MaterialIcons name="category" size={24} color="#111851" />
-            <FontAwesome name="pencil" size={24} color="#111851" />
-            <Ionicons name="color-palette-outline" size={24} color="#111851" />
-            <FontAwesome name="building-o" size={24} color="#111851" />
-            <Octicons name="search" size={24} color="#111851" />
           </View>
-          <View style={styles.inputItem}>
-            {selectedPic ? (
-              <Image source={{ uri: selectedPic }} style={styles.selectedImage} />
-            ) : (
-              <Text style={styles.imgText}>Select an image</Text>
-            )}
-            <TouchableOpacity
-              style={styles.categoryButton}
-              onPress={showActionSheet}
-            >
-              <Text style={styles.categoryButtonText}>
-                {selectedCategory || 'Select Category'}
+          <View style={styles.title}>
+            <Text style={styles.createHeader}>Create New Post</Text>
+          </View>
+          <View style={styles.uploadIcon}>
+            <TouchableOpacity onPress={handleUploadPost}>
+              <Feather name="upload" size={30} color="#111851" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.center}>
+          <View style={styles.profile}>
+            <View style={styles.imageContainer}>
+              {userData && userData.image ? (
+                <Image source={{ uri: userData.image }} style={styles.image} />
+              ) : (
+                <View style={[styles.image, styles.placeholderImage]} />
+              )}
+            </View>
+            <View>
+              <Text style={styles.userName}>
+                {userData ? userData.fullName : 'Loading...'}
               </Text>
-            </TouchableOpacity>
+            </View>
+          </View>
 
+          <View style={styles.content}>
             <TextInput
-              style={styles.input}
-              placeholder='product name'
-              value={postData.productName}
-              onChangeText={(text) => setPostData({ ...postData, productName: text })}
+              multiline
+              style={styles.contentText}
+              placeholder='What product are you looking for ?'
+              value={postData.content}
+              onChangeText={(text) => setPostData({ ...postData, content: text })}
             />
-            <TextInput
-              style={styles.input}
-              placeholder='color'
-              value={color}
-              onChangeText={setColor}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder='company'
-              value={company}
-              onChangeText={setCompany}
-            />
-            <GooglePlacesAutocomplete
-              placeholder='Enter location'
-              onPress={(data, details = null) => {
-                console.log(data, details);
-                // You can set the location state here
-              }}
-              query={{
-                key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
-                language: 'en',
-              }}
-              styles={{
-                container: {
-                  flex: 0,
-                  width:'100%'
-                },
-                textInput: styles.input,
-                listView: styles.autocompleteListView,
-                row: styles.autocompleteRow,
-              }}
-              enablePoweredByContainer={false}
-              fetchDetails={true}
-              onFail={error => console.error(error)}
-            />
+            {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
           </View>
         </View>
-      </KeyboardAwareScrollView>
 
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={toggleModal}
-      >
-        <TouchableWithoutFeedback onPress={toggleModal}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity style={styles.modalbtn} onPress={pickFromGallery}>
-                      <Text style={styles.buttonText}>Open Gallery</Text>
+        <KeyboardAwareScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardShouldPersistTaps="handeld"
+        >
+
+          <View style={styles.bottom}>
+            <View style={styles.inputItem}>
+              <View style={styles.imageSelectionContainer}>
+                {
+                  selectedPic ? (
+                    <Image source={{ uri: selectedPic }} style={styles.selectedImage} />
+                  ) : (
+                    <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
+                      <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.modalbtn} onPress={pickFromCamera}>
-                      <Text style={styles.buttonText} >Open Camera</Text>
+                  )
+                }
+              </View>
+
+              <TouchableOpacity
+                style={[styles.input, styles.categoryButton]}
+                onPress={showActionSheet}
+              >
+                <MaterialIcons name="category" size={24} color="#111851" />
+                <Text style={styles.categoryButtonText}>
+                  {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
+                </Text>
+              </TouchableOpacity>
+
+              <IconTextInput
+                icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
+                placeholder="Product name"
+                value={postData.productName}
+                onChangeText={(text) => setPostData({ ...postData, productName: text })}
+                style={styles.input}
+              />
+
+              <IconTextInput
+                icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
+                placeholder="Color"
+                value={color}
+                onChangeText={setColor}
+                style={styles.input}
+              />
+
+              {isFashionCategorySelected() && (
+                <IconTextInput
+                  icon={<Entypo name="ruler" size={24} color="#111851" />}
+                  style={[styles.input, styles.sizeInput]}
+                  placeholder='Size'
+                  value={size}
+                  onChangeText={setSize}
+                />
+              )}
+
+              <IconTextInput
+                icon={<FontAwesome name="building-o" size={24} color="#111851" />}
+                placeholder="Company"
+                value={company}
+                onChangeText={setCompany}
+                style={styles.input}
+              />
+
+
+              <GooglePlacesAutocomplete
+                icon={<Octicons name="search" size={24} color="#111851" />}
+                ref={googlePlacesRef}
+                placeholder={postData.pickUpAddress}
+                onPress={(data, details = null) => {
+                  setPostData(prev => ({
+                    ...prev,
+                    pickUpAddress: data.description,
+                    pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
+                    pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
+                  }));
+                }}
+                query={{
+                  key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+                  language: 'en',
+                }}
+                styles={{
+                  container: {
+                    flex: 0,
+                    width: '100%',
+                  },
+                  textInput: styles.input,
+                  listView: styles.autocompleteListView,
+                  row: styles.autocompleteRow,
+                }}
+                enablePoweredByContainer={false}
+                fetchDetails={true}
+                onFail={error => console.error(error)}
+              />
+            </View>
+          </View>
+          {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
+        </KeyboardAwareScrollView>
+
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={toggleModal}
+        >
+          <TouchableWithoutFeedback onPress={toggleModal}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
+                      <Text style={styles.buttonText}>OPEN GALLERY</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
+                      <Text style={styles.buttonText}>OPEN CAMERA</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </View>
   )
 }
 
@@ -358,15 +481,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#EAF0F3',
-    paddingTop:38
+    paddingTop: 38
   },
   scrollContainer: {
     flexGrow: 1,
-    //padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    //paddingBottom: 100 
+    alignItems: 'left',
+    justifyContent: 'flex-start',
     backgroundColor: '#F0F6FE',
+
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    backgroundColor: '#31A1E5',
+    padding: 15,
+    borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   center: {
     flex: 1,
@@ -380,6 +522,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: 'white',
     borderBottomWidth: 2,
+  },
+  placeholderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 7,
+  },
+  placeholderText: {
+    color: '#111851',
+    fontSize: 16,
   },
   exit: {
     width: '15%',
@@ -442,79 +595,125 @@ const styles = StyleSheet.create({
   },
   bottom: {
     flex: 1,
+    alignItems: 'left',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     backgroundColor: '#F0F6FE',
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderTopWidth:1,
-    borderColor:'#ffff',
-    height: 10
-  },
-  iconItem: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'flex-start',
-    width: '20%',
-    height: 250, // Changed from fixed height
+    //paddingHorizontal: 15,
+    borderTopWidth: 1,
+    borderColor: '#ffff',
+    height: 10,
+    paddingTop: 20,
+    justifyContent: 'flex-start',
   },
   inputItem: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    alignItems: 'flex-start',
-    width: '75%',
-    height: 250, // Changed from fixed height
+    alignItems: 'left',
+    justifyContent: 'flex-start',
+    width: '80%',
+    paddingHorizontal: 15,
+  },
+  iconTextInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#31a1e5',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    marginBottom: -5,
+    height: 40,
+    width: '100%',
+  },
+  iconTextInput: {
+    marginLeft: 10,
+    fontSize: 16,
+    flex: 1,
   },
   input: {
+    alignText: 'left',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     width: '100%',
     borderColor: '#31a1e5',
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: 'white',
     paddingHorizontal: 15,
+    paddingTop: 8,
+    marginVertical: 10,
     height: 40,
-    marginBottom: 10,
+    //marginBottom: 0,
     fontSize: 16
+  },
+  sizeInput: {
+    marginTop: 10, // Increase this value to add more space above the Size input
   },
   imgText: {
     fontSize: 16,
     color: '#111851',
     marginBottom: 10,
-  },
-  categoryButton: {
     backgroundColor: '#F0F6FE',
     borderWidth: 1,
     borderColor: '#31a1e5',
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
+    width: 'auto',
+    textAlign: 'left',
+    paddingLeft: 10
+
+  },
+  imgContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%'
+  },
+  imgBtn: {
+    width: '100%',
+  },
+  categoryButton: {
+    backgroundColor: '#ffff',
+    borderWidth: 1,
+    borderColor: '#31a1e5',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: -5,
+    marginVertical: 10,
     width: '100%',
   },
   categoryButtonText: {
-    color: '#111851',
+    color: 'rgba(17, 24, 81, 0.3)',
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: 'left',
+    marginLeft: 7
   },
   modalbtn: {
-    borderWidth: 1,
-    borderColor: '#31A1E5',
-    borderRadius: 30,
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    backgroundColor: '#31a1e5',
     padding: 10,
-    marginBottom: 10,
+    borderRadius: 10,
+  },
+  imageSelectionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: -15,
+    width: '100%',
   },
   modalContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 20,
+    width: '80%',
+    backgroundColor: 'white',
     borderRadius: 10,
-    borderWidth: 3,
-    borderColor: '#31A1E5',
+    padding: 20,
+    alignItems: 'center',
   },
   buttonText: {
-    fontSize: 14,
     textAlign: 'center',
     color: '#111851',
+    fontSize: 11,
+    fontWeight: 'bold'
   },
   modalOverlay: {
     flex: 1,
@@ -523,16 +722,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    elevation: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   selectedImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 5,
-    marginBottom: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginVertical: 10
   },
   autocompleteContainer: {
     zIndex: 3,
@@ -555,4 +752,11 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 15,
   },
+  overallErrorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+
 });

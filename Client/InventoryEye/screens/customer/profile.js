@@ -11,10 +11,28 @@ import { AntDesign } from '@expo/vector-icons';
 import Post from '../shared/post';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from 'react';
+import { formatDate , formatTime} from '../../utils';
+
 
 
 export default function Profile() {
   const navigation = useNavigation();
+  const [user, setUser] = useState({
+    id: 0,
+    role: 0,
+    lastSeen: '',
+    fullName: '',
+    emailAddress: '',
+    password: '',
+    birthDate: '',
+    lat: 0,
+    lng: 0,
+    address: '',
+    image: '',
+    createdAt: '',
+    score: 0,
+  });
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("logged user");
@@ -23,13 +41,44 @@ export default function Profile() {
       console.error("Error logging out:", error);
     }
   };
+  const fetchUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('logged user');
+      if (jsonValue != null) {
+        const userData = JSON.parse(jsonValue);
+        setUser({
+          id: userData.id,
+          role: userData.role,
+          lastSeen: userData.lastSeen,
+          fullName: userData.fullName,
+          emailAddress: userData.emailAddress,
+          password: userData.password,
+          birthDate: userData.birthDate,
+          lat: userData.lat,
+          lng: userData.lng,
+          address: userData.address,
+          image: userData.image,
+          createdAt: userData.createdAt,
+          score: userData.score
+        });
+        console.log('Fetched user data:', user);
+      } else {
+        console.error('No user data found in AsyncStorage');
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
+  };
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.info}>
         <View style={styles.frame}>
           <View style={styles.inner}>
-            <Info fullName='Nelly Adar' profileImage={profileImage} email='Nelly_Adar@gmail.com' birthdate='25/12/1998' city='Tel Aviv'></Info>
+            <Info fullName={user.fullName } profileImage={{ uri: user.image }} email={user.emailAddress} birthdate={formatDate(new Date(user.birthDate))} city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>
                 <AntDesign name="edit" size={24} color="#111851" />
@@ -44,7 +93,7 @@ export default function Profile() {
             <Text style={{ fontSize: 18 }}>My Score</Text>
           </View>
           <View style={styles.score}>
-            <Score ScoreNum='70'></Score>
+            <Score ScoreNum={user.score}></Score>
           </View>
         </View>
         <View style={styles.postsHistory}>

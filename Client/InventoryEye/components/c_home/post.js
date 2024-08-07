@@ -9,7 +9,7 @@ export default function Post({ fullName, profileImage, score, productImage, publ
       <View style={styles.left}>
         <View style={styles.info}>
         <View style={styles.profileImage} >
-            <Image source={profileImage} style={styles.myImg} />
+            <Image source={productImage} style={styles.myImg} />
             <View style={[styles.score, { left: 7 }]}>
               <Text style={styles.scoretext}>{score}</Text>
             </View>
@@ -34,7 +34,7 @@ export default function Post({ fullName, profileImage, score, productImage, publ
         </View>
       </View>
       <View style={styles.right}>
-        <Image source={productImage} style={styles.pImg} />
+        <Image source={profileImage} style={styles.pImg} />
       </View>
     </View>
   )

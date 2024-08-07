@@ -1,7 +1,6 @@
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from 'react-native'
 import { useEffect, useState } from 'react';
 import C_header from '../../components/c_home/c_header'
-import profileImage from '../../images/profileImage.jpg'
 import Search from '../../components/c_home/search'
 import { Feather } from '@expo/vector-icons';
 import Post from '../../components/c_home/post'
@@ -28,7 +27,7 @@ export default function C_home() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName= {user.fullName} notiNum={12} profileImage={profileImage} userScore={user.score} />
+        <C_header fullName= {user.fullName} notiNum={12} profileImage={{ uri: user.image }}  userScore={user.score} />
       </View>
       <View style={styles.searchView}>
         <Search />
@@ -43,12 +42,10 @@ export default function C_home() {
         </View>
         <View style={styles.postsView}>
           {
-
-            
             posts.length == 0 ? <Text>No posts were found </Text> :
               posts.map((post) => <TouchableOpacity key={post.postId} onPress={() => navigation.navigate('Post_Det', {state:post})}>
                 <View style={styles.postContainer}>
-                  <Post style={styles.posts} content={post.content} productName={post.productName} category={post.categoryDesc} productImage={post.image} profileImage={post.userImage} fullName={post.userName} score={post.score} publishedDate={formatDate(new Date(post.createAt))} publishedHour={formatTime(new Date(post.createAt))} />
+                  <Post style={styles.posts} content={post.content} productName={post.productName} category={post.categoryDesc} productImage={{ uri: post.image }} profileImage={{ uri: post.userImage }} fullName={post.userName} score={post.score} publishedDate={formatDate(new Date(post.createAt))} publishedHour={formatTime(new Date(post.createAt))} />
                 </View>
               </TouchableOpacity>)
           }

@@ -50,7 +50,7 @@ export default function C_Register() {
     lat: 0,
     lng: 0,
     address: '',
-    image: 'string',
+    image: '',
     createdAt: '',
     lastSeen: '',
     score: 0,
@@ -73,7 +73,9 @@ export default function C_Register() {
 
   const handleCustomerRegister = async () => {
     setErrors({});
+    
     try {
+      const defaultImageURL = 'https://res.cloudinary.com/dqqe3zu2i/image/upload/v1722896767/profileImage_vgibdg.jpg';
       const updatedUser = {
         id: user.id,
         fullName: user.fullName,
@@ -83,7 +85,7 @@ export default function C_Register() {
         lat: user.lat,
         lng: user.lng,
         address: user.address,
-        image: user.image,
+        image: user.image.trim() !== '' ? user.image : defaultImageURL,
         createdAt: currentDate,
         lastSeen: currentDate,
         score: user.score,
