@@ -23,6 +23,10 @@ export default function C_home() {
 
   useEffect(() => { getAllPosts() }, [])
 
+  const handlePostPress = (post) => {
+    navigation.navigate('Post_Det', { postId: post.postId });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -43,9 +47,19 @@ export default function C_home() {
         <View style={styles.postsView}>
           {
             posts.length == 0 ? <Text>No posts were found </Text> :
-              posts.map((post) => <TouchableOpacity key={post.postId} onPress={() => navigation.navigate('Post_Det', {state:post})}>
+              posts.map((post) => <TouchableOpacity key={post.postId} onPress={() => handlePostPress(post)}>
                 <View style={styles.postContainer}>
-                  <Post style={styles.posts} content={post.content} productName={post.productName} category={post.categoryDesc} productImage={{ uri: post.image }} profileImage={{ uri: post.userImage }} fullName={post.userName} score={post.score} publishedDate={formatDate(new Date(post.createAt))} publishedHour={formatTime(new Date(post.createAt))} />
+                  <Post 
+                  style={styles.posts} 
+                  content={post.content} 
+                  productName={post.productName} 
+                  category={post.categoryDesc} 
+                  productImage={{ uri: post.image }} 
+                  profileImage={{ uri: post.userImage }} 
+                  fullName={post.userName} score={post.score} 
+                  publishedDate={formatDate(new Date(post.createAt))} 
+                  publishedHour={formatTime(new Date(post.createAt))}
+                   />
                 </View>
               </TouchableOpacity>)
           }
