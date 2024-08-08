@@ -10,12 +10,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import * as yup from 'yup';
 import Entypo from '@expo/vector-icons/Entypo';
 
-// const DismissKeyboard = ({ children }) => (
-//   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-//     {children}
-//   </TouchableWithoutFeedback>
-// );
-
 export default function EditOrCreatePost() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);

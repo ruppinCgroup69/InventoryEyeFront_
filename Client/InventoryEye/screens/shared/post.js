@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
 import Comment from '../../components/post/comment';
@@ -7,18 +7,16 @@ import Yarden from '../../images/yarden.jpg';
 import Sharon from '../../images/sharon.jpg';
 import Adar from '../../images/ADAR.jpeg';
 import profileImage from '../../images/profileImage.jpg';
+import ResponseModal from '../customer/responseModal';
 import Lipstick from '../../images/Lipstic.jpeg';
 import { GET } from '../../api';
 
 
 export default function Post() {
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-      >
         <View style={styles.details}>
           <Details
             fullName={'Yarden Assulin'}
@@ -34,8 +32,8 @@ export default function Post() {
             content={'In the Search for this Lipstick! Help me, the shade is Whirl. There is no stock available anywhere...'}
           />
         </View>
-        <View style={styles.comments}>
-          <View style={styles.comment}>
+        <ScrollView style={styles.comments}>
+                 <View style={styles.comment}>
             <Comment
               profilepic={Sharon} score={10} fullName={'Sharon Tebul'} content={'I saw it an hour ago, I checked and there is stock!'}
               inventoryeye={'24/07/2024 ,15:00'} location={'Azriely Mall, Haifa'} store={'MAC'} bought={'NO'}
@@ -56,16 +54,9 @@ export default function Post() {
               stock={'High'} datepub={'24/07/2024 ,15:37'} 
             />
           </View>
-        </View>
-        <View style={styles.spacer} />
-      </ScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={styles.keyboardAvoidingView}
-      >
-        <NewComment fullName={'Yarden Assulin'} />
-      </KeyboardAvoidingView>
+          </ScrollView>
+          <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
+          <ResponseModal visible={modalVisible} onClose={() => setModalVisible(false)} fullName={'Yarden Assulin'} />
     </View>
   );
 }

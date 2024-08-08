@@ -9,7 +9,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import * as yup from 'yup';
 import { POST } from '../../api';
-import axios from 'axios';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -145,7 +144,7 @@ export default function C_Register() {
         {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
 
         <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Email:</Text>
+        <Text style={styles.lable}>Email:</Text>
           <TextInput
             style={styles.input}
             value={user.emailAddress}
@@ -156,7 +155,7 @@ export default function C_Register() {
         {errors.emailAddress && <Text style={styles.errorText}>{errors.emailAddress}</Text>}
 
         <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Password:</Text>
+        <Text style={styles.lable}>Password:</Text>
           <TextInput
             style={styles.input}
             value={user.password}
@@ -166,7 +165,7 @@ export default function C_Register() {
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
         <View style={styles.fieldContainer} >
-          <Text style={styles.lable}>Re Password:</Text>
+        <Text style={styles.lable}>Re Password:</Text>
           <TextInput
             style={styles.input}
             value={rePassword}
@@ -177,7 +176,7 @@ export default function C_Register() {
 
         {errors.rePassword && <Text style={styles.errorText}>{errors.rePassword}</Text>}
         <View style={styles.fieldContainer}>
-          <Text style={styles.lable}>Birthdate:</Text>
+        <Text style={styles.lable}>Birthdate:</Text>
           <View style={styles.input}>
             <DateTimePicker style={styles.date}
               testID="dateTimePicker"
@@ -193,7 +192,7 @@ export default function C_Register() {
         {errors.birthdate && <Text style={styles.errorText}>{errors.birthdate}</Text>}
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.lable}>Address:</Text>
+        <Text style={styles.lable}>Address:</Text>
           <GooglePlacesAutocomplete
             placeholder='Enter address'
             onPress={(data, details = null) => {
@@ -303,17 +302,18 @@ const styles = StyleSheet.create({
   lable: {
     fontSize: 16,
     marginRight: 10,
+    width:100
   },
   input: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     width: 250,
     height: 40,
     borderColor: '#31a1e5',
     borderWidth: 1,
     borderRadius: 30,
     backgroundColor: 'white',
-    paddingHorizontal: 15,
+   paddingHorizontal: 15,
     marginTop: 8,
   },
   dateInput: {
