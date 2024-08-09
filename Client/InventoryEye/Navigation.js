@@ -139,7 +139,7 @@ export default function Navigation() {
                     <Stack.Screen name="SupplierTabs" component={SupplierTabs} options={{ headerShown: false }} />
                     <Stack.Screen name="C_Register" component={C_Register} options={{ headerShown: false }} />
                     <Stack.Screen name="S_Register" component={S_Register} options={{ headerShown: false }} />
-                    {/* <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} /> */}
+                    {<Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} />}
                 </Stack.Navigator>
             </NavigationContainer>
         </>

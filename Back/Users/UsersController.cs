@@ -86,9 +86,20 @@ namespace InventoryEyeBack.Users
         [HttpDelete("{email}")]
         public IActionResult Delete(string email)
         {
+            //UsersModel user = new UsersModel();
+            //user.DeleteUser(email);
+            //return Ok();
+
             UsersModel user = new UsersModel();
-            user.DeleteUser(email);
-            return Ok();
+            int result = user.DeleteUser(email);
+            if (result > 0)
+            {
+                return Ok("User and all associated data deleted successfully");
+            }
+            else
+            {
+                return NotFound("User not found or no data was deleted");
+            }
         }
     }
 }

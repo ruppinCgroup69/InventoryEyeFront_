@@ -18,8 +18,24 @@ Alter PROCEDURE [dbo].[SP_InEye_DeleteUser]
 AS
 BEGIN
 	SET NOCOUNT ON;
-    -- Insert statements for procedure here
-	Delete from Users where [EmailAddress] = @emailAddress
+	DECLARE @userId int;
+
+    SELECT @userId = Id FROM Users WHERE EmailAddress = @emailAddress;
+
+    IF @userId IS NULL
+    BEGIN
+        RETURN;
+    END
+
+
+    DELETE FROM Comments WHERE UserId = @userId;
+
+    DELETE FROM Comments WHERE PostId IN (SELECT Id FROM Post WHERE UserId = @userId);
+
+    DELETE FROM Post WHERE UserId = @userId;
+
+	DELETE FROM Users WHERE Id = @userId;
+
 	
 END
 
@@ -93,8 +109,8 @@ AS
 BEGIN
 	SET NOCOUNT ON;
     -- Insert statements for procedure here
-	Delete from Post where Id=@id
 	Delete from Comments where PostId = @id
+	Delete from Post where Id=@id
 END
 
 -- =============================================

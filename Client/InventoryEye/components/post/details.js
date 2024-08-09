@@ -5,11 +5,30 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 ;
 
-export default function Details({ fullName, profileImage, pDate, pHour, category, size, pName, company, color, location, content, productImage }) {
+export default function Details({
+  fullName,
+  profileImage,
+  pDate,
+  pHour,
+  category,
+  size,
+  pName,
+  company,
+  color,
+  location,
+  content,
+  productImage,
+  postUserId,
+  currentUserId }) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
   const toggleModal = () => setModalVisible(!modalVisible);
+
+  const isCurrentUserPost = postUserId === currentUserId;
+  console.log('postUserId:',postUserId );
+  console.log('currentUserId:',currentUserId );
+  console.log('isCurrentUserPost:',isCurrentUserPost );
 
   return (
     <View style={styles.container}>
@@ -28,6 +47,16 @@ export default function Details({ fullName, profileImage, pDate, pHour, category
               <Text style={{ textAlign: 'left', fontSize: 18, color: '#111851' }}>{fullName}</Text>
               <Text style={{ textAlign: 'left', fontSize: 14, color: '#111851' }}>{pDate} {pHour}</Text>
             </View>
+            {!isCurrentUserPost && (
+              <View style={styles.upLeft}>
+                <TouchableOpacity>
+                  <AntDesign name="edit" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleModal}>
+                  <AntDesign name="delete" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
+                </TouchableOpacity>
+              </View>
+            )}
             <View style={styles.upLeft}>
               <TouchableOpacity>
                 <AntDesign name="edit" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
@@ -69,8 +98,8 @@ export default function Details({ fullName, profileImage, pDate, pHour, category
           <View style={styles.modalContent}>
             <Text style={styles.deleteText}>Are you sure you want to delete this post?</Text>
             <Text style={styles.deleteText}>This action cannot be undone</Text>
-            <View style={{flexDirection:'row'}}>
-            <TouchableOpacity style={styles.modalbtn} onPress={toggleModal}>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity style={styles.modalbtn} onPress={toggleModal}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalbtn} >
@@ -160,7 +189,7 @@ const styles = StyleSheet.create({
   productImage: {
     width: '100%',
     height: '100%',
-resizeMode: 'contain',
+    resizeMode: 'contain',
     marginBottom: '1%',
     marginTop: '1%'
   },
@@ -185,14 +214,14 @@ resizeMode: 'contain',
     marginBottom: '3%'
 
   },
-  modalbtn:{
-    borderWidth:1,
+  modalbtn: {
+    borderWidth: 1,
     borderColor: '#31A1E5',
-    borderRadius:'50%',
-    marginLeft:'3%',
-    width:'25%'
+    borderRadius: '50%',
+    marginLeft: '3%',
+    width: '25%'
   },
-  buttonText:{
+  buttonText: {
     fontSize: 18,
     textAlign: 'center',
     color: '#111851',

@@ -225,7 +225,7 @@ export default function EditOrCreatePost() {
     })
       .then(res => res.json())
       .then(data => {
-        setSelectedPic(data.url);
+        setPostData(prevData => ({ ...prevData, image: data.url }));
       })
       .catch(err => {
         console.error("Error uploading image: ", err);
@@ -246,7 +246,7 @@ export default function EditOrCreatePost() {
         content: postData.content,
         color: color,
         company: company,
-        image: selectedPic,
+        image:  postData.image,
       };
       await PostSchema.validate(postToValidate, { abortEarly: false });
       if (!selectedCategory) {
@@ -263,7 +263,7 @@ export default function EditOrCreatePost() {
         editedAt: new Date(),
         productName: postData.productName,
         content: postData.content,
-        image: selectedPic,
+        image: postData.image,
         tags: tagsString,
         category: selectedCategory.categoryId,
         categoryDesc: selectedCategory.categoryDesc,
@@ -274,10 +274,10 @@ export default function EditOrCreatePost() {
       console.log('Server response:', response);
 
       if (response && response.success) {
-        navigation.navigate('Home'); 
+        navigation.navigate('Home');
       }
       else {
-      alert('An error occurred while uploading the post. Please try again.');
+        alert('An error occurred while uploading the post. Please try again.');
       }
     }
     catch (err) {
@@ -299,175 +299,207 @@ export default function EditOrCreatePost() {
   };
 
   return (
-      <View style={styles.container}>
-        <View style={styles.top}>
-          <View style={styles.exit}>
-            <TouchableOpacity onPress={handleExit}>
-              <Feather name="x" size={30} color="#111851" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.title}>
-            <Text style={styles.createHeader}>Create New Post</Text>
-          </View>
-          <View style={styles.uploadIcon}>
-            <TouchableOpacity onPress={handleUploadPost}>
-              <Feather name="upload" size={30} color="#111851" />
-            </TouchableOpacity>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.top}>
+        <View style={styles.exit}>
+          <TouchableOpacity onPress={handleExit}>
+            <Feather name="x" size={30} color="#111851" />
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.center}>
-          <View style={styles.profile}>
-            <View style={styles.imageContainer}>
-              {userData && userData.image ? (
-                <Image source={{ uri: userData.image }} style={styles.image} />
-              ) : (
-                <View style={[styles.image, styles.placeholderImage]} />
-              )}
-            </View>
-            <View>
-              <Text style={styles.userName}>
-                {userData ? userData.fullName : 'Loading...'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.content}>
-            <TextInput
-              multiline
-              style={styles.contentText}
-              placeholder='What product are you looking for ?'
-              value={postData.content}
-              onChangeText={(text) => setPostData({ ...postData, content: text })}
-            />
-            {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
-          </View>
+        <View style={styles.title}>
+          <Text style={styles.createHeader}>Create New Post</Text>
         </View>
-
-        <KeyboardAwareScrollView
-          style={styles.container}
-          contentContainerStyle={styles.scrollContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardShouldPersistTaps="handeld"
-        >
-
-          <View style={styles.bottom}>
-            <View style={styles.inputItem}>
-              <View style={styles.imageSelectionContainer}>
-                {
-                  selectedPic ? (
-                    <Image source={{ uri: selectedPic }} style={styles.selectedImage} />
-                  ) : (
-                    <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
-                      <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
-                    </TouchableOpacity>
-                  )
-                }
-              </View>
-
-              <TouchableOpacity
-                style={[styles.input, styles.categoryButton]}
-                onPress={showActionSheet}
-              >
-                <MaterialIcons name="category" size={24} color="#111851" />
-                <Text style={styles.categoryButtonText}>
-                  {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
-                </Text>
-              </TouchableOpacity>
-
-              <IconTextInput
-                icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
-                placeholder="Product name"
-                value={postData.productName}
-                onChangeText={(text) => setPostData({ ...postData, productName: text })}
-                style={styles.input}
-              />
-
-              <IconTextInput
-                icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
-                placeholder="Color"
-                value={color}
-                onChangeText={setColor}
-                style={styles.input}
-              />
-
-              {isFashionCategorySelected() && (
-                <IconTextInput
-                  icon={<Entypo name="ruler" size={24} color="#111851" />}
-                  style={[styles.input, styles.sizeInput]}
-                  placeholder='Size'
-                  value={size}
-                  onChangeText={setSize}
-                />
-              )}
-
-              <IconTextInput
-                icon={<FontAwesome name="building-o" size={24} color="#111851" />}
-                placeholder="Company"
-                value={company}
-                onChangeText={setCompany}
-                style={styles.input}
-              />
-
-
-              <GooglePlacesAutocomplete
-                icon={<Octicons name="search" size={24} color="#111851" />}
-                ref={googlePlacesRef}
-                placeholder={postData.pickUpAddress}
-                onPress={(data, details = null) => {
-                  setPostData(prev => ({
-                    ...prev,
-                    pickUpAddress: data.description,
-                    pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
-                    pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
-                  }));
-                }}
-                query={{
-                  key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
-                  language: 'en',
-                }}
-                styles={{
-                  container: {
-                    flex: 0,
-                    width: '100%',
-                  },
-                  textInput: styles.input,
-                  listView: styles.autocompleteListView,
-                  row: styles.autocompleteRow,
-                }}
-                enablePoweredByContainer={false}
-                fetchDetails={true}
-                onFail={error => console.error(error)}
-              />
-            </View>
-          </View>
-          {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
-        </KeyboardAwareScrollView>
-
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={toggleModal}
-        >
-          <TouchableWithoutFeedback onPress={toggleModal}>
-            <View style={styles.modalOverlay}>
-              <TouchableWithoutFeedback>
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
-                      <Text style={styles.buttonText}>OPEN GALLERY</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
-                      <Text style={styles.buttonText}>OPEN CAMERA</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
+        <View style={styles.uploadIcon}>
+          <TouchableOpacity onPress={handleUploadPost}>
+            <Feather name="upload" size={30} color="#111851" />
+          </TouchableOpacity>
+        </View>
       </View>
+
+      <View style={styles.center}>
+
+
+        <View style={styles.profile}>
+          <View style={styles.imageContainer}>
+            {userData && userData.image ? (
+              <Image source={{ uri: userData.image }} style={styles.image} />
+            ) : (
+              <View style={[styles.image, styles.placeholderImage]} />
+            )}
+          </View>
+          <View>
+            <Text style={styles.userName}>
+              {userData ? userData.fullName : 'Loading...'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.content}>
+          <TextInput
+            multiline
+            style={styles.contentText}
+            placeholder='What product are you looking for ?'
+            value={postData.content}
+            onChangeText={(text) => setPostData({ ...postData, content: text })}
+          />
+          {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
+        </View>
+      </View>
+
+      <KeyboardAwareScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardShouldPersistTaps="handeld"
+      >
+
+        <View style={styles.bottom}>
+          <View style={styles.inputItem}>
+            <View style={styles.imageSelectionContainer}>
+              {
+                postData.image ? (
+                  <Image source={{ uri: postData.image }} style={styles.selectedImage} />
+                ) : (
+                  <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
+                    <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
+                  </TouchableOpacity>
+                )
+              }
+            </View>
+
+            <TouchableOpacity
+              style={[styles.input, styles.categoryButton]}
+              onPress={showActionSheet}
+            >
+              <MaterialIcons name="category" size={24} color="#111851" />
+              <Text style={styles.categoryButtonText}>
+                {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* <IconTextInput
+              icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
+              placeholder="Product name"
+              value={postData.productName}
+              onChangeText={(text) => setPostData({ ...postData, productName: text })}
+              style={styles.input}
+            />
+
+            <IconTextInput
+              icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
+              placeholder="Color"
+              value={color}
+              onChangeText={setColor}
+              style={styles.input}
+            />
+
+            {isFashionCategorySelected() && (
+              <IconTextInput
+                icon={<Entypo name="ruler" size={24} color="#111851" />}
+                style={[styles.input, styles.sizeInput]}
+                placeholder='Size'
+                value={size}
+                onChangeText={setSize}
+              />
+            )}
+
+            <IconTextInput
+              icon={<FontAwesome name="building-o" size={24} color="#111851" />}
+              placeholder="Company"
+              value={company}
+              onChangeText={setCompany}
+              style={styles.input}
+            /> */}
+
+            <TextInput
+              placeholder="Product name"
+              value={postData.productName}
+              onChangeText={(text) => setPostData({ ...postData, productName: text })}
+              style={styles.input}
+            />
+
+            <TextInput
+              placeholder="Color"
+              value={color}
+              onChangeText={setColor}
+              style={styles.input}
+            />
+
+            {isFashionCategorySelected() && (
+              <TextInput
+                style={[styles.input, styles.sizeInput]}
+                placeholder='Size'
+                value={size}
+                onChangeText={setSize}
+              />
+            )}
+
+            <TextInput
+              placeholder="Company"
+              value={company}
+              onChangeText={setCompany}
+              style={styles.input}
+            />
+
+
+            <GooglePlacesAutocomplete
+              icon={<Octicons name="search" size={24} color="#111851" />}
+              ref={googlePlacesRef}
+              placeholder={postData.pickUpAddress}
+              onPress={(data, details = null) => {
+                setPostData(prev => ({
+                  ...prev,
+                  pickUpAddress: data.description,
+                  pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
+                  pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
+                }));
+              }}
+              query={{
+                key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+                language: 'en',
+              }}
+              styles={{
+                container: {
+                  flex: 0,
+                  width: '100%',
+                },
+                textInput: styles.input,
+                listView: styles.autocompleteListView,
+                row: styles.autocompleteRow,
+              }}
+              enablePoweredByContainer={false}
+              fetchDetails={true}
+              onFail={error => console.error(error)}
+            />
+          </View>
+        </View>
+        {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
+      </KeyboardAwareScrollView>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={toggleModal}
+      >
+        <TouchableWithoutFeedback onPress={toggleModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
+                    <Text style={styles.buttonText}>OPEN GALLERY</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
+                    <Text style={styles.buttonText}>OPEN CAMERA</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </View>
   )
 }
 
@@ -637,7 +669,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     marginVertical: 10,
     height: 40,
-    //marginBottom: 0,
+    marginBottom: -5,
     fontSize: 16
   },
   sizeInput: {

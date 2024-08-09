@@ -2,17 +2,13 @@
 //The Post 
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import {useEffect, useState} from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
 import Comment from '../../components/post/comment';
-import Yarden from '../../images/yarden.jpg';
 import Sharon from '../../images/sharon.jpg';
 import Adar from '../../images/ADAR.jpeg';
 import profileImage from '../../images/profileImage.jpg';
 import ResponseModal from '../customer/responseModal';
-import Lipstick from '../../images/Lipstic.jpeg';
 import { GET } from '../../api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -65,22 +61,10 @@ export default function Post() {
       if (jsonValue != null) {
         const userData = JSON.parse(jsonValue);
         setUser({
-          id: userData.id,
-          role: userData.role,
-          lastSeen: userData.lastSeen,
-          fullName: userData.fullName,
-          emailAddress: userData.emailAddress,
-          password: userData.password,
-          birthDate: userData.birthDate,
-          lat: userData.lat,
-          lng: userData.lng,
-          address: userData.address,
-          image: userData.image,
-          createdAt: userData.createdAt,
-          score: userData.score
-
+          ...userData,
+          id: userData.id  // Ensure the id is set correctly
         });
-        console.log('Fetched user data:', user);
+        console.log('Fetched user data:', userData);
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -92,28 +76,7 @@ export default function Post() {
     fetchUserData();
   }, []);
 
-
-  const getPostFromServer = async (postId) => {
-    try {
-      const response = await GET(`Posts/${postId}`);
-      if (response) {
-        try {
-          await AsyncStorage.setItem(`post_${postId}`, JSON.stringify(response));
-          console.log('Post data stored successfully');
-        } catch (storageError) {
-          console.error('AsyncStorage error:', storageError);
-        }
-      } else {
-        console.log('Failed to fetch post data');
-      }
-    } catch (error) {
-      console.error('An error occurred while fetching post data:', error);
-    }
-  };
-
-  useEffect(() => {
-    getPostFromServer();
-  }, []);
+  console.log('AsyncStorage:',user);
 
   const fetchPostData = async () => {
     try {
@@ -203,24 +166,25 @@ export default function Post() {
 
   return (
     <View style={styles.container}>
-        <View style={styles.details}>
-          <Details
-            fullName={user.fullName}
-            profileImage={{ uri: user.image }}
-            pDate={formatDate(postData.createAt)}
-            pHour={formatTime(postData.createAt)}
-            category={postData.categoryDesc}
-            size={parsedTags[2]}
-            pName={postData.productName}
-            company={parsedTags[1]}
-            color={parsedTags[0]}
-            location={postData.pickUpAddress}
-            productImage={{ uri: postData.userImage }}
-            content={postData.content}
-          />
-
-        </View>
-        <View style={styles.comments}>
+      <View style={styles.details}>
+        <Details
+          fullName={postData.userName}
+          profileImage={{ uri: postData.image }}
+          pDate={formatDate(postData.createAt)}
+          pHour={formatTime(postData.createAt)}
+          category={postData.categoryDesc}
+          size={parsedTags[2]}
+          pName={postData.productName}
+          company={parsedTags[1]}
+          color={parsedTags[0]}
+          location={postData.pickUpAddress}
+          productImage={{ uri: postData.userImage }}
+          content={postData.content}
+          postUserId={postData.userId}  // Add this line
+          currentUserId={user.id}  // Add this line
+        />
+      </View>
+      <ScrollView style={styles.comments}>
           {comments.map((comment, index) => (
             <View key={comment.commentId || index} style={styles.comment}>
               <Comment
@@ -240,42 +204,12 @@ export default function Post() {
               />
             </View>
           ))}
-        </View>
-        <View style={styles.spacer} />
+
       </ScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={styles.keyboardAvoidingView}
-      >
-        <NewComment fullName={'Yarden Assulin'} />
-      </KeyboardAvoidingView>
-        <ScrollView style={styles.comments}>
-                 <View style={styles.comment}>
-            <Comment
-              profilepic={Sharon} score={10} fullName={'Sharon Tebul'} content={'I saw it an hour ago, I checked and there is stock!'}
-              inventoryeye={'24/07/2024 ,15:00'} location={'Azriely Mall, Haifa'} store={'MAC'} bought={'NO'}
-              stock={'High'} datepub={'24/07/2024 ,15:37'} 
-            />
-          </View>
-          <View style={styles.comment}>
-            <Comment
-              profilepic={Adar} score={2} fullName={'Adar Biton'} content={'I saw it an hour ago, I checked and there is stock!'}
-              inventoryeye={'24/07/2024 ,15:00'} location={'Azriely Mall, Haifa'} store={'MAC'} bought={'Yes'}
-              stock={'High'} datepub={'24/07/2024 ,15:37'} quality={'High'} datepurch={'24/07/2024 ,15:00'} rank={8}
-            />
-          </View>
-          <View style={styles.comment}>
-            <Comment
-              profilepic={profileImage} score={5} fullName={'Gal Cohen'} content={'I saw it an hour ago, I checked and there is stock!'}
-              inventoryeye={'24/07/2024 ,15:00'} location={'Azriely Mall, Haifa'} store={'MAC'} bought={'NO'}
-              stock={'High'} datepub={'24/07/2024 ,15:37'} 
-            />
-          </View>
-          </ScrollView>
-          <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
-          <ResponseModal visible={modalVisible} onClose={() => setModalVisible(false)} fullName={'Yarden Assulin'} />
+      <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
+      <ResponseModal visible={modalVisible} onClose={() => setModalVisible(false)} fullName={'Yarden Assulin'} />
     </View>
+
   );
 }
 
