@@ -23,7 +23,6 @@ import C_Messages from './screens/customer/c_messages';
 import ChooseCupons from './screens/customer/chooseCupons';
 import Post from './screens/shared/post';
 
-
 //create the default Stack
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -129,17 +128,18 @@ export default function Navigation() {
             <NavigationContainer>
                 <Stack.Navigator >
                     {/* options={{ headerShown: false }} * initialRouteName='UserTabs'*/}
+                    {/* <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} /> */}
                     <Stack.Screen name="Welcome" component={Welcome} />
                     <Stack.Screen name="RegisterType" component={RegisterType} />
-                    <Stack.Screen name="Login" component={Login} />
+                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
                     <Stack.Screen name="ResetPassword" component={ResetPassword} />
                     <Stack.Screen name="SuccessResetPassword" component={SuccessResetPassword} />
-                    <Stack.Screen name="Loading" component={Loading} />
+                    <Stack.Screen name="Lרoading" component={Loading} />
                     <Stack.Screen name="UserTabs" component={UserTabs} options={{ headerShown: false }} />
                     <Stack.Screen name="SupplierTabs" component={SupplierTabs} options={{ headerShown: false }} />
                     <Stack.Screen name="C_Register" component={C_Register} options={{ headerShown: false }} />
                     <Stack.Screen name="S_Register" component={S_Register} options={{ headerShown: false }} />
-                    <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} />
+                    {/* <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} /> */}
                 </Stack.Navigator>
             </NavigationContainer>
         </>

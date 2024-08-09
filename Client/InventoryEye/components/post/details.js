@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   picture: {
-    height: '57%',
+    height: '60%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   productImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'contain',
+resizeMode: 'contain',
     marginBottom: '1%',
     marginTop: '1%'
   },

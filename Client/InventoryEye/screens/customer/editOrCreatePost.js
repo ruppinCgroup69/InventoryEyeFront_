@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Keyboard, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, Keyboard, ScrollView } from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
 import { GET, POST } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as yup from 'yup';
 import Entypo from '@expo/vector-icons/Entypo';
-
-const DismissKeyboard = ({ children }) => (
-  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    {children}
-  </TouchableWithoutFeedback>
-);
 
 export default function EditOrCreatePost() {
   const [categories, setCategories] = useState([]);
@@ -31,11 +26,6 @@ export default function EditOrCreatePost() {
   const [overallError, setOverallError] = useState('');
   const [errors, setErrors] = useState({});
   const [size, setSize] = useState('');
-  const [parsedTags, setParsedTags] = useState({
-    color: '',
-    company: '',
-    size: ''
-  });
   const [postData, setPostData] = useState({
     postId: 0,
     userId: 0,
@@ -190,37 +180,17 @@ export default function EditOrCreatePost() {
     );
   };
 
-  const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const inputRef = useRef(null);
-
-    useEffect(() => {
-      if (isFocused && inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, [isFocused]);
-
-    return (
-      <View style={[styles.iconTextInputContainer, style]}>
-        {icon}
-        <TextInput
-          ref={inputRef}
-          style={[styles.iconTextInput, { flex: 1 }]}
-          placeholder={placeholder}
-          value={value}
-          onChangeText={(text) => {
-            onChangeText(text);
-            setIsFocused(true);
-          }}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          blurOnSubmit={false}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
-    );
-  };
+  const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => (
+    <View style={[styles.iconTextInputContainer, style]}>
+      {icon}
+      <TextInput
+        style={[styles.iconTextInput, { flex: 1 }]} // Ensures input takes the remaining space
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+      />
+    </View>
+  );
 
   const isFashionCategorySelected = () => {
     if (!selectedCategory) {
@@ -275,7 +245,6 @@ export default function EditOrCreatePost() {
         productName: postData.productName,
         content: postData.content,
         color: color,
-        size: size,
         company: company,
         image: selectedPic,
       };
@@ -283,21 +252,8 @@ export default function EditOrCreatePost() {
       if (!selectedCategory) {
         throw new Error('Please select a category before uploading.');
       }
-      const tagsArray = [color, company, size].filter(tag => tag !== '');
-      const tagsString = tagsArray.join('|');
-      const parseTags = (tagsString) => {
-        try {
-          const tagsArray = JSON.parse(tagsString);
-          setParsedTags({
-            color: tagsArray[0],
-            company: tagsArray[1],
-            size: tagsArray[2]
-          });
-        } catch (error) {
-          console.error('Error parsing tags:', error);
-          setParsedTags({ color: '', company: '', size: '' });
-        }
-      };
+      const tagsArray = [color, company].filter(tag => tag !== '');
+      const tagsString = JSON.stringify(tagsArray);
       const finalPostData = {
         ...postData,
         userId: userData.id,
@@ -308,7 +264,7 @@ export default function EditOrCreatePost() {
         productName: postData.productName,
         content: postData.content,
         image: selectedPic,
-        tags: JSON.stringify(tagsArray), // Store as JSON string
+        tags: tagsString,
         category: selectedCategory.categoryId,
         categoryDesc: selectedCategory.categoryDesc,
         pickUpFromUser: userData.address,
@@ -318,10 +274,10 @@ export default function EditOrCreatePost() {
       console.log('Server response:', response);
 
       if (response && response.success) {
-        navigation.navigate('Home');
+        navigation.navigate('Home'); 
       }
       else {
-        alert('An error occurred while uploading the post. Please try again.');
+      alert('An error occurred while uploading the post. Please try again.');
       }
     }
     catch (err) {
@@ -343,33 +299,23 @@ export default function EditOrCreatePost() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-    >
-      <View style={styles.top}>
-        <View style={styles.exit}>
-          <TouchableOpacity onPress={handleExit}>
-            <Feather name="x" size={30} color="#111851" />
-          </TouchableOpacity>
+      <View style={styles.container}>
+        <View style={styles.top}>
+          <View style={styles.exit}>
+            <TouchableOpacity onPress={handleExit}>
+              <Feather name="x" size={30} color="#111851" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.title}>
+            <Text style={styles.createHeader}>Create New Post</Text>
+          </View>
+          <View style={styles.uploadIcon}>
+            <TouchableOpacity onPress={handleUploadPost}>
+              <Feather name="upload" size={30} color="#111851" />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.title}>
-          <Text style={styles.createHeader}>Create New Post</Text>
-        </View>
-        <View style={styles.uploadIcon}>
-          <TouchableOpacity onPress={handleUploadPost}>
-            <Feather name="upload" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-      </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
         <View style={styles.center}>
           <View style={styles.profile}>
             <View style={styles.imageContainer}>
@@ -393,172 +339,139 @@ export default function EditOrCreatePost() {
               placeholder='What product are you looking for ?'
               value={postData.content}
               onChangeText={(text) => setPostData({ ...postData, content: text })}
-              blurOnSubmit={false}
             />
             {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
           </View>
         </View>
 
-        <View style={styles.bottom}>
-          <View style={styles.inputItem}>
-            <View style={styles.imageSelectionContainer}>
-              {
-                selectedPic ? (
-                  <Image source={{ uri: selectedPic }} style={styles.selectedImage} />
-                ) : (
-                  <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
-                    <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
-                  </TouchableOpacity>
-                )
-              }
-            </View>
+        <KeyboardAwareScrollView
+          style={styles.container}
+          contentContainerStyle={styles.scrollContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardShouldPersistTaps="handeld"
+        >
 
-            <TouchableOpacity
-              style={[styles.input, styles.categoryButton]}
-              onPress={showActionSheet}
-            >
-              <MaterialIcons name="category" size={24} color="#111851" />
-              <Text style={styles.categoryButtonText}>
-                {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
-              </Text>
-            </TouchableOpacity>
-            {/* 
-            <IconTextInput
-              icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
-              placeholder="Product name"
-              value={postData.productName}
-              onChangeText={(text) => setPostData({ ...postData, productName: text })}
-              style={styles.input} />
-
-            <IconTextInput
-              icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
-              placeholder="Color"
-              value={color}
-              onChangeText={setColor}
-              style={styles.input}
-            />
-
-            {isFashionCategorySelected() && (
-              <IconTextInput
-                icon={<Entypo name="ruler" size={24} color="#111851" />}
-                style={[styles.input, styles.sizeInput]}
-                placeholder='Size'
-                value={size}
-                onChangeText={setSize}
-
-              />
-            )}
-
-            <IconTextInput
-              icon={<FontAwesome name="building-o" size={24} color="#111851" />}
-              placeholder="Company"
-              value={company}
-              onChangeText={setCompany}
-              style={styles.input}
-
-            /> */}
-
-            <TextInput
-              style={styles.input}
-              placeholder='Product Name'
-              value={postData.productName}
-              onChangeText={(text) => setPostData({ ...postData, productName: text })}
-            />
-
-            <TextInput
-              placeholder="Color"
-              value={color}
-              onChangeText={setColor}
-              style={styles.input}
-            />
-
-            {isFashionCategorySelected() && (
-              <TextInput
-                style={[styles.input, styles.sizeInput]}
-                placeholder='Size'
-                value={size}
-                onChangeText={setSize}
-              />
-            )}
-
-            <TextInput
-              placeholder="Company"
-              value={company}
-              onChangeText={setCompany}
-              style={styles.input}
-            />
-
-
-
-
-
-            <GooglePlacesAutocomplete
-              icon={<Octicons name="search" size={24} color="#111851" />}
-              ref={googlePlacesRef}
-              placeholder={postData.pickUpAddress}
-              onPress={(data, details = null) => {
-                setPostData(prev => ({
-                  ...prev,
-                  pickUpAddress: data.description,
-                  pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
-                  pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
-                }));
-              }}
-              query={{
-                key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
-                language: 'en',
-              }}
-              styles={{
-                container: {
-                  flex: 0,
-                  width: '100%',
-                },
-                textInput: styles.input,
-                listView: styles.autocompleteListView,
-                row: styles.autocompleteRow,
-              }}
-              textInputProps={{ blurOnSubmit: false }}
-              enablePoweredByContainer={false}
-              fetchDetails={true}
-              onFail={error => console.error(error)}
-            />
-
-          </View>
-        </View>
-        {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
-      </ScrollView>
-
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={toggleModal}
-      >
-        <TouchableWithoutFeedback onPress={toggleModal}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                  <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
-                    <Text style={styles.buttonText}>OPEN GALLERY</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
-                    <Text style={styles.buttonText}>OPEN CAMERA</Text>
-                  </TouchableOpacity>
-                </View>
+          <View style={styles.bottom}>
+            <View style={styles.inputItem}>
+              <View style={styles.imageSelectionContainer}>
+                {
+                  selectedPic ? (
+                    <Image source={{ uri: selectedPic }} style={styles.selectedImage} />
+                  ) : (
+                    <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
+                      <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
+                    </TouchableOpacity>
+                  )
+                }
               </View>
-            </TouchableWithoutFeedback>
+
+              <TouchableOpacity
+                style={[styles.input, styles.categoryButton]}
+                onPress={showActionSheet}
+              >
+                <MaterialIcons name="category" size={24} color="#111851" />
+                <Text style={styles.categoryButtonText}>
+                  {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
+                </Text>
+              </TouchableOpacity>
+
+              <IconTextInput
+                icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
+                placeholder="Product name"
+                value={postData.productName}
+                onChangeText={(text) => setPostData({ ...postData, productName: text })}
+                style={styles.input}
+              />
+
+              <IconTextInput
+                icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
+                placeholder="Color"
+                value={color}
+                onChangeText={setColor}
+                style={styles.input}
+              />
+
+              {isFashionCategorySelected() && (
+                <IconTextInput
+                  icon={<Entypo name="ruler" size={24} color="#111851" />}
+                  style={[styles.input, styles.sizeInput]}
+                  placeholder='Size'
+                  value={size}
+                  onChangeText={setSize}
+                />
+              )}
+
+              <IconTextInput
+                icon={<FontAwesome name="building-o" size={24} color="#111851" />}
+                placeholder="Company"
+                value={company}
+                onChangeText={setCompany}
+                style={styles.input}
+              />
+
+
+              <GooglePlacesAutocomplete
+                icon={<Octicons name="search" size={24} color="#111851" />}
+                ref={googlePlacesRef}
+                placeholder={postData.pickUpAddress}
+                onPress={(data, details = null) => {
+                  setPostData(prev => ({
+                    ...prev,
+                    pickUpAddress: data.description,
+                    pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
+                    pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
+                  }));
+                }}
+                query={{
+                  key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+                  language: 'en',
+                }}
+                styles={{
+                  container: {
+                    flex: 0,
+                    width: '100%',
+                  },
+                  textInput: styles.input,
+                  listView: styles.autocompleteListView,
+                  row: styles.autocompleteRow,
+                }}
+                enablePoweredByContainer={false}
+                fetchDetails={true}
+                onFail={error => console.error(error)}
+              />
+            </View>
           </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    </KeyboardAvoidingView>
-  );
+          {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
+        </KeyboardAwareScrollView>
+
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={toggleModal}
+        >
+          <TouchableWithoutFeedback onPress={toggleModal}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
+                      <Text style={styles.buttonText}>OPEN GALLERY</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
+                      <Text style={styles.buttonText}>OPEN CAMERA</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: '#EAF0F3',
@@ -724,7 +637,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     marginVertical: 10,
     height: 40,
-    marginBottom: -5,
+    //marginBottom: 0,
     fontSize: 16
   },
   sizeInput: {

@@ -1,19 +1,15 @@
 import React from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function NewComment({ fullName }) {
+
+export default function NewComment({ fullName, onPress }) {
+
   return (
     <View style={styles.container}>
-<TextInput
-  style={styles.input}
-  placeholder={`Respond to ${fullName}...`}
-  multiline
-  numberOfLines={4} 
-  textAlignVertical="top" 
-/>
-      <TouchableOpacity style={styles.button}>
-        <Ionicons name="send" size={24} color='rgba(17, 24, 81, 0.7)' />
+      <TouchableOpacity style={styles.responseButton} onPress={onPress}>
+        <Ionicons name="send" size={20} color="#111851" />
+        <Text style={styles.responseText}>Respond to {fullName}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -21,28 +17,27 @@ export default function NewComment({ fullName }) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    height:70,
+    height: 70,
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#C6DEE7', // Ensure it's visible against the background
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    borderTopWidth:1,
+    borderTopColor:'#C6DEE7',
   },
-  input: {
-    flex: 1,
-    minHeight: 40, // Minimum height of the input
-    maxHeight: 120, // Maximum height of the input
-    borderColor: 'rgba(17, 24, 81, 0.4)',
-    borderWidth: 1,
+  responseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
     borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10, // Padding for text inside input
-    backgroundColor: '#EAF0F3',
-    textAlignVertical: 'top', // Align text to the top
-    marginBottom:'3%'
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    elevation: 2,
+    borderWidth:1,
+    borderColor:'#31A1E5'
   },
-  button: {
-    marginLeft: 10,
-    marginBottom:'3.5%'
+  responseText: {
+    color: '#111851',
+    fontSize: 14,
+    marginLeft: 8,
   },
 });

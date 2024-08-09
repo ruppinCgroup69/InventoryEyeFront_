@@ -246,11 +246,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '4%',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   lable: {
     fontSize: 16,
     marginRight: 10,
+    width:100
   },
   input: {
     flexDirection: 'row',
