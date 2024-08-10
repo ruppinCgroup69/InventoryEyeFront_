@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform ,TouchableOpacity, Text} from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
 import Comment from '../../components/post/comment';
 import ResponseModal from '../customer/responseModal';
+import RateModal from '../customer/rateModal';
 import { GET } from '../../api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -57,7 +58,7 @@ export default function Post() {
         const userData = JSON.parse(jsonValue);
         setUser({
           ...userData,
-          id: userData.id 
+          id: userData.id
         });
       } else {
         console.error('No user data found in AsyncStorage');
@@ -157,6 +158,19 @@ export default function Post() {
   }, [comments]);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
+  const [ratingData, setRatingData] = useState({ publishedBy: null, ratedBy: null });
+  const handleOpenRatingModal = (commentUserId) => {
+    setRatingData({
+      publishedBy: commentUserId,
+      ratedBy: user.id  // This is the ID of the logged-in user
+    });
+    setIsRatingModalVisible(true);
+  };
+  
+  const handleCloseRatingModal = () => {
+    setIsRatingModalVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -174,41 +188,51 @@ export default function Post() {
           location={postData.pickUpAddress}
           productImage={{ uri: postData.userImage }}
           content={postData.content}
-          postUserId={postData.userId} 
+          postUserId={postData.userId}
           currentUserId={user.id}
           postId={postId}
         />
       </View>
       <ScrollView style={styles.comments}>
-          {comments.map((comment, index) => (
-            <View key={comment.commentId || index} style={styles.comment}>
-              <Comment
-                profilepic={{ uri: comment.userImage }}
-                score={comment.score}
-                fullName={comment.userName}
-                content={comment.content}
-                inventoryeye={formatDate(comment.inventoryEye)}
-                location={comment.storeLocation}
-                store={comment.storeLocation} 
-                bought={comment.bought ? 'Yes' : 'NO'}
-                stock={'High'} 
-                datepub={formatDate(comment.createdAt)}
-                quality={comment.bought ? comment.productQuality : undefined}
-                datepurch={comment.bought ? formatDate(comment.boughtDate) : ''}
-                rank={comment.bought ? comment.satisfaction : undefined}
-              />
-            </View>
-          ))}
+        {comments.map((comment, index) => (
+          <View key={comment.commentId || index} style={styles.comment}>
+            <Comment
+              profilepic={{ uri: comment.userImage }}
+              score={comment.score}
+              fullName={comment.userName}
+              content={comment.content}
+              inventoryeye={formatDate(comment.inventoryEye)}
+              location={comment.storeLocation}
+              store={comment.storeLocation}
+              bought={comment.bought ? 'Yes' : 'NO'}
+              stock={'High'}
+              datepub={formatDate(comment.createdAt)}
+              quality={comment.bought ? comment.productQuality : undefined}
+              datepurch={comment.bought ? formatDate(comment.boughtDate) : ''}
+              rank={comment.bought ? comment.satisfaction : undefined}
+              onRatePress={handleOpenRatingModal}
+              commentUserId={comment.userId} 
+            />
+          </View>
+        ))}
 
       </ScrollView>
       <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
-      <ResponseModal 
-      visible={modalVisible}
-       onClose={() => setModalVisible(false)}
+      <ResponseModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
         fullName={'Yarden Assulin'}
         postId={postId}
         onCommentPosted={refreshComments}
-         />
+      />
+
+      <RateModal
+        visible={isRatingModalVisible}
+        onClose={handleCloseRatingModal}
+        publishedBy={ratingData.publishedBy}
+        ratedBy={ratingData.ratedBy}
+        postId={postId}
+      />
     </View>
 
   );

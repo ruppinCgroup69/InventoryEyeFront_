@@ -111,7 +111,7 @@ export default function Profile() {
         </View>
         <View style={styles.postsHistory}>
           <View style={styles.postsText}>
-            <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
+            <Text style={{ textAlign: 'left', marginLeft: '9%' , marginTop:'2%'}}>
               Post's History </Text>
           </View>
           <ScrollView horizontal contentContainerStyle={styles.postsList}>

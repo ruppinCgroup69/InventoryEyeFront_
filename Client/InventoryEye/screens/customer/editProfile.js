@@ -4,14 +4,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { useState, useEffect } from 'react';
-import { PUT } from '../../api'
+import { useState, useEffect , useRef } from 'react';
+import { PUT, GET } from '../../api'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EditProfile() {
   const currentDate = new Date();
   const maxDate = new Date(currentDate.getFullYear() - 16, currentDate.getMonth(), currentDate.getDate());
   const minDate = new Date(currentDate.getFullYear() - 120, currentDate.getMonth(), currentDate.getDate());
+  const googlePlacesRef = useRef(null);
   const [user, setUser] = useState({
     id: 0,
     role: 0,
@@ -48,6 +49,9 @@ export default function EditProfile() {
           createdAt: userData.createdAt,
           score: userData.score
         });
+        if (googlePlacesRef.current) {
+          googlePlacesRef.current.setAddressText(userData.address);
+        }
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -119,6 +123,7 @@ export default function EditProfile() {
         <View style={styles.fieldContainer}>
           <Text style={styles.lable}>Address:</Text>
           <GooglePlacesAutocomplete
+          ref={googlePlacesRef}
             placeholder='Enter address'
             fetchDetails={true}
             query={{
@@ -202,6 +207,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
+    marginTop:40
   },
   fieldContainer: {
     flexDirection: 'row',
@@ -263,6 +269,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#31A1E5',
     width: 180,
+    marginTop:55
   },
   UpdateButtonText: {
     color: '#111851',
@@ -280,6 +287,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginLeft: 10,
+    marginLeft:80,
+
   },
 });

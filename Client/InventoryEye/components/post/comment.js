@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
+import RateModal from '../../screens/customer/rateModal';
 
-export default function Comment({ profilepic, score, fullName, content, inventoryeye, location, bought, store, stock, datepub, datepurch, quality, rank }) {
+export default function Comment({ profilepic, score, fullName, content, inventoryeye, location, bought, store, stock, datepub, datepurch, quality, rank, onRatePress,
+  commentUserId }) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
@@ -14,7 +16,10 @@ export default function Comment({ profilepic, score, fullName, content, inventor
           </View>
         </View>
         <View style={styles.leftDown}>
-          <TouchableOpacity style={styles.relativeContainer}>
+          <TouchableOpacity
+            style={styles.relativeContainer}
+            onPress={() => onRatePress(commentUserId)}
+          >
             <AntDesign name="star" size={26} color="#31A1E5" style={styles.starIcon} />
             <View style={styles.Plus}>
               <Text style={styles.plusText}>+</Text>

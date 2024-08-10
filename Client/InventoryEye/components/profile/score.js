@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
   },
   scoreNumContainer: {
     position: 'absolute',
-    top: '25%',
-    left: '11%',
+    top: '22%',
+    left: '15%',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

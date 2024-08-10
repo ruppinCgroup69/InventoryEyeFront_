@@ -149,16 +149,16 @@ const styles = StyleSheet.create({
     marginVertical: '5%'//10
   },
   categoryText: {
-    fontSize: '15',
+    fontSize: '12',
     fontWeight: 'bold',
     color: '#111851',
     paddingTop: 10,
     textAlign: 'center'
   },
   categoriesContainer: {
-    width: '100%',
+    width: '180',
     height: '180',
-    borderRadius: 40,
+    borderRadius: 30,
     borderColor: '#111851',
     borderWidth: 1,
     backgroundColor: '#F0F6FE',
