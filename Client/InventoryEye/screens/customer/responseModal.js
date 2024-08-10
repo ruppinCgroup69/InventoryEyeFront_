@@ -1,21 +1,162 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, ScrollView,Modal,TouchableWithoutFeedback } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, TextInput, ScrollView, Modal, TouchableWithoutFeedback, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { AntDesign } from '@expo/vector-icons';
+import { Keyboard } from 'react-native';
+import { GET, POST } from '../../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ResponseModal({ visible, onClose, fullName }) {
-  const [selectedStockLevel, setSelectedStockLevel] = useState('High');
-  const [selectedQuality, setSelectedQuality] = useState('High');
-  const [date, setDate] = useState(new Date());
+const Option = ({ label, isSelected, onPress }) => (
+  <TouchableOpacity
+    style={[styles.option, isSelected && styles.selectedOption]}
+    onPress={onPress}
+  >
+    <Text style={isSelected ? styles.selectedOptionText : styles.optionText}>
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
+
+const qualityMapping = {
+  'Low': 1,
+  'Medium': 2,
+  'High': 3
+};
+
+const reverseQualityMapping = {
+  1: 'Low',
+  2: 'Medium',
+  3: 'High'
+};
+
+export default function ResponseModal({ visible, onClose, fullName, postId, onCommentPosted  }) {
+  const [respnseContent, setRespnseContent] = useState('');
+  const [inEyeDate, setInEyeDate] = useState(new Date());
   const [location, setLocation] = useState('');
-  const [store, setStore] = useState('');
-  const [purchased, setPurchased] = useState('NO');
-  const [satisfaction, setSatisfaction] = useState('Satisfied');
+  const [selectedStockLevel, setSelectedStockLevel] = useState('');
+  const [purchased, setPurchased] = useState('No');
+  const [selectedQuality, setSelectedQuality] = useState('');
+  const [purchDate, setPurchDate] = useState(new Date());
+  const [satisfaction, setSatisfaction] = useState('');
+  const [inputHeight, setInputHeight] = useState(30);
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [stores, setStores] = useState([]);
+  const [stockLevels, setStockLevels] = useState([]);
+  const [responseData, setResponseData] = useState({
+    postId: 0,
+    userId: 0,
+    storeId: 0,
+    stockId: 0,
+    commentId: 0,
+    createdAt: new Date().toISOString(),
+    editedAt: new Date().toISOString(),
+    content: '',
+    inventoryEye: new Date().toISOString(),
+    storeLocation: '',
+    bought: 0,
+    boughtDate: null,
+    productQuality: 0,
+    userName: '',
+    userImage: '',
+    score: 0,
+    satisfaction: 0
+  });
 
-  const handleTouchOutside = () => {
-    onClose();
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await GET('Stores');
+        setStores(response);
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+    fetchStores();
+  }, []);
+
+  useEffect(() => {
+    const fetchStockLevels = async () => {
+      try {
+        const response = await GET('StockLevel');
+        setStockLevels(response);
+      } catch (error) {
+        console.error('Error fetching stock levels:', error);
+      }
+    };
+    fetchStockLevels();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('logged user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          console.log('Fetched User Data:', user);
+          setResponseData((prevData) => ({
+            ...prevData,
+            userId: user.id,
+            userName: user.fullName,
+            userImage: user.image,
+            score: user.score
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  const PLACEHOLDER_DATE = '1900-01-01T00:00:00.000Z';
+
+  const handleSend = async () => {
+    const updatedResponseData = {
+      ...responseData,
+      postId,
+      content: respnseContent,
+      inventoryEye: inEyeDate.toISOString(),
+      storeLocation: location,
+      storeId: selectedStore ? selectedStore.storeId : 0,
+      stockId: stockLevels.find(level => level.stockDesc === selectedStockLevel)?.stockId || 0,
+      bought: purchased === 'Yes',
+      boughtDate: purchased === 'Yes' ? purchDate.toISOString() : PLACEHOLDER_DATE,
+      productQuality: qualityMapping[selectedQuality] || 0,
+      satisfaction: satisfaction ? parseInt(satisfaction, 10) : 0,
+    };
+
+    console.log('Post ID:', postId);
+    console.log('Updated Response Data:', updatedResponseData);
+
+    try {
+      const response = await POST('Comments', updatedResponseData);
+      console.log('Comment posted successfully:', response);
+      onCommentPosted();
+      onClose();
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    }
   };
+
+
+  const showActionSheet = () => {
+    Alert.alert(
+      "Select Store",
+      "",
+      [
+        ...stores.map(store => ({
+          text: store.storeName,
+          onPress: () => {
+            setSelectedStore(store)
+          }
+        })),
+        {
+          text: "Cancel",
+          style: "cancel"
+        }
+      ]
+    );
+  };
+
 
   return (
     <Modal
@@ -24,105 +165,135 @@ export default function ResponseModal({ visible, onClose, fullName }) {
       visible={visible}
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={handleTouchOutside}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.modalContainer}>
           <TouchableWithoutFeedback>
             <View style={styles.modalContent}>
-              <Text style={styles.title}>Respond to {fullName}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Type your response here..."
-                multiline={true}
-              />
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Date and Time when you saw the product:</Text>
-                <DateTimePicker
-                  style={styles.date}
-                  testID="dateTimePicker"
-                  mode="date"
-                  value={date}
-                  onChange={(event, selectedDate) => setDate(selectedDate || date)}
-                />
-                <AntDesign name="calendar" size={24} color="rgba(17, 24, 81, 0.6)" style={{ marginTop: 6 }} />
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Location:</Text>
+              <ScrollView>
+                <Text style={styles.title}>Respond to {fullName}</Text>
                 <TextInput
-                  style={styles.input}
-                  value={location}
-                  onChangeText={setLocation}
+                  style={[styles.input, { height: inputHeight }]}
+                  placeholder="Type your response here..."
+                  multiline={true}
+                  onContentSizeChange={(event) => {
+                    setInputHeight(event.nativeEvent.contentSize.height);
+                  }}
+                  onChangeText={setRespnseContent}
                 />
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Store Name:</Text>
-                <TextInput
-                  style={styles.input}
-                  value={store}
-                  onChangeText={setStore}
-                />
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Stock Level:</Text>
-                <Picker
-                  selectedValue={selectedStockLevel}
-                  onValueChange={(itemValue) => setSelectedStockLevel(itemValue)}
-                >
-                  <Picker.Item label="High" value="High" />
-                  <Picker.Item label="Medium" value="Medium" />
-                  <Picker.Item label="Low" value="Low" />
-                </Picker>
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Purchased:</Text>
-                <Picker
-                  selectedValue={purchased}
-                  onValueChange={(itemValue) => setPurchased(itemValue)}
-                >
-                  <Picker.Item label="Yes" value="Yes" />
-                  <Picker.Item label="No" value="No" />
-                </Picker>
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Product Quality:</Text>
-                <Picker
-                  selectedValue={selectedQuality}
-                  onValueChange={(itemValue) => setSelectedQuality(itemValue)}
-                >
-                  <Picker.Item label="High" value="High" />
-                  <Picker.Item label="Medium" value="Medium" />
-                  <Picker.Item label="Low" value="Low" />
-                </Picker>
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Purchase Date:</Text>
-                <DateTimePicker
-                  style={styles.date}
-                  testID="dateTimePicker"
-                  mode="date"
-                  value={date}
-                  onChange={(event, selectedDate) => setDate(selectedDate || date)}
-                />
-                <AntDesign name="calendar" size={24} color="rgba(17, 24, 81, 0.6)" style={{ marginTop: 6 }} />
-              </View>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Degree of Satisfaction:</Text>
-                <Picker
-                  selectedValue={satisfaction}
-                  onValueChange={(itemValue) => setSatisfaction(itemValue)}
-                >
-                  <Picker.Item label="Very Satisfied" value="Very Satisfied" />
-                  <Picker.Item label="Satisfied" value="Satisfied" />
-                  <Picker.Item label="Neutral" value="Neutral" />
-                  <Picker.Item label="Dissatisfied" value="Dissatisfied" />
-                  <Picker.Item label="Very Dissatisfied" value="Very Dissatisfied" />
-                </Picker>
-              </View>
-              <Button title="Send" onPress={onClose} />
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.inEyeLabel}>I kept an eye on it on:</Text>
+                  <View style={styles.optionsContainer}>
+                    <DateTimePicker
+                      style={styles.date}
+                      testID="dateTimePicker"
+                      mode="date"
+                      value={inEyeDate}
+                      maximumDate={new Date()}
+                      onChange={(event, selectedDate) => setInEyeDate(selectedDate || date)}
+                    />
+                  </View>
+                </View>
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>Location:</Text>
+                  <TextInput
+                    style={[styles.input, { flex: 1 }]}
+                    value={location}
+                    onChangeText={setLocation}
+                  />
+                </View>
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>Store Name:</Text>
+                  <TouchableOpacity
+                    style={[styles.input, { flex: 1 }]}
+                    onPress={showActionSheet}
+                  >
+                    <Text style={styles.storeButtonText}>
+                      {selectedStore ? selectedStore.storeName : 'Select Store'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>Stock Level:</Text>
+                  <View style={styles.optionsContainer}>
+                    {stockLevels.map((level) => (
+                      <Option
+                        key={level.stockId}
+                        label={level.stockDesc}
+                        isSelected={selectedStockLevel === level.stockDesc}
+                        onPress={() => setSelectedStockLevel(level.stockDesc)}
+                      />
+                    ))}
+                  </View>
+                </View>
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>Purchased:</Text>
+                  <View style={styles.optionsContainer}>
+                    {['Yes', 'No'].map((option) => (
+                      <Option
+                        key={option}
+                        label={option}
+                        isSelected={purchased === option}
+                        onPress={() => setPurchased(option)}
+                      />
+                    ))}
+                  </View>
+                </View>
+
+                {purchased === 'Yes' && (
+                  <>
+                    <View style={styles.fieldContainer}>
+                      <Text style={styles.label}>Product Quality:</Text>
+                      <View style={styles.optionsContainer}>
+                        {['Low', 'Medium', 'High'].map((quality) => (
+                          <Option
+                            key={quality}
+                            label={quality}
+                            isSelected={selectedQuality === quality}
+                            onPress={() => setSelectedQuality(quality)}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                    <View style={styles.fieldContainer}>
+                      <Text style={styles.label}>Purchase Date:</Text>
+                      <View style={styles.optionsContainer}>
+                        <DateTimePicker
+                          style={styles.date}
+                          testID="dateTimePicker"
+                          mode="date"
+                          value={purchDate}
+                          maximumDate={new Date()}
+                          onChange={(event, selectedDate) => setPurchDate(selectedDate || purchDate)}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.fieldContainer}>
+                      <Text style={styles.label}>Satisfaction:</Text>
+                      <Text style={styles.satisfactionLabel}>Low</Text>
+                      <View style={styles.optionsRankContainer}>
+                        {[1, 2, 3, 4, 5].map((level) => (
+                          <Option
+                            key={level}
+                            label={String(level)}
+                            isSelected={satisfaction === level}
+                            onPress={() => setSatisfaction(level)}
+                          />
+                        ))}
+                      </View>
+                      <Text style={styles.satisfactionLabel}>High</Text>
+                    </View>
+                  </>
+                )}
+                <View style={styles.buttons}>
+                  <Button title="Comment" onPress={handleSend} style={styles.button} />
+                  <Button title="Close" onPress={onClose} style={styles.closeButton} />
+                </View>
+              </ScrollView>
             </View>
           </TouchableWithoutFeedback>
         </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+      </TouchableWithoutFeedback >
+    </Modal >
   );
 }
 
@@ -133,7 +304,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
+    width: '97%',
+    height: '60%',
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
@@ -141,12 +313,51 @@ const styles = StyleSheet.create({
     borderColor: '#31A1E5',
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
     color: '#111851',
+    marginBottom: 7
   },
   fieldContainer: {
-    marginBottom: 15,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inEyeLabel: {
+    fontSize: 14,
+    marginBottom: 0,
+    width: '60%'
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 0,
+    width: '30%'
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  optionsRankContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  option: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#31A1E5',
+    margin: 2,
+  },
+  selectedOption: {
+    backgroundColor: '#31A1E5',
+  },
+  optionText: {
+    color: '#111851',
+  },
+  selectedOptionText: {
+    color: 'white',
   },
   input: {
     borderColor: '#31A1E5',
@@ -154,14 +365,44 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: 'white',
     paddingHorizontal: 15,
-    height: 40,
+    minHeight: 30,
+    textAlignVertical: 'top',
   },
   date: {
     width: '100%',
     height: 40,
   },
-  label: {
+  button: {
+    marginTop: 10,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: '#31A1E5',
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  satisfactionLabel: {
+    fontSize: 14,
+    color: '#111851',
+  },
+  storeButton: {
+    backgroundColor: '#ffff',
+    borderWidth: 1,
+    borderColor: '#31a1e5',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: -5,
+    marginVertical: 10,
+    width: '100%',
+  },
+  storeButtonText: {
+    color: 'rgba(17, 24, 81, 0.3)',
     fontSize: 16,
-    marginBottom: 5,
+    textAlign: 'left',
+    marginLeft: 7,
+    paddingVertical: 0,
+    paddingTop: 5
   },
 });

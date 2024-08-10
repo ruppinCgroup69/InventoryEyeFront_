@@ -1,20 +1,16 @@
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react'
 import Info from '../../components/profile/info'
 import Score from '../../components/profile/score'
 import PostsHistory from '../../components/profile/postsHistory'
 import CuponsHistory from '../../components/profile/cuponsHistory'
-import profileImage from '../../images/profileImage.jpg'
-import productImage from '../../images/productImage.jpg';
 import bonusImage from '../../images/bonusImage.png';
 import { AntDesign } from '@expo/vector-icons';
-import Post from '../shared/post';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
-import { formatDate , formatTime} from '../../utils';
-
-
+import { formatDate } from '../../utils';
+import { GET } from '../../api';
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -33,6 +29,23 @@ export default function Profile() {
     createdAt: '',
     score: 0,
   });
+  const [userPosts, setUserPosts] = useState([]);
+
+  const fetchUserPosts = async (userId) => {
+    try {
+      const posts = await GET(`Posts/UserID/${userId}`);
+      setUserPosts(posts);
+    } catch (error) {
+      console.error('Error retrieving user posts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData().then(() => {
+      fetchUserPosts(user.id);
+    });
+  }, [user.id]);
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("logged user");
@@ -41,6 +54,7 @@ export default function Profile() {
       console.error("Error logging out:", error);
     }
   };
+  
   const fetchUserData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('logged user');
@@ -61,7 +75,6 @@ export default function Profile() {
           createdAt: userData.createdAt,
           score: userData.score
         });
-        console.log('Fetched user data:', user);
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -78,10 +91,10 @@ export default function Profile() {
       <View style={styles.info}>
         <View style={styles.frame}>
           <View style={styles.inner}>
-            <Info fullName={user.fullName } profileImage={{ uri: user.image }} email={user.emailAddress} birthdate={formatDate(new Date(user.birthDate))} city={user.address}></Info>
+            <Info fullName={user.fullName} profileImage={{ uri: user.image }} email={user.emailAddress} birthdate={formatDate(new Date(user.birthDate))} city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>
-                <AntDesign name="edit" size={24} color="#111851" />
+                <AntDesign name="edit" size={24} color="#111851" onPress={() => navigation.navigate('Edit Profile')} />
               </TouchableOpacity>
             </View>
           </View>
@@ -101,12 +114,15 @@ export default function Profile() {
             <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
               Post's History </Text>
           </View>
-          <View style={styles.postsList}>
-            <PostsHistory Post={productImage}></PostsHistory>
-            <PostsHistory Post={productImage}></PostsHistory>
-            <PostsHistory Post={productImage}></PostsHistory>
-            <PostsHistory Post={productImage}></PostsHistory>
-          </View>
+          <ScrollView horizontal contentContainerStyle={styles.postsList}>
+            {userPosts.map((post) => (
+              <PostsHistory
+                key={post.postId}
+                Post={post.userImage}
+                postId={post.postId}
+              />
+            ))}
+          </ScrollView>
         </View>
 
         <View style={styles.bonusHistory}>
@@ -213,25 +229,27 @@ const styles = StyleSheet.create({
   },
   postsList: {
     flexDirection: 'row',
-    marginLeft: '6%'
+    marginLeft: '6%',
   },
   bonusList: {
     flexDirection: 'row',
     marginLeft: '5%'
   },
   logoutButtonContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    position: 'absolute',
+    top: 50,
+    right: 20,
   },
   logoutButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: 'white',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
+    borderWidth:2,
+    borderColor:'#31A1E5'
   },
   logoutButtonText: {
-    color: 'white',
+    color: '#111851',
     fontSize: 16,
     fontWeight: 'bold',
   },

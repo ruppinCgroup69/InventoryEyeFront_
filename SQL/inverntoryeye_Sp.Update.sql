@@ -65,7 +65,8 @@ Alter PROCEDURE [dbo].[SP_InEye_UpdateComments]
 	@storeLocation nvarchar(max),
 	@bought bit ,
 	@boughtDate date,
-	@productQuality int
+	@productQuality int,
+	@satisfaction int
 
 AS
 BEGIN
@@ -77,7 +78,7 @@ BEGIN
 	end
 
     -- update statements for procedure here
-	update Comments set [EditedAt]=@editedAt,[Content]=@content,[InventoryEye]=@inventoryEye,[StoreId]=@storeId,[StockId]=@stockId,[StoreLocation]=@storeLocation,[Bought]=@bought,[BoughtDate]=@boughtDate,[ProductQuality]=@productQuality
+	update Comments set [EditedAt]=@editedAt,[Content]=@content,[InventoryEye]=@inventoryEye,[StoreId]=@storeId,[StockId]=@stockId,[StoreLocation]=@storeLocation,[Bought]=@bought,[BoughtDate]=@boughtDate,[ProductQuality]=@productQuality,[Satisfaction]=@satisfaction
 	where [UserId] = @userId	   
 	return 1
 	
@@ -174,14 +175,16 @@ GO
 ALTER PROCEDURE [dbo].[SP_InEye_UpdateCategory]
 
 	@id int,
-	@categoryDesc nvarchar (max)
+	@categoryDesc nvarchar (max),
+	@categoryImage varchar (max)
 
 AS
 BEGIN
     SET NOCOUNT ON;
 
     -- Update statements for procedure here
-    UPDATE Category SET [CategoryDesc] = @categoryDesc
+    UPDATE Category SET [CategoryDesc] = @categoryDesc, [CategoryImage]=@categoryImage
+
     WHERE [Id] = @id
 
     RETURN 1;

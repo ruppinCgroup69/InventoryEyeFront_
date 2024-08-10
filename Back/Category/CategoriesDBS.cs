@@ -136,6 +136,7 @@ namespace InventoryEyeBack.Category
 
             cmd.Parameters.AddWithValue("@id", category.CategoryId);
             cmd.Parameters.AddWithValue("@categoryDesc", category.CategoryDesc);
+            cmd.Parameters.AddWithValue("@categoryImage", category.CategoryImage);
 
             return cmd;
         }
@@ -235,6 +236,7 @@ namespace InventoryEyeBack.Category
                 CategoriesModel c = new CategoriesModel();
                 c.CategoryId = Convert.ToInt32(dataReader["Id"].ToString());
                 c.CategoryDesc = dataReader["CategoryDesc"].ToString();
+                c.CategoryImage= dataReader["CategoryImage"].ToString();
 
                 categories.Add(c);
             }

@@ -73,7 +73,7 @@ namespace InventoryEyeBack.Comments
         }
 
         // DELETE api/<CommentsController>/5
-        [HttpDelete("{commentId}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             CommentsModel comment = new CommentsModel();

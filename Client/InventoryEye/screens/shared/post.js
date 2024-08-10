@@ -1,24 +1,19 @@
-
-//The Post 
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
 import Comment from '../../components/post/comment';
-import Sharon from '../../images/sharon.jpg';
-import Adar from '../../images/ADAR.jpeg';
-import profileImage from '../../images/profileImage.jpg';
 import ResponseModal from '../customer/responseModal';
 import { GET } from '../../api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 
-
 export default function Post() {
   const route = useRoute();
   const { postId } = route.params;
   const navigation = useNavigation();
+  const [comments, setComments] = useState([]);
   const [parsedTags, setParsedTags] = useState([]);
   const [user, setUser] = useState({
     id: 0,
@@ -62,9 +57,8 @@ export default function Post() {
         const userData = JSON.parse(jsonValue);
         setUser({
           ...userData,
-          id: userData.id  // Ensure the id is set correctly
+          id: userData.id 
         });
-        console.log('Fetched user data:', userData);
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -76,21 +70,17 @@ export default function Post() {
     fetchUserData();
   }, []);
 
-  console.log('AsyncStorage:',user);
 
   const fetchPostData = async () => {
     try {
       const response = await GET(`Posts/${postId}`);
       if (response) {
         setPostData(response);
-        console.log('Fetched post data:', response);
 
-        // Parse the tags
         if (response.tags) {
           try {
             const tagsArray = JSON.parse(response.tags);
             setParsedTags(tagsArray);
-            console.log('Parsed tags:', tagsArray);
           } catch (parseError) {
             console.error('Error parsing tags:', parseError);
           }
@@ -98,7 +88,6 @@ export default function Post() {
 
         try {
           await AsyncStorage.setItem(`post_${postId}`, JSON.stringify(response));
-          console.log('Post data stored successfully');
         } catch (storageError) {
           console.error('AsyncStorage error:', storageError);
         }
@@ -114,6 +103,19 @@ export default function Post() {
     fetchPostData();
   }, [postId]);
 
+  const refreshComments = async () => {
+    try {
+      const response = await GET(`Comments/PostId/${postId}`);
+      if (response && Array.isArray(response)) {
+        setComments(response);
+      } else {
+        console.log('Failed to fetch comments or invalid response');
+      }
+    } catch (error) {
+      console.error('An error occurred while fetching comments:', error);
+    }
+  };
+
   const formatDate = (date) => {
     if (!(date instanceof Date)) {
       date = new Date(date);
@@ -128,19 +130,13 @@ export default function Post() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const [comments, setComments] = useState([]);
-
   const fetchComments = async (postId) => {
     try {
-      console.log('Fetching comments for postId:', postId);
       const response = await GET(`Comments/PostId/${postId}`);
-      console.log('Raw response from comments API:', response);
       if (response && Array.isArray(response)) {
         setComments(response);
-        console.log('Fetched comments:', response);
         try {
           await AsyncStorage.setItem(`comments_for_post_${postId}`, JSON.stringify(response));
-          console.log('Comments data stored successfully in AsyncStorage');
         } catch (storageError) {
           console.error('AsyncStorage error:', storageError);
         }
@@ -158,9 +154,7 @@ export default function Post() {
   }, [postId]);
 
   useEffect(() => {
-    console.log('Current comments in state:', comments);
   }, [comments]);
-
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -180,8 +174,9 @@ export default function Post() {
           location={postData.pickUpAddress}
           productImage={{ uri: postData.userImage }}
           content={postData.content}
-          postUserId={postData.userId}  // Add this line
-          currentUserId={user.id}  // Add this line
+          postUserId={postData.userId} 
+          currentUserId={user.id}
+          postId={postId}
         />
       </View>
       <ScrollView style={styles.comments}>
@@ -194,20 +189,26 @@ export default function Post() {
                 content={comment.content}
                 inventoryeye={formatDate(comment.inventoryEye)}
                 location={comment.storeLocation}
-                store={comment.storeLocation} // לעשות פטצ' ל STORE 
+                store={comment.storeLocation} 
                 bought={comment.bought ? 'Yes' : 'NO'}
-                stock={'High'} // לעשות פטצ ל STOCK
+                stock={'High'} 
                 datepub={formatDate(comment.createdAt)}
-                quality={comment.productQuality}
+                quality={comment.bought ? comment.productQuality : undefined}
                 datepurch={comment.bought ? formatDate(comment.boughtDate) : ''}
-                rank={comment.productQuality} // לשאול את ירדן מה זה השדה הזה (אם חסר אז להוסיף לשרת)
+                rank={comment.bought ? comment.satisfaction : undefined}
               />
             </View>
           ))}
 
       </ScrollView>
       <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
-      <ResponseModal visible={modalVisible} onClose={() => setModalVisible(false)} fullName={'Yarden Assulin'} />
+      <ResponseModal 
+      visible={modalVisible}
+       onClose={() => setModalVisible(false)}
+        fullName={'Yarden Assulin'}
+        postId={postId}
+        onCommentPosted={refreshComments}
+         />
     </View>
 
   );

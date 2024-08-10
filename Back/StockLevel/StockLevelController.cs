@@ -1,4 +1,5 @@
 ﻿using InventoryEyeBack.Posts;
+using InventoryEyeBack.Stores;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -11,17 +12,12 @@ namespace InventoryEyeBack.StockLevel
     {
         // GET: api/<StockLevelController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<StockLevelModel> Get()
         {
-            return new string[] { "value1", "value2" };
+            StockLevelModel stockLevel = new StockLevelModel();
+            return stockLevel.ReadAllStockLevel();
         }
 
-        // GET api/<StockLevelController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
 
         // POST api/<StockLevelController>
         [HttpPost]
@@ -54,11 +50,13 @@ namespace InventoryEyeBack.StockLevel
             }
         }
 
-        // DELETE api/<StockLevelController>/5
+        // DELETE api/<StoresController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
-           
+            StockLevelModel stockLevel = new StockLevelModel();
+            stockLevel.DeleteStockLevel(id);
+            return Ok();
         }
     }
 }

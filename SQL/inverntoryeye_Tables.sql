@@ -40,6 +40,7 @@ CREATE TABLE [Post] (
 CREATE TABLE [Category] (
 	[Id] int IDENTITY(1,1) NOT NULL UNIQUE,
 	[CategoryDesc] nvarchar(max) NOT NULL,
+	[CategoryImage] nvarchar(max) NULL,
 	PRIMARY KEY ([Id])
 );
 
@@ -57,6 +58,7 @@ CREATE TABLE [Comments] (
 	[Bought] bit,
 	[BoughtDate] date,
 	[ProductQuality] int,
+	[Satisfaction] int,
 	PRIMARY KEY ([PostId], [Id])
 );
 

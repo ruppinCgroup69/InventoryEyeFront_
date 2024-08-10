@@ -22,9 +22,9 @@ namespace InventoryEyeBack.Comments
         DateTime boughtDate;
         int productQuality;
         int score;
-        
+        int satisfaction;
 
-        public CommentsModel(int postId,int userId, int storeId, int stockId, int commentId, DateTime createdAt, DateTime editedAt, string content, DateTime inventoryEye, string storeLocation, bool bought, DateTime boughtDate, int productQuality)
+        public CommentsModel(int postId,int userId, int storeId, int stockId, int commentId, DateTime createdAt, DateTime editedAt, string content, DateTime inventoryEye, string storeLocation, bool bought, DateTime boughtDate, int productQuality, int satisfaction)
         {
             PostId = postId;
             UserId = userId;
@@ -39,6 +39,7 @@ namespace InventoryEyeBack.Comments
             Bought = bought;
             BoughtDate = boughtDate;
             ProductQuality = productQuality;
+            Satisfaction = satisfaction;
         }
 
         public CommentsModel() { }
@@ -59,6 +60,7 @@ namespace InventoryEyeBack.Comments
         public string UserName { get => userName; set => userName = value; }
         public string UserImage { get => userImage; set => userImage = value; }
         public int Score { get => score; set => score = value; }
+        public int Satisfaction { get => satisfaction; set => satisfaction = value; }
 
         public int InsertComment(CommentsModel comment)
         {

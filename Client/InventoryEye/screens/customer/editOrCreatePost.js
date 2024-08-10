@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, Keyboard, ScrollView } from 'react-native';
+import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert } from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
 import { GET, POST } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
@@ -55,7 +55,6 @@ export default function EditOrCreatePost() {
 
 
   useEffect(() => {
-    console.log('userData updated:', userData);
   }, [userData]);
 
   useEffect(() => {
@@ -66,7 +65,6 @@ export default function EditOrCreatePost() {
 
 
   const fetchUserData = async () => {
-    // console.log('Fetching user data');
     try {
       const jsonValue = await AsyncStorage.getItem('logged user');
       if (jsonValue != null) {

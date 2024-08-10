@@ -8,20 +8,56 @@ import { useNavigation } from '@react-navigation/native';
 import { GET } from '../../api';
 import { formatDate , formatTime} from '../../utils';
 import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function C_home() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user } = route.params;
-
+  const [user, setUser] = useState(route.params?.user || {});
+  const [category, setCategory] = useState(route.params?.category || '');
   const [posts, setPosts] = useState([]);
-  async function getAllPosts() {
-    let allPosts = await GET('Posts');
-    console.log(allPosts);
-    setPosts(allPosts);
-  }
 
-  useEffect(() => { getAllPosts() }, [])
+  const getPosts = async () => {
+    try {
+      const url = category ? `Posts/Category/${category}` : 'Posts'; 
+      const postsData = await GET(url);
+      setPosts(postsData);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+  
+  
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('loggedUser'); 
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser); 
+        } else {
+          await AsyncStorage.setItem('loggedUser', JSON.stringify(route.params.user)); 
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (route.params?.category) {
+      setCategory(route.params.category);
+    } else {
+      setCategory('');
+    }
+  }, [route.params?.category]);
+
+  useEffect(() => {
+    getPosts(); 
+  }, [category]);
 
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, StyleSheet, Text, View, Image, TouchableOpacity, Button } from 'react-native';
+import { Modal, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-;
+import { DELETE } from '../../api';
 
 export default function Details({
   fullName,
@@ -19,17 +19,30 @@ export default function Details({
   content,
   productImage,
   postUserId,
-  currentUserId }) {
+  currentUserId,
+  postId }) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
   const toggleModal = () => setModalVisible(!modalVisible);
 
   const isCurrentUserPost = postUserId === currentUserId;
-  console.log('postUserId:',postUserId );
-  console.log('currentUserId:',currentUserId );
-  console.log('isCurrentUserPost:',isCurrentUserPost );
 
+  const handleDelete = async () => {
+    try {
+      const response = await DELETE(`Posts/${postId}`);
+  
+      if (response.ok) {
+        toggleModal();
+        navigation.navigate('Home');
+      } else {
+        console.error('Failed to delete post: Server returned an error.');
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -67,19 +80,32 @@ export default function Details({
             </View>
           </View>
           <View style={styles.down}>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={styles.first}>
-                <Text style={{ color: '#111851' }}>Category: <Text style={{ color: 'black' }}>{category}</Text></Text>
-                <Text style={{ color: '#111851' }}>Product: <Text style={{ color: 'black' }}>{pName}</Text></Text>
-                <Text style={{ color: '#111851' }}>Color: <Text style={{ color: 'black' }}>{color}</Text></Text>
-              </View>
-              <View style={styles.second}>
-                <Text style={{ color: '#111851' }}>Size: <Text style={{ color: 'black' }}>{size}</Text></Text>
-                <Text style={{ color: '#111851' }}>Company: <Text style={{ color: 'black' }}>{company}</Text></Text>
-                <Text style={{ color: '#111851' }}>Location: <Text style={{ color: 'black' }}>{location}</Text></Text>
-              </View>
-            </View>
-          </View>
+  <View style={styles.category}>
+    <Text style={{ color: '#111851' }}>Category: <Text style={{ color: 'black' }}>{category}</Text></Text>
+  </View>
+  <View style={styles.row}>
+    <View style={styles.product}>
+      <Text style={{ color: '#111851' }}>Product: <Text style={{ color: 'black' }}>{pName}</Text></Text>
+    </View>
+    <View style={styles.color}>
+      <Text style={{ color: '#111851' }}>Color: <Text style={{ color: 'black' }}>{color}</Text></Text>
+    </View>
+  </View>
+  <View style={styles.row}>
+    <View style={styles.company}>
+      <Text style={{ color: '#111851' }}>Company: <Text style={{ color: 'black' }}>{company}</Text></Text>
+    </View>
+    {category === 'Clothing&Fashion' && (
+      <View style={styles.size}>
+        <Text style={{ color: '#111851' }}>Size: <Text style={{ color: 'black' }}>{size}</Text></Text>
+      </View>
+    )}
+  </View>
+  <View style={styles.location}>
+    <Text style={{ color: '#111851' }}>Location: <Text style={{ color: 'black' }}>{location}</Text></Text>
+  </View>
+</View>
+
         </View>
       </View>
       <View style={styles.content}>
@@ -102,7 +128,7 @@ export default function Details({
               <TouchableOpacity style={styles.modalbtn} onPress={toggleModal}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalbtn} >
+              <TouchableOpacity style={styles.modalbtn} onPress={handleDelete} >
                 <Text style={styles.buttonText}>Delete</Text>
               </TouchableOpacity>
             </View>
@@ -172,27 +198,56 @@ const styles = StyleSheet.create({
     marginRight: '10'
   },
   first: {
-    marginLeft: '2%'
+    marginLeft: '2%',
+    flexDirection: 'row',
   },
-  second: {
-    marginLeft: '1%'
+  third: {
+    marginLeft: '2%',
+    flexDirection: 'row',
+    alignContent:'space-between'
+  },
+  category: {
+    marginLeft: '2%',
+  },
+  row: {
+    flexDirection: 'row',
+    marginLeft: '2%',
+  },
+  product: {
+    width: '45%',
+  },
+  color: {
+    width: '55%',
+  },
+  company: {
+    width: '45%',
+  },
+  size: {
+    width: '55%',
+  },
+  location: {
+    width: '100%',
+    marginLeft: '2%',
   },
   content: {
     marginHorizontal: '2%',
-    flex: 1,
+    marginTop:2,
   },
   picture: {
-    height: '60%',
+    height: 180, // Set a fixed height for the image view
+    width: 180, // Make it responsive to container width
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden', // Hide overflow content
+    alignSelf: 'center',
   },
   productImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
-    marginBottom: '1%',
-    marginTop: '1%'
+    width: '100%', // Ensure the image scales to fit the container width
+    height: '100%', // Ensure the image scales to fit the container height
+    resizeMode: 'cover', // Ensure the image fills the container proportionally
+    alignSelf: 'center',
   },
+  
   modalContainer: {
     position: 'absolute',
     top: '15%',

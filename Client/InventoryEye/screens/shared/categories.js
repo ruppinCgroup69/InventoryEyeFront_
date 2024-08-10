@@ -1,103 +1,96 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import { useEffect, useState } from 'react'
 import C_header from '../../components/c_home/c_header'
 import Search from '../../components/c_home/search'
-import profileImage from '../../images/profileImage.jpg'
-import toiletteAndHygiene from '../../images/Toiletries&hygiene.jpg'
-import clothingAndfashion from '../../images/clothing&fashion.jpg'
-import sportsAndtraining from '../../images/sports&training.jpg'
-import HomeForniture from '../../images/Home Furniture.jpg'
-import OfficeSuppliers from '../../images/Office Supplies.jpg'
-import GardenAndYard from '../../images/Garden&Yard.jpg'
-import CareAndCosmetics from '../../images/Care&Cosmetics.jpg'
-import CellPhone from '../../images/Cell Phone.jpg'
-
+import { GET } from '../../api'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { StackActions } from '@react-navigation/native';
 
 export default function Categories() {
+  const [user, setUser] = useState({});
+  const [categories, setCategories] = useState([]);
+  const navigation = useNavigation();
 
+  const handleCategoryPress = (categoryId) => {
+    navigation.navigate('UserTabs', {
+      screen: 'Home',
+      params: { category: categoryId } 
+    });
+  };
+  
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('logged user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          setUser(user);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await GET('Categories');
+        setCategories(response);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName='Nelly' notiNum={12} profileImage={profileImage} userScore={70} />
+        <C_header fullName={user.fullName} notiNum={12} profileImage={{ uri: user.image }} userScore={user.score} />
       </View>
       <View style={styles.middleContainer}>
         <Search />
       </View>
       <View style={styles.inEye}>
-          <Text style={styles.keepEyeText}>Keep an eye on ... </Text>
-        </View>
-      <ScrollView 
-          contentContainerStyle={[
-            styles.bottomContainer, 
-            { flexGrow: 1 } // Adds 10 pixels of space between items
-          ]}
-      >
+        <Text style={styles.keepEyeText}>Keep an eye on ... </Text>
+      </View>
+      <ScrollView contentContainerStyle={[styles.bottomContainer, { flexGrow: 1 }]}>
         <View style={styles.categLeft}>
+          {categories.slice(0, 5).map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleCategoryPress(category.categoryId)}
+              >
+              <View style={styles.categoriesContainer}>
+                <Text style={styles.categoryText}>{category.categoryDesc}</Text>
+                <Image source={{ uri: category.categoryImage }} style={styles.image} />
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Toilette&Hygiene</Text>
-              <Image source={toiletteAndHygiene} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Clothing&Fashion</Text>
-              <Image source={clothingAndfashion} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Home Furniture</Text>
-              <Image source={HomeForniture} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText} >Sports&Training</Text>
-              <Image source={sportsAndtraining} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
+          ))}
         </View>
-
 
         <View style={styles.categRight}>
+          {categories.slice(5, 10).map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleCategoryPress(category.categoryId)}
+              >
+              <View style={styles.categoriesContainer}>
+                <Text style={styles.categoryText}>{category.categoryDesc}</Text>
+                <Image source={{ uri: category.categoryImage }} style={styles.image} />
+              </View>
+            </TouchableOpacity>
 
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Office Suppliers</Text>
-              <Image source={OfficeSuppliers} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Garden&Yard </Text>
-              <Image source={GardenAndYard} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Care&Cosmetics</Text>
-              <Image source={CareAndCosmetics} style={styles.image} />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <View style={styles.categoriesContainer}>
-              <Text style={styles.categoryText}>Cell Phone</Text>
-              <Image source={CellPhone} style={styles.image} />
-            </View>
-          </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
+
     </View>
   )
 }
@@ -121,21 +114,21 @@ const styles = StyleSheet.create({
     width: '50%',
     //height: '100%',
     //backgroundColor: 'red', 
-    paddingTop:5, //10
-    paddingHorizontal:28
+    paddingTop: 5, //10
+    paddingHorizontal: 28
   },
   categRight: {
     width: '50%',
     //height: '100%',
-   // backgroundColor: 'yellow', 
-    paddingTop:5, //10, 
-    paddingHorizontal:28
+    // backgroundColor: 'yellow', 
+    paddingTop: 5, //10, 
+    paddingHorizontal: 28
   },
   inEye: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#111851',
-    alignItems:'center',
+    alignItems: 'center',
     paddingVertical: 10,
   },
   keepEyeText: {
@@ -152,8 +145,8 @@ const styles = StyleSheet.create({
     borderColor: '#111851',
     borderWidth: 1,
     margin: 7,
-    marginHorizontal:'10%',
-    marginVertical:'5%'//10
+    marginHorizontal: '10%',
+    marginVertical: '5%'//10
   },
   categoryText: {
     fontSize: '15',
@@ -162,15 +155,15 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     textAlign: 'center'
   },
-  categoriesContainer:{
+  categoriesContainer: {
     width: '100%',
-    height: '180', 
+    height: '180',
     borderRadius: 40,
     borderColor: '#111851',
     borderWidth: 1,
     backgroundColor: '#F0F6FE',
-    marginVertical:10, 
-    
+    marginVertical: 10,
+
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

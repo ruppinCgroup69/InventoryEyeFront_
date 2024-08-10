@@ -55,6 +55,7 @@ GO
 -- =============================================
 Alter PROCEDURE [dbo].[SP_InEye_InsertComments]
 
+@postId int, 
 @userId int,
 @createdAt date,
 @editedAt date,
@@ -65,14 +66,15 @@ Alter PROCEDURE [dbo].[SP_InEye_InsertComments]
 @storeLocation nvarchar(max),
 @bought bit,
 @boughtDate date,
-@productQuality int
+@productQuality int,
+@satisfaction int
 
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-INSERT INTO Comments ([UserId],[CreatedAt],[EditedAt],[Content],[InventoryEye],[StoreId],[StockId],[StoreLocation],[Bought],[BoughtDate],[ProductQuality])
-VALUES (@userId,@createdAt,@editedAt,@content,@inventoryEye,@storeId,@stockId,@storeLocation,@bought,@boughtDate,@productQuality);
+INSERT INTO Comments ([PostId],[UserId],[CreatedAt],[EditedAt],[Content],[InventoryEye],[StoreId],[StockId],[StoreLocation],[Bought],[BoughtDate],[ProductQuality],[Satisfaction])
+VALUES (@postId,@userId,@createdAt,@editedAt,@content,@inventoryEye,@storeId,@stockId,@storeLocation,@bought,@boughtDate,@productQuality,@satisfaction);
 return 1
 
 END
@@ -170,14 +172,15 @@ GO
 -- =============================================
 Alter PROCEDURE [dbo].[SP_InEye_InsertCategory]
 
-@categoryDesc nvarchar (max)
+@categoryDesc nvarchar (max),
+@caegoryImage nvarchar (max)
 
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-INSERT INTO Category(CategoryDesc)
-VALUES (@categoryDesc);
+INSERT INTO Category([CategoryDesc],[CategoryImage])
+VALUES (@categoryDesc,@caegoryImage);
 return 1
 
 END

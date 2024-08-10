@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native'
 import { useState } from 'react'
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
@@ -35,9 +35,11 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-
-      <View style={styles.container}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <MyHeader imageSize={130} title='Log In' titleSize={45} />
         </View>
@@ -91,7 +93,7 @@ export default function Login() {
             <Text style={styles.registerNowText}> Register now!</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }

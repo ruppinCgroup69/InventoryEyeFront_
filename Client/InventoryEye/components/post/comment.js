@@ -34,15 +34,19 @@ export default function Comment({ profilepic, score, fullName, content, inventor
           </View>
           <View style={styles.contentright}>
             <Text style={{ fontSize: 13, color: "#111851" }}>Purchased by me?: <Text style={{ fontSize: 13, color: "black" }}>{bought}</Text></Text>
-            <Text style={{ fontSize: 13, color: "#111851" }}>Product quality: <Text style={{ fontSize: 13, color: "black" }}>{quality}</Text></Text>
-            <Text style={{ fontSize: 13, color: "#111851" }}>Purchase Date: <Text style={{ fontSize: 13, color: "black" }}>{datepurch}</Text></Text>
-            <Text style={{ fontSize: 13, color: "#111851" }}>Satisfaction rank: <Text style={{ fontSize: 13, color: "black" }}>{rank}</Text></Text>
+            {bought === 'Yes' && (
+              <>
+                {quality !== undefined && <Text style={{ fontSize: 13, color: "#111851" }}>Product quality: <Text style={{ fontSize: 13, color: "black" }}>{quality}</Text></Text>}
+                {datepurch && <Text style={{ fontSize: 13, color: "#111851" }}>Purchase Date: <Text style={{ fontSize: 13, color: "black" }}>{datepurch}</Text></Text>}
+                {rank !== undefined && <Text style={{ fontSize: 13, color: "#111851" }}>Satisfaction rank: <Text style={{ fontSize: 13, color: "black" }}>{rank}</Text></Text>}
+              </>
+            )}
           </View>
         </View>
-        <View style={{ flexDirection: 'row' , marginTop:'2%'}}>
-          <Text style={{color:'#B0B0B0', fontSize:10}}>{datepub}</Text>
-          <TouchableOpacity style={{marginLeft:'5%'}}>
-            <Text style={{color:'#B0B0B0', fontSize:10}}>Reply</Text>
+        <View style={{ flexDirection: 'row', marginTop: '2%' }}>
+          <Text style={{ color: '#B0B0B0', fontSize: 10 }}>{datepub}</Text>
+          <TouchableOpacity style={{ marginLeft: '5%' }}>
+            <Text style={{ color: '#B0B0B0', fontSize: 10 }}>Reply</Text>
           </TouchableOpacity>
         </View>
       </View>

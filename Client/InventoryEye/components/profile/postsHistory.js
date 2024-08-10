@@ -1,17 +1,16 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { useNavigation } from '@react-navigation/native';
 
-//recives props (Number of posts, Posts)
-export default function PostsHistory({  Post }) {
+export default function PostsHistory({Post, postId }) {
+  const navigation = useNavigation();
+
   return (
     <View>
-
-        <TouchableOpacity>
-          <Image source={Post} style={styles.productimage} />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Post_Det', { postId })}>
+        <Image source={{ uri: Post }} style={styles.productimage} />
+      </TouchableOpacity>
     </View>
-
-
   )
 }
 

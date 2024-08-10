@@ -187,3 +187,27 @@ BEGIN
     -- Insert statements for procedure here
 	Delete from StoreCategories where [StoreId]=@storeId and [CategoryId]=@categoryId
 END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Delete Store>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteStorckLevel]
+
+@id int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	Delete from StockLevel where Id=@id
+END

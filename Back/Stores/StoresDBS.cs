@@ -1,5 +1,6 @@
 ﻿
 using InventoryEyeBack.Posts;
+using InventoryEyeBack.StockLevel;
 using Microsoft.Data.SqlClient;
 using System.Data;
 

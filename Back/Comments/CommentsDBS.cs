@@ -84,6 +84,7 @@ namespace InventoryEyeBack.Comments
             cmd.Parameters.AddWithValue("@bought", comment.Bought);
             cmd.Parameters.AddWithValue("@boughtDate", comment.BoughtDate);
             cmd.Parameters.AddWithValue("@productQuality", comment.ProductQuality);
+            cmd.Parameters.AddWithValue("@satisfaction", comment.Satisfaction);
 
             return cmd;
         }
@@ -190,6 +191,7 @@ namespace InventoryEyeBack.Comments
                 c.StockId = Convert.ToInt32(dataReader["StockId"].ToString());
                 c.Score = Convert.ToInt32(dataReader["Score"].ToString());
                 c.PostId = Convert.ToInt32(dataReader["PostId"].ToString());
+                c.Satisfaction = Convert.ToInt32(dataReader["Satisfaction"].ToString());
             }
             else
             {
@@ -267,6 +269,8 @@ namespace InventoryEyeBack.Comments
                 c.StockId = Convert.ToInt32(dataReader["StockId"].ToString());
                 c.Score = Convert.ToInt32(dataReader["Score"].ToString());
                 c.PostId = Convert.ToInt32(dataReader["PostId"].ToString());
+                c.Satisfaction = Convert.ToInt32(dataReader["Satisfaction"].ToString());
+
                 comments.Add(c);
             }
 
@@ -339,6 +343,8 @@ namespace InventoryEyeBack.Comments
                 c.StockId = Convert.ToInt32(dataReader["StockId"].ToString());
                 c.Score = Convert.ToInt32(dataReader["Score"].ToString());
                 c.PostId = Convert.ToInt32(dataReader["PostId"].ToString());
+                c.Satisfaction = Convert.ToInt32(dataReader["Satisfaction"].ToString());
+
                 comments.Add(c);
             }
             if (con != null)
@@ -411,6 +417,8 @@ namespace InventoryEyeBack.Comments
                 c.StockId = Convert.ToInt32(dataReader["StockId"].ToString());
                 c.Score = Convert.ToInt32(dataReader["Score"].ToString());
                 c.PostId = Convert.ToInt32(dataReader["PostId"].ToString());
+                c.Satisfaction = Convert.ToInt32(dataReader["Satisfaction"].ToString());
+
                 comments.Add(c);
             }
             if (con != null)
@@ -501,6 +509,8 @@ namespace InventoryEyeBack.Comments
             cmd.Parameters.AddWithValue("@bought", comment.Bought);
             cmd.Parameters.AddWithValue("@boughtDate", comment.BoughtDate.Date); // Pass only the date part
             cmd.Parameters.AddWithValue("@productQuality", comment.ProductQuality);
+            cmd.Parameters.AddWithValue("@satisfaction", comment.Satisfaction);
+
 
             return cmd;
         }
