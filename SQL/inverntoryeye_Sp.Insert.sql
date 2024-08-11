@@ -269,3 +269,35 @@ return 1
 END
 
 -- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <24/05/2024>
+-- Description:	<Insert Survey>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertSurvey]
+
+@userId int,
+@favCategory int,
+@favStore int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+ IF NOT EXISTS (SELECT * FROM Users WHERE Id = @userId)
+    BEGIN
+        RETURN 0;
+    END
+
+    INSERT INTO Survey ([UserId], [FavCategory], [FavStore])
+    VALUES (@userId, @favCategory, @favStore);
+
+END
+

@@ -21,7 +21,7 @@ namespace InventoryEyeBack.Users
         string image;
         DateTime createdAt;
         int score = 0;
-        double searchRadius = 0;
+        double searchRadius;
 
         public UsersModel() { }
         public UsersModel(int id, int role, DateTime lastSeen, string fullName, string emailAddress, string password, DateTime birthDate, double lat, double lng, string address, string image, DateTime createdAt)
@@ -60,7 +60,7 @@ namespace InventoryEyeBack.Users
             UsersDBS dbs = new UsersDBS();
             return dbs.InsertUserDBS(user);
         }
-        public int UpdateUser(UsersModel user)
+        public int UpdateUser(UserUpdateModel user)
         {
             UsersDBS dbs = new UsersDBS();
             return dbs.UpdateUserDBS(user);

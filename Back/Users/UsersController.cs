@@ -54,9 +54,10 @@ namespace InventoryEyeBack.Users
 
         // PUT Update user api/<UsersController>/5
         [HttpPut("{email}")]
-        public IActionResult Put([FromBody] UsersModel user)
+        public IActionResult Put([FromBody] UserUpdateModel user)
         {
-            int status = user.UpdateUser(user);
+            UsersModel usersModel = new UsersModel();
+            int status = usersModel.UpdateUser(user);
             if (status == 1)
             {
                 return Ok(user);
@@ -65,6 +66,7 @@ namespace InventoryEyeBack.Users
             {
                 return BadRequest();
             }
+
         }
 
         //PUT Update user email api/<UsersController>/5

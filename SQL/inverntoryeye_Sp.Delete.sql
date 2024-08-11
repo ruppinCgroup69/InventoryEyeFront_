@@ -33,6 +33,8 @@ BEGIN
 
     DELETE FROM Post WHERE UserId = @userId;
 
+	Delete From Survey Where UserId=@userId
+
 	DELETE FROM Users WHERE Id = @userId;
 	
 END
@@ -208,4 +210,54 @@ BEGIN
 	SET NOCOUNT ON;
     -- Insert statements for procedure here
 	Delete from StockLevel where Id=@id
+END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Delete Survey>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteSurvey]
+
+ @userId INT,
+    @favCategory INT = NULL,
+    @favStore INT = NULL
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	  -- Delete surveys by category
+    IF @favCategory IS NOT NULL
+    BEGIN
+        DELETE FROM SURVEY
+        WHERE UserId = @userId
+        AND FavCategory = @favCategory;
+
+        -- Also delete stores related to the category
+        DELETE FROM SURVEY
+        WHERE UserId = @userId
+        AND FavStore IN (
+            SELECT StoreId
+            FROM StoreCategories
+            WHERE CategoryId = @favCategory
+        );
+    END
+
+	-- Delete specific store
+    IF @favStore IS NOT NULL
+    BEGIN
+        DELETE FROM SURVEY
+        WHERE UserId = @userId
+        AND FavStore = @favStore;
+    END
+
 END

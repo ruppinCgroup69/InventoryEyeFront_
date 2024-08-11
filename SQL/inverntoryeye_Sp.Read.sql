@@ -511,4 +511,28 @@ FROM PostView
 WHERE [FullName] like CONCAT('%',@string,'%') or [Name] like CONCAT('%',@string,'%') or [Content]  like CONCAT('%',@string,'%') or [Tags] like CONCAT('%',@string,'%')
 END
 
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read All Survey>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAllSurvey]
+
+@id int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [Survey]
+WHERE [UserId] = @id;
+END
 

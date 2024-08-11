@@ -18,19 +18,54 @@ export default function C_home() {
   const [category, setCategory] = useState(route.params?.category || '');
   const [posts, setPosts] = useState([]);
 
+  const getSurvey = async () => {
+    try {
+      let surveyData = await GET(`Survey/${user.id}`);
+      // Check if surveyData is an empty array
+      if (Array.isArray(surveyData) && surveyData.length === 0) {
+        navigation.navigate('SurveyEntry', { user });
+      }
+    } catch (error) {
+      console.error('Error fetching survey data:', error);
+    }
+  };
+
   const getPosts = async () => {
     try {
       const url = category ? `Posts/Category/${category}` : `Posts/${user.id}`;
       let postsData = await GET(url);
-      console.log('API Response:', postsData);
-      if (user.SearchRadius != 0) {
-        postsData = postsData.filter((post) => distance(post.PickUpLat, post.PicUpLng, user.lat, user.lng) <= user.SearchRadius);
+  
+      console.log('postsData', postsData); // Logs the entire postsData array
+      console.log('user details', user);
+  
+      // If searchRadius is not 0, filter posts by distance
+      if (user.searchRadius !== 0) {
+        postsData = postsData.filter((post) => {
+          const calculatedDistance = distance(post.pickUpLat, post.picUpLng, user.lat, user.lng);
+          console.log(`Distance for postId ${post.postId}:`, calculatedDistance);
+          return calculatedDistance <= user.searchRadius;
+        });
+      } else {
+        // If searchRadius is 0, skip filtering
+        console.log('SearchRadius is 0, showing all posts');
       }
+  
+      // Set the filtered or unfiltered postsData to state
       setPosts(postsData);
+      console.log('Updated posts state:', postsData);
+  
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
-  };  
+  };
+  
+  useFocusEffect(
+    useCallback(() => {
+      getPosts();
+    }, [category])
+  );
+  
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,6 +74,7 @@ export default function C_home() {
         if (userData) {
           const parsedUser = JSON.parse(userData);
           setUser(parsedUser);
+          await getSurvey(); // Fetch survey data after setting user
         } else {
           await AsyncStorage.setItem('logged user', JSON.stringify(route.params.user));
         }
@@ -57,10 +93,6 @@ export default function C_home() {
       setCategory('');
     }
   }, [route.params?.category]);
-
-  useFocusEffect(useCallback(() => {
-    getPosts();
-  }, [category]));
 
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });

@@ -102,7 +102,6 @@ export default function C_Register() {
         alert('Failed to register user: No response from server');
         return;
       }
-      alert('User registered successfully!');
       navigation.navigate('Login');
     }
     catch (err) {

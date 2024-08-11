@@ -23,6 +23,8 @@ import C_Messages from './screens/customer/c_messages';
 import ChooseCupons from './screens/customer/chooseCupons';
 import Post from './screens/shared/post';
 import EditProfile from './screens/customer/editProfile';
+import SurveyEntry from './screens/customer/surveyEntry';
+import Survey from './screens/customer/surveyScreen';
 
 //create the default Stack
 const Stack = createNativeStackNavigator();
@@ -41,7 +43,7 @@ function UserTabs() {
                             name={focused ? 'message-text' : 'message-text-outline'}
                             size={24}
                             color="rgba(17, 24, 81, 0.6)" />),
-            tabBarActiveTintColor:"#111851",
+                    tabBarActiveTintColor: "#111851",
                 }} />
             <Tab.Screen
                 name="Cupons"
@@ -53,7 +55,7 @@ function UserTabs() {
                             name={focused ? 'medal' : 'medal-outline'}
                             size={24}
                             color="rgba(17, 24, 81, 0.6)" />),
-                            tabBarActiveTintColor:"#111851",
+                    tabBarActiveTintColor: "#111851",
                 }} />
             <Tab.Screen
                 name="Home"
@@ -80,11 +82,22 @@ function UserTabs() {
                             />
                         </View>
                     ),
-                    tabBarActiveTintColor:"#111851",
+                    tabBarActiveTintColor: "#111851",
                 }}
             />
-            <Tab.Screen name="New Post" component={EditOrCreatePost} options={{ headerShown: false,tabBarButton: () => null }} />
-            <Tab.Screen name="Edit Profile" component={EditProfile} options={{ headerShown: false,tabBarButton: () => null }} />
+            <Tab.Screen name="New Post" component={EditOrCreatePost} options={{ headerShown: false, tabBarButton: () => null }} />
+            <Tab.Screen name="Edit Profile" component={EditProfile} options={{ headerShown: false, tabBarButton: () => null }} />
+            <Tab.Screen
+                name="SurveyEntry"
+                component={SurveyEntry}
+                options={{ headerShown: false, tabBarStyle: { display: 'none' } ,tabBarButton: () => null }}
+            />
+            <Tab.Screen
+                name="Survey"
+                component={Survey}
+                options={{ headerShown: false, tabBarStyle: { display: 'none' },tabBarButton: () => null  }}
+            />
+
             <Tab.Screen
                 name="Categories"
                 component={Categories}
@@ -95,7 +108,7 @@ function UserTabs() {
                             name={focused ? 'cart' : 'cart-outline'}
                             size={24}
                             color="rgba(17, 24, 81, 0.6)" />),
-                            tabBarActiveTintColor:"#111851",
+                    tabBarActiveTintColor: "#111851",
                 }} />
             <Tab.Screen
                 name="Profile"
@@ -107,8 +120,8 @@ function UserTabs() {
                             name={focused ? 'account' : 'account-outline'}
                             size={24}
                             color="rgba(17, 24, 81, 0.6)" />),
-                            tabBarActiveTintColor:"#111851",
-                }}     
+                    tabBarActiveTintColor: "#111851",
+                }}
             />
         </Tab.Navigator>
     )
@@ -132,7 +145,7 @@ export default function Navigation() {
                     {/* options={{ headerShown: false }} * initialRouteName='UserTabs'*/}
                     <Stack.Screen name="Welcome" component={Welcome} />
                     <Stack.Screen name="RegisterType" component={RegisterType} />
-                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
+                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                     <Stack.Screen name="ResetPassword" component={ResetPassword} />
                     <Stack.Screen name="SuccessResetPassword" component={SuccessResetPassword} />
                     <Stack.Screen name="Loading" component={Loading} />
@@ -140,7 +153,7 @@ export default function Navigation() {
                     <Stack.Screen name="SupplierTabs" component={SupplierTabs} options={{ headerShown: false }} />
                     <Stack.Screen name="C_Register" component={C_Register} options={{ headerShown: false }} />
                     <Stack.Screen name="S_Register" component={S_Register} options={{ headerShown: false }} />
-                    {<Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} />}
+                    <Stack.Screen name="Post_Det" component={Post} options={{ headerShown: false }} />
                 </Stack.Navigator>
             </NavigationContainer>
         </>

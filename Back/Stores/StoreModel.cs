@@ -30,8 +30,6 @@ namespace InventoryEyeBack.Stores
             StoresDBS dbs = new StoresDBS();
             return dbs.UpdateStoreDBS(store);
         }
-
-
         public int DeleteStore(int id)
         {
             StoresDBS dbs = new StoresDBS();

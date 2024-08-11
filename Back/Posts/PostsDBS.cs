@@ -13,7 +13,6 @@ namespace InventoryEyeBack.Posts
 {
     public class PostsDBS
     {
-
         public PostsDBS() { }
         public SqlConnection connect(String conString)
         {

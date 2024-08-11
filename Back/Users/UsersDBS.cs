@@ -86,7 +86,7 @@ namespace InventoryEyeBack.Users
         }
 
         //-------------Update User-------------//
-        public int UpdateUserDBS(UsersModel user)
+        public int UpdateUserDBS(UserUpdateModel user)
         {
             SqlConnection con;
             SqlCommand cmd;
@@ -124,7 +124,7 @@ namespace InventoryEyeBack.Users
                 }
             }
         }
-        private SqlCommand CreateUpdatetUserWithStoredProcedure(String spName, SqlConnection con, UsersModel user)
+        private SqlCommand CreateUpdatetUserWithStoredProcedure(String spName, SqlConnection con, UserUpdateModel user)
         {
 
             SqlCommand cmd = new SqlCommand(); // create the command object
@@ -146,8 +146,8 @@ namespace InventoryEyeBack.Users
             cmd.Parameters.AddWithValue("@address", user.Address);
             cmd.Parameters.AddWithValue("@image", user.Image);
             cmd.Parameters.AddWithValue("@createdAt", user.CreatedAt);
-            cmd.Parameters.AddWithValue("@emailAddress", user.EmailAddress);
             cmd.Parameters.AddWithValue("@searchRadius", user.SearchRadius);
+            cmd.Parameters.AddWithValue("@emailAddress", user.EmailAddress);
 
             return cmd;
         }
@@ -441,6 +441,8 @@ namespace InventoryEyeBack.Users
                 u.Image = dataReader["Image"].ToString();
                 u.CreatedAt = Convert.ToDateTime(dataReader["CreatedAt"].ToString());
                 u.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                u.SearchRadius = Convert.ToDouble(dataReader["SearchRadius"].ToString());
+
                 users.Add(u);
             }
 
@@ -505,6 +507,7 @@ namespace InventoryEyeBack.Users
                 u.Lng = Convert.ToDouble(dataReader["Lng"].ToString());
                 u.Image = dataReader["Image"].ToString();
                 u.CreatedAt = Convert.ToDateTime(dataReader["CreatedAt"].ToString());
+                u.SearchRadius = Convert.ToDouble(dataReader["SearchRadius"].ToString());
                 u.Score = Convert.ToInt32(dataReader["Score"].ToString());
             }
 

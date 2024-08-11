@@ -12,31 +12,42 @@ GO
 -- Description:	<Update User>
 -- =============================================
 Alter PROCEDURE [dbo].[SP_InEye_UpdateUser]
-	@role int,
-	@lastSeen date,
-	@fullName nvarchar(max),
-	@emailAddress nvarchar(255),
-	@birthDate date ,
-	@lat float(53),
-	@lng float(53),
-	@address nvarchar(max) ,
-	@image nvarchar(max),
-	@createdAt date,
-	@searchRadius float
-
+	  @role int,
+    @lastSeen date,
+    @fullName nvarchar(max),
+    @birthDate date,
+    @lat float(53),
+    @lng float(53),
+    @address nvarchar(max),
+    @image nvarchar(max),
+    @createdAt date,
+    @searchRadius float,
+    @emailAddress nvarchar(255)
 AS
 BEGIN
-	SET NOCOUNT ON;
+    SET NOCOUNT ON;
 
-	if not exists (select [EmailAddress] from Users where [EmailAddress] = @emailAddress)
-	begin
-		return 0
-	end
+    IF NOT EXISTS (SELECT [EmailAddress] FROM Users WHERE [EmailAddress] = @emailAddress)
+    BEGIN
+        RETURN 0
+    END
 
-    -- update statements for procedure here
-	update Users set [Role]=@role,[LastSeen]=@lastSeen,[FullName]=@fullName,[EmailAddress]=@emailAddress,[BirthDate]=@birthDate,[Lat]=@lat,[Lng]=@lng,[Address]=@address,[Image]=@image,[CreatedAt]=@createdAt, SearchRadius=@searchRadius
-	where [EmailAddress] = @emailAddress	   
-	return 1
+    -- Update statements
+    UPDATE Users 
+    SET 
+        [Role] = @role,
+        [LastSeen] = @lastSeen,
+        [FullName] = @fullName,
+        [BirthDate] = @birthDate,
+        [Lat] = @lat,
+        [Lng] = @lng,
+        [Address] = @address,
+        [Image] = @image,
+        [CreatedAt] = @createdAt,
+        [SearchRadius] = @searchRadius
+    WHERE [EmailAddress] = @emailAddress;
+
+    RETURN 1;
 	
 END
 
@@ -368,3 +379,39 @@ BEGIN
 
     RETURN 1;
 END;
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <25/04/2024>
+-- Description:	<Update Survey>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateSurvey]
+    @userId int,
+	@favCategory int,
+	@favStore int
+
+	AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT [UserId] FROM Survey WHERE [UserId] = @userId)
+    BEGIN
+        RETURN 0;
+    END;
+
+    UPDATE Survey
+    SET [FavCategory] = @favCategory,
+        [FavStore] = @favStore
+    WHERE [UserId] = @userId;
+
+    RETURN 1;
+END;
+
