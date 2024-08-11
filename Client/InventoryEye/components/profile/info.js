@@ -6,7 +6,7 @@ export default function Info({fullName, profileImage,email,birthdate,city}) {
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-      <Image source={profileImage} style={styles.image} />
+      {profileImage&&profileImage!=''&&<Image source={profileImage} style={styles.image}/>} 
       </View>
       <View style={styles.info}>
       <Text style={styles.name}>{fullName}</Text>

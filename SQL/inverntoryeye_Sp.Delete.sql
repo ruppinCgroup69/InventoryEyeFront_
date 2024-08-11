@@ -27,7 +27,6 @@ BEGIN
         RETURN;
     END
 
-
     DELETE FROM Comments WHERE UserId = @userId;
 
     DELETE FROM Comments WHERE PostId IN (SELECT Id FROM Post WHERE UserId = @userId);
@@ -35,7 +34,6 @@ BEGIN
     DELETE FROM Post WHERE UserId = @userId;
 
 	DELETE FROM Users WHERE Id = @userId;
-
 	
 END
 

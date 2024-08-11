@@ -30,7 +30,7 @@ export default function Details({
 
   const handleDelete = async () => {
     try {
-      const response = await DELETE(`Posts/${postId}`);
+      const response = await DELETE(`Posts/PostId/${postId}`);
   
       if (response.ok) {
         toggleModal();

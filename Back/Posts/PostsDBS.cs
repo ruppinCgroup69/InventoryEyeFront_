@@ -221,7 +221,7 @@ namespace InventoryEyeBack.Posts
         }
 
         //-------------Read all Posts -------------//
-        public List<PostsModel> ReadAllPostsDBS()
+        public List<PostsModel> ReadAllPostsDBS(int id)
         {
 
             SqlConnection con;
@@ -241,7 +241,7 @@ namespace InventoryEyeBack.Posts
             List<PostsModel> posts = new List<PostsModel>();
 
             // create a Command with the connection to use, name of stored procedure and its parameters
-            cmd = buildReadAllPostsStoredProcedureCommand(con, "SP_InEye_ReadAllPosts");
+            cmd = buildReadAllPostsStoredProcedureCommand(con, "SP_InEye_ReadAllPosts", id);
 
             // call the stored procedure (using the cmd) and get results to DataReader
             SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -265,6 +265,8 @@ namespace InventoryEyeBack.Posts
                 p.CategoryDesc = dataReader["CategoryDesc"].ToString();
                 p.PickUpAddress = dataReader["PickUpAddress"].ToString();
                 p.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                p.PickUpLat = Convert.ToDouble(dataReader["PickUpLat"].ToString());
+                p.PicUpLng = Convert.ToDouble(dataReader["PicUpLng"].ToString());
 
                 posts.Add(p);
 
@@ -279,7 +281,7 @@ namespace InventoryEyeBack.Posts
 
             return posts;
         }
-        private SqlCommand buildReadAllPostsStoredProcedureCommand(SqlConnection con, String spName)
+        private SqlCommand buildReadAllPostsStoredProcedureCommand(SqlConnection con, String spName, int id)
         {
 
             SqlCommand cmd = new SqlCommand(); // create the command object
@@ -291,6 +293,8 @@ namespace InventoryEyeBack.Posts
             cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
 
             cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+            cmd.Parameters.AddWithValue("@id", id);
 
             return cmd;
 
@@ -340,6 +344,8 @@ namespace InventoryEyeBack.Posts
                 p.CategoryDesc = dataReader["CategoryDesc"].ToString();
                 p.PickUpAddress = dataReader["PickUpAddress"].ToString();
                 p.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                p.PickUpLat = Convert.ToDouble(dataReader["PickUpLat"].ToString());
+                p.PicUpLng = Convert.ToDouble(dataReader["PicUpLng"].ToString());
 
 
             }
@@ -412,6 +418,8 @@ namespace InventoryEyeBack.Posts
                 p.CategoryDesc = dataReader["CategoryDesc"].ToString();
                 p.PickUpAddress = dataReader["PickUpAddress"].ToString();
                 p.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                p.PickUpLat = Convert.ToDouble(dataReader["PickUpLat"].ToString());
+                p.PicUpLng = Convert.ToDouble(dataReader["PicUpLng"].ToString());
 
                 posts.Add(p);
 
@@ -486,6 +494,8 @@ namespace InventoryEyeBack.Posts
                 p.CategoryDesc = dataReader["CategoryDesc"].ToString();
                 p.PickUpAddress = dataReader["PickUpAddress"].ToString();
                 p.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                p.PickUpLat = Convert.ToDouble(dataReader["PickUpLat"].ToString());
+                p.PicUpLng = Convert.ToDouble(dataReader["PicUpLng"].ToString());
 
                 posts.Add(p);
 
@@ -515,7 +525,6 @@ namespace InventoryEyeBack.Posts
             cmd.Parameters.AddWithValue("@userId", userId);
             return cmd;
         }
-
 
 
         //-------------Search Posts by Product Search -------------//
@@ -558,6 +567,8 @@ namespace InventoryEyeBack.Posts
                 p.CategoryDesc = dataReader["CategoryDesc"].ToString();
                 p.PickUpAddress = dataReader["PickUpAddress"].ToString();
                 p.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                p.PickUpLat = Convert.ToDouble(dataReader["PickUpLat"].ToString());
+                p.PicUpLng = Convert.ToDouble(dataReader["PicUpLng"].ToString());
                 posts.Add(p);
             }
             if (con != null)

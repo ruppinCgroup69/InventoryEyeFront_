@@ -81,10 +81,10 @@ namespace InventoryEyeBack.Posts
         }
 
 
-        public List<PostsModel> ReadAllPosts()
+        public List<PostsModel> ReadAllPosts(int id)
         {
             PostsDBS dbs = new PostsDBS();
-            return dbs.ReadAllPostsDBS();
+            return dbs.ReadAllPostsDBS(id);
         }
 
         public PostsModel ReadPostByPostId(int id)

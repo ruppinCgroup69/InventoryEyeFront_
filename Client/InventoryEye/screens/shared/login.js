@@ -6,31 +6,30 @@ import { useNavigation } from '@react-navigation/native';
 import { POST } from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 export default function Login() {
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
-
   const handleLogin = async () => {
-    console.log(`User: ${emailAddress}, Password: ${password}`);
     try {
-      const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image: '' });
-      if (response) {
-        try {
-          await AsyncStorage.setItem("logged user", JSON.stringify(response));
-          navigation.navigate('UserTabs', { screen: 'Home', params: { user: response } });
-        } catch (storageError) {
-          console.error('AsyncStorage error:', storageError);
+        const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image: '' });
+        if (response?.ok) {
+            try {
+                await AsyncStorage.setItem("logged user", JSON.stringify(response.date));
+                navigation.navigate('UserTabs', { screen: 'Home', params: { user: response.date } });
+            } catch (storageError) {
+                console.error('AsyncStorage error:', storageError);
+            }
+        } else {
+            alert('Login failed. Please check your email and password.');
         }
-      }
-      else {
-        alert('Login failed. Please check your email and password.');
-      }
     } catch (error) {
-      alert('An error occurred. Please try again.');
+        alert('An error occurred. Please try again.');
     }
-  };
+};
+
 
   return (
     <KeyboardAvoidingView

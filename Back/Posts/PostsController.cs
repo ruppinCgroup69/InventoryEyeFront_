@@ -9,16 +9,16 @@ namespace InventoryEyeBack.Posts
     public class PostsController : ControllerBase
     {
         // GET:ReadAllPosts api/<PostsController>
-        [HttpGet]
-        public IEnumerable<PostsModel> Get()
+        [HttpGet("{userId}")]
+        public IEnumerable<PostsModel> Get( int userId)
         {
             PostsModel post = new PostsModel();
-            return post.ReadAllPosts();
+            return post.ReadAllPosts(userId);
         }
 
         // GET: Read Posts by postId api/<PostsController>/5
-        [HttpGet("{id}")]
-        public PostsModel Get(int id)
+        [HttpGet("PostId/{id}")]
+        public PostsModel GetByPostId(int id)
         {
             PostsModel post = new PostsModel();
             return post.ReadPostByPostId(id);

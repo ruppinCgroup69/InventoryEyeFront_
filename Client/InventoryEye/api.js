@@ -4,15 +4,20 @@ const BASE_URL = "https://proj.ruppin.ac.il/cgroup69/prod/api";
 
 export async function POST(url, obj) {
     try {
-        let { data } = await axios.post(`${BASE_URL}/${url}`, obj,
+        let res = await axios.post(`${BASE_URL}/${url}`, obj,
             {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
 
-        console.log('data ==> ', data);
-        return data;
+        console.log('data ==> ', res);
+        if (res.status == 200 || res.status == 201) {
+            return {date:res.data,ok:true}
+        }
+        else{
+            return false
+        }
 
     } catch (error) {
         console.error({ error });
@@ -70,23 +75,23 @@ export async function PUT(url, obj) {
 
 export async function DELETE(url) {
     try {
-        let res = await fetch(`${BASE_URL}/${url}`, {
-            method: 'DELETE',
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        let res = await axios.delete(`${BASE_URL}/${url}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        //הסטטוס הוא לא מקבוצת 200
-        if (!res.ok) {
-            console.log({ res });
-            return;
+        console.log('data ==> ', res);
+        if (res.status == 200 ) {
+            return {date:res.data,ok:true}
         }
-
-        let data = await res.json();
-        return data;
+        else{
+            return false
+        }
 
     } catch (error) {
         console.error({ error });
+        throw error;
     }
 }

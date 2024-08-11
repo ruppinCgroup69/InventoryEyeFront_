@@ -22,7 +22,7 @@ Alter PROCEDURE [dbo].[SP_InEye_UpdateUser]
 	@address nvarchar(max) ,
 	@image nvarchar(max),
 	@createdAt date,
-	@password nvarchar(max)
+	@searchRadius float
 
 AS
 BEGIN
@@ -34,7 +34,7 @@ BEGIN
 	end
 
     -- update statements for procedure here
-	update Users set [Role]=@role,[LastSeen]=@lastSeen,[FullName]=@fullName,[EmailAddress]=@emailAddress,[BirthDate]=@birthDate,[Lat]=@lat,[Lng]=@lng,[Address]=@address,[Image]=@image,[CreatedAt]=@createdAt, [Password]=@password
+	update Users set [Role]=@role,[LastSeen]=@lastSeen,[FullName]=@fullName,[EmailAddress]=@emailAddress,[BirthDate]=@birthDate,[Lat]=@lat,[Lng]=@lng,[Address]=@address,[Image]=@image,[CreatedAt]=@createdAt, SearchRadius=@searchRadius
 	where [EmailAddress] = @emailAddress	   
 	return 1
 	
@@ -332,6 +332,39 @@ BEGIN
 
     -- Update statements for procedure here
     UPDATE Weights SET GeneralWeight=@generalWeight, BoughtWeight=@boughtWeight, CredibilityWeight=@credibilityWeight
+
+    RETURN 1;
+END;
+
+------------------------------------------------
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <02/06/2024>
+-- Description:	<Update User Password>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateUserPassword]
+
+	@id int,
+	@password nvarchar (max)
+
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT [Id] FROM Users WHERE [Id] = @id)
+    BEGIN
+        RETURN 0;
+    END;
+
+    -- Update statements for procedure here
+    UPDATE Users SET [Password] = @password
+    WHERE [Id] = @id
 
     RETURN 1;
 END;

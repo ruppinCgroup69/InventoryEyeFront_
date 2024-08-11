@@ -1,14 +1,15 @@
 import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from 'react-native'
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import C_header from '../../components/c_home/c_header'
 import Search from '../../components/c_home/search'
 import { Feather } from '@expo/vector-icons';
 import Post from '../../components/c_home/post'
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { GET } from '../../api';
-import { formatDate , formatTime} from '../../utils';
+import { formatDate, formatTime } from '../../utils';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { distance } from '../../utils';
 
 export default function C_home() {
   const navigation = useNavigation();
@@ -19,25 +20,27 @@ export default function C_home() {
 
   const getPosts = async () => {
     try {
-      const url = category ? `Posts/Category/${category}` : 'Posts'; 
-      const postsData = await GET(url);
+      const url = category ? `Posts/Category/${category}` : `Posts/${user.id}`;
+      let postsData = await GET(url);
+      console.log('API Response:', postsData);
+      if (user.SearchRadius != 0) {
+        postsData = postsData.filter((post) => distance(post.PickUpLat, post.PicUpLng, user.lat, user.lng) <= user.SearchRadius);
+      }
       setPosts(postsData);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
-  };
-  
-  
-  
+  };  
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userData = await AsyncStorage.getItem('loggedUser'); 
+        const userData = await AsyncStorage.getItem('logged user');
         if (userData) {
           const parsedUser = JSON.parse(userData);
-          setUser(parsedUser); 
+          setUser(parsedUser);
         } else {
-          await AsyncStorage.setItem('loggedUser', JSON.stringify(route.params.user)); 
+          await AsyncStorage.setItem('logged user', JSON.stringify(route.params.user));
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -55,9 +58,9 @@ export default function C_home() {
     }
   }, [route.params?.category]);
 
-  useEffect(() => {
-    getPosts(); 
-  }, [category]);
+  useFocusEffect(useCallback(() => {
+    getPosts();
+  }, [category]));
 
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });
@@ -67,7 +70,7 @@ export default function C_home() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName= {user.fullName} notiNum={12} profileImage={{ uri: user.image }}  userScore={user.score} />
+        <C_header fullName={user.fullName} notiNum={12} profileImage={{ uri: user.image }} userScore={user.score} />
       </View>
       <View style={styles.searchView}>
         <Search />
@@ -85,17 +88,17 @@ export default function C_home() {
             posts.length == 0 ? <Text>No posts were found </Text> :
               posts.map((post) => <TouchableOpacity key={post.postId} onPress={() => handlePostPress(post)}>
                 <View style={styles.postContainer}>
-                  <Post 
-                  style={styles.posts} 
-                  content={post.content} 
-                  productName={post.productName} 
-                  category={post.categoryDesc} 
-                  productImage={{ uri: post.image }} 
-                  profileImage={{ uri: post.userImage }} 
-                  fullName={post.userName} score={post.score} 
-                  publishedDate={formatDate(new Date(post.createAt))} 
-                  publishedHour={formatTime(new Date(post.createAt))}
-                   />
+                  <Post
+                    style={styles.posts}
+                    content={post.content}
+                    productName={post.productName}
+                    category={post.categoryDesc}
+                    productImage={{ uri: post.image }}
+                    profileImage={{ uri: post.userImage }}
+                    fullName={post.userName} score={post.score}
+                    publishedDate={formatDate(new Date(post.createAt))}
+                    publishedHour={formatTime(new Date(post.createAt))}
+                  />
                 </View>
               </TouchableOpacity>)
           }

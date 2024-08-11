@@ -82,12 +82,30 @@ GO
 -- =============================================
 ALTER PROCEDURE [dbo].[SP_InEye_ReadAllPosts]
 
+@id int =0
 
 AS
 BEGIN
 
 	SET NOCOUNT ON;
+	if @id=0
 	SELECT * from PostView
+
+	else
+	SELECT * from PostView where (
+	Category in (Select CategoryId
+				from StoreCategories
+				where StoreId in (select FavStore
+									from Survey
+									where UserId=@id) 
+				UNION 
+				Select Category
+				from Category
+				where Category in (Select FavCategory
+									from Survey
+									where UserId=@id))
+	)
+
 END
 
 -- =============================================
@@ -492,3 +510,5 @@ SELECT *
 FROM PostView
 WHERE [FullName] like CONCAT('%',@string,'%') or [Name] like CONCAT('%',@string,'%') or [Content]  like CONCAT('%',@string,'%') or [Tags] like CONCAT('%',@string,'%')
 END
+
+

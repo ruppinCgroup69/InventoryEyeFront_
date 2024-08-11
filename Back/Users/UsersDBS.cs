@@ -146,8 +146,9 @@ namespace InventoryEyeBack.Users
             cmd.Parameters.AddWithValue("@address", user.Address);
             cmd.Parameters.AddWithValue("@image", user.Image);
             cmd.Parameters.AddWithValue("@createdAt", user.CreatedAt);
-            cmd.Parameters.AddWithValue("@password", user.Password);
             cmd.Parameters.AddWithValue("@emailAddress", user.EmailAddress);
+            cmd.Parameters.AddWithValue("@searchRadius", user.SearchRadius);
+
             return cmd;
         }
 
@@ -208,8 +209,65 @@ namespace InventoryEyeBack.Users
             return cmd;
         }
 
+        //-------------Update User Password-------------//
+        public int UpdateUserPasswordDBS(int id, string password)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("MySqlConnectionString"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            cmd = CreateUpdatetUserPasswordlWithStoredProcedure("SP_InEye_UpdateUserPassword", con, id, password); // create the command
+
+            try
+            {
+                // 0 - failure, 1 - success
+                cmd.ExecuteScalar(); // execute the command
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+        }
+        private SqlCommand CreateUpdatetUserPasswordlWithStoredProcedure(String spName, SqlConnection con, int id, string password)
+        {
+
+            SqlCommand cmd = new SqlCommand(); // create the command object
+
+            cmd.Connection = con;              // assign the connection to the command object
+
+            cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+
+            cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+
+            cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@password", password);
+            return cmd;
+        }
+
         //-------------Delete User -------------//
-        public int DeleteUserDBS(string email)
+        public bool DeleteUserDBS(string email)
         {
 
             SqlConnection con;
@@ -229,8 +287,8 @@ namespace InventoryEyeBack.Users
 
             try
             {
-                int numEffected = cmd.ExecuteNonQuery(); // execute the command
-                return numEffected;
+                cmd.ExecuteNonQuery(); // execute the command
+                return true;
             }
             catch (Exception ex)
             {
@@ -265,7 +323,6 @@ namespace InventoryEyeBack.Users
 
             return cmd;
         }
-
 
         //-------------Login User -------------//
         public UserLoginModel LoginUserDBS(UsersModel user)
@@ -308,6 +365,8 @@ namespace InventoryEyeBack.Users
                 u.Image = dataReader["Image"].ToString();
                 u.CreatedAt = Convert.ToDateTime(dataReader["CreatedAt"].ToString());
                 u.Score = Convert.ToInt32(dataReader["Score"].ToString());
+                u.SearchRadius = Convert.ToDouble(dataReader["SearchRadius"].ToString());
+
                 users.Add(u);
             }
 

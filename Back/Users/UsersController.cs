@@ -82,17 +82,28 @@ namespace InventoryEyeBack.Users
             }
         }
 
+        //PUT Update user password api/<UsersController>/5
+        [HttpPut("/api/Users/UpdatePassword")]
+        public IActionResult PutPassword([FromBody] UsersModel user)
+        {
+            int status = user.UpdateUserPassword();
+            if (status == 1)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
         // DELETE api/<UsersController>/5
         [HttpDelete("{email}")]
         public IActionResult Delete(string email)
         {
-            //UsersModel user = new UsersModel();
-            //user.DeleteUser(email);
-            //return Ok();
-
             UsersModel user = new UsersModel();
-            int result = user.DeleteUser(email);
-            if (result > 0)
+            bool result = user.DeleteUser(email);
+            if (result ==true)
             {
                 return Ok("User and all associated data deleted successfully");
             }

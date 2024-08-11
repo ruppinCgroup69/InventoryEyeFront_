@@ -69,7 +69,6 @@ export default function EditOrCreatePost() {
       const jsonValue = await AsyncStorage.getItem('logged user');
       if (jsonValue != null) {
         const user = JSON.parse(jsonValue);
-        console.log('Fetched user data:', user);
         setUserData(user);
         setPostData(prevData => ({
           ...prevData,
@@ -178,17 +177,17 @@ export default function EditOrCreatePost() {
     );
   };
 
-  const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => (
-    <View style={[styles.iconTextInputContainer, style]}>
-      {icon}
-      <TextInput
-        style={[styles.iconTextInput, { flex: 1 }]} // Ensures input takes the remaining space
-        placeholder={placeholder}
-        value={value}
-        onChangeText={onChangeText}
-      />
-    </View>
-  );
+  // const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => (
+  //   <View style={[styles.iconTextInputContainer, style]}>
+  //     {icon}
+  //     <TextInput
+  //       style={[styles.iconTextInput, { flex: 1 }]} 
+  //       placeholder={placeholder}
+  //       value={value}
+  //       onChangeText={onChangeText}
+  //     />
+  //   </View>
+  // );
 
   const isFashionCategorySelected = () => {
     if (!selectedCategory) {
@@ -201,12 +200,9 @@ export default function EditOrCreatePost() {
 
 
   const handleExit = () => {
-    console.log('Exiting EditOrCreatePost');
     if (previousScreen) {
-      console.log('Navigating to:', previousScreen);
       navigation.navigate(previousScreen);
     } else {
-      console.log('Navigating to Home');
       navigation.navigate('Home');
     }
   };
@@ -231,7 +227,6 @@ export default function EditOrCreatePost() {
   }
 
   const handleUploadPost = async () => {
-    console.log('Starting handleUploadPost');
     if (!userData) {
       alert('Error: User data is not available. Please try again.');
       return;
@@ -269,9 +264,8 @@ export default function EditOrCreatePost() {
         score: userData.score
       };
       const response = await POST('Posts', finalPostData)
-      console.log('Server response:', response);
 
-      if (response && response.success) {
+      if (response && response.ok) {
         navigation.navigate('Home');
       }
       else {

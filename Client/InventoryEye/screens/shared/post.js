@@ -60,6 +60,7 @@ export default function Post() {
           ...userData,
           id: userData.id
         });
+        console.log('user:',userData)
       } else {
         console.error('No user data found in AsyncStorage');
       }

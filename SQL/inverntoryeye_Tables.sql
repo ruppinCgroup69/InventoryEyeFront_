@@ -11,6 +11,7 @@ Create TABLE [Users] (
 	[Address] nvarchar(max) NOT NULL,
 	[Image] nvarchar(max) NOT NULL,
 	[CreatedAt] date NOT NULL,
+	[SearchRadius] float,
 	PRIMARY KEY ([Id])
 );
 
@@ -96,6 +97,12 @@ CREATE TABLE [Weights] (
 	[GeneralWeight] int NOT NULL,
 	[BoughtWeight] int NOT NULL,
 	[CredibilityWeight] int NOT NULL
+);
+
+CREATE TABLE [Survey] (
+[UserId] int constraint [Survey_fk01] FOREIGN KEY REFERENCES [Users]([Id]),
+[FavCategory] int NOT NULL,
+[FavStore] int NOT NULL,
 );
 
 ALTER TABLE [Users] ADD CONSTRAINT [Users_fk1] FOREIGN KEY ([Role]) REFERENCES [UserRoles]([Id]);
