@@ -59,19 +59,27 @@ export async function PUT(url, obj) {
             body: JSON.stringify(obj)
         });
 
-        //הסטטוס הוא לא מקבוצת 200
         if (!res.ok) {
             console.log({ res });
-            return;
+            return { ok: false }; // Return an object with ok: false for error responses
         }
 
-        let data = await res.json();
-        return data;
+        // Check if the response body exists before parsing
+        let data = null;
+        if (res.headers.get('Content-Length') !== '0') {
+            data = await res.json();
+        }
+
+        // Return the parsed data along with the ok status
+        return { ok: true, data };
 
     } catch (error) {
         console.error({ error });
+        return { ok: false }; // Return an object with ok: false in case of a catch error
     }
 }
+
+
 
 export async function DELETE(url) {
     try {

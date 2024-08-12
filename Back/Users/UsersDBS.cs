@@ -168,7 +168,7 @@ namespace InventoryEyeBack.Users
                 throw (ex);
             }
 
-            cmd = CreateUpdatetUserEmailWithStoredProcedure("SP_InEye_UpdateUserEmail", con, id,emailAddress); // create the command
+            cmd = CreateUpdatetUserEmailWithStoredProcedure("SP_InEye_UpdateUserEmail", con, id, emailAddress); // create the command
 
             try
             {
@@ -191,7 +191,7 @@ namespace InventoryEyeBack.Users
                 }
             }
         }
-        private SqlCommand CreateUpdatetUserEmailWithStoredProcedure(String spName, SqlConnection con,int id, string emailAddress)
+        private SqlCommand CreateUpdatetUserEmailWithStoredProcedure(String spName, SqlConnection con, int id, string emailAddress)
         {
 
             SqlCommand cmd = new SqlCommand(); // create the command object

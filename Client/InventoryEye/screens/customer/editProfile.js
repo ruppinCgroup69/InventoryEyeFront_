@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PUT } from '../../api';
+import { PUT, GET } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -16,8 +16,12 @@ export default function EditProfile() {
   const googlePlacesRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const toggleModal = () => setModalVisible(!modalVisible);
+  const [changedFields, setChangedFields] = useState({});
+  const [isEmailEditble, setIsEmailEditble] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  
   const [user, setUser] = useState({
-    id: null, //0
+    id: 0,
     role: 0,
     lastSeen: '',
     fullName: '',
@@ -33,21 +37,26 @@ export default function EditProfile() {
     searchRadius: 0,
   });
 
-  const [changedFields, setChangedFields] = useState({});
-
   const fetchUserData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('logged user');
       if (jsonValue != null) {
         const userData = JSON.parse(jsonValue);
-        setUser(prevUser => ({
-          ...prevUser,
-          ...userData,
-          searchRadius: parseFloat(userData.searchRadius) || 0,
-          lat: parseFloat(userData.lat) || 0,
-          lng: parseFloat(userData.lng) || 0,
-        }));
-        console.log('Fetched user data:', userData);
+        const userDataId = (userData.id)
+
+        const response = await GET(`Users/${userDataId}`);
+        if (response) {
+          setUser(prevUser => ({
+            ...prevUser,
+            ...response,
+            searchRadius: parseFloat(response.searchRadius) || 0,
+            lat: parseFloat(response.lat) || 0,
+            lng: parseFloat(response.lng) || 0,
+          }));
+          console.log('Fetched user data:', response);
+        } else {
+          console.error('No data returned from GET request');
+        }
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -55,37 +64,40 @@ export default function EditProfile() {
       console.error('Error retrieving user data:', error);
     }
   };
+
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    setNewEmail(user.emailAddress);
+  }, [user.emailAddress]);
+
+  const toggleEmailEdit = () => {
+    if (isEmailEditble) {
+      handleEmailUpdate();
+    } else {
+      setIsEmailEditble(true);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setUser(prevUser => {
       const newUser = { ...prevUser, [field]: value };
       return newUser;
     });
+
     setChangedFields(prevFields => {
       const newFields = { ...prevFields, [field]: true };
-      console.log('Changed fields:', newFields);
       return newFields;
     });
   };
-
-  // const handleInputChange = (field, value) => {
-  //   setUser(prevUser => {
-  //     let newValue = value;
-  //     if (field === 'searchRadius') {
-  //       newValue = value === '' ? 0 : parseFloat(value) || 0;
-  //     }
-  //     return { ...prevUser, [field]: newValue };
-  //   });
-  // };
 
   const handleUpdate = async () => {
     try {
       const updatedFields = {
         role: user.role,
-        lastSeen: new Date().toISOString(), // Use current date for lastSeen
+        lastSeen: new Date().toISOString(),
         fullName: user.fullName,
         emailAddress: user.emailAddress,
         birthDate: user.birthDate,
@@ -97,60 +109,76 @@ export default function EditProfile() {
         searchRadius: user.searchRadius
       };
       const result = await PUT(`Users/${user.emailAddress}`, updatedFields);
-      if (result && result.success) {
-        alert('Your details changed successfuly!')
-        await AsyncStorage.setItem('logged user', JSON.stringify(user));
+
+      if (result && result.emailAddress) {
+        alert('Your details were changed successfully!');
+        const updatedUser = {
+          ...user,
+          ...updatedFields,
+        };
+        console.log('updatedUser:', updatedUser)
+        await AsyncStorage.setItem('logged user', JSON.stringify(updatedUser));
+
+        setUser(updatedUser);
       } else {
         let errorMessage = 'Failed to update profile. ';
         if (result && result.data) {
-          errorMessage += Server `response: ${result.data}`;
+          errorMessage += `Server response: ${result.data}`;
         } else if (result && result.message) {
           errorMessage += result.message;
         } else {
           errorMessage += 'Unknown error occurred.';
         }
+        console.error(errorMessage);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
     }
   };
 
-  // const handleUpdate = async () => {
-  //   if (!user.id) {
-  //     console.error('User ID is undefined');
-  //     alert('Error', 'User ID is missing. Please try logging out and logging in again.');
-  //     return;
-  //   }
+  const handleEmailUpdate = async () => {
+    console.log('newEmail', newEmail)
+    if (!newEmail || newEmail === user.emailAddress) {
+        setIsEmailEditble(false)
+        return
+    }
+    try {
+        const result = await PUT(`Users/UpdateEmail/${user.id}`, { emailAddress: newEmail, fullName: '', address: '', image: '' });
+        console.log('result', result)
+        if (result && result.ok) {
+            setUser(prevUser => ({ ...prevUser, emailAddress: newEmail }));
+            console.log('user', user)
+            try {
+                const storedUser = await AsyncStorage.getItem('logged user');
+                console.log('storedUser', storedUser)
+                if (storedUser !== null) {
+                    const parsedUser = JSON.parse(storedUser);
+                    console.log('parsedUser', parsedUser)
+                    parsedUser.emailAddress = newEmail;
+                    console.log('parsedUser.emailAddress', parsedUser.emailAddress)
+                    await AsyncStorage.setItem('logged user', JSON.stringify(parsedUser));
+                    console.log('AsyncStorage updated with new email')
+                }
+            }
+            catch (storageErr) {
+                console.error('error updating AsyncStorage: ', storageErr)
+            }
+            alert('Success', 'email updated')
+            setIsEmailEditble(false)
+        }
+        else {
+            alert('error', 'failed to update email')
+        }
+    }
+    catch (err) {
+        console.error('error updating email: ', err)
+        alert('Error', 'An error occurred while updating email.')
+    }
+    finally {
+        setIsEmailEditble(false);
+    }
+};
 
-  //   try {
-  //     const updatedFields = {
-  //       ...user,
-  //       searchRadius: parseFloat(user.searchRadius) || 0,
-  //       lat: parseFloat(user.lat) || 0,
-  //       lng: parseFloat(user.lng) || 0,
-  //     };
-  //     console.log('Sending updated fields to server:', updatedFields);
-
-  //     const result = await PUT(Users/${user.id}, updatedFields);
-  //     console.log('Server response:', result);
-
-  //     if (result.success) {
-  //       console.log('Profile updated successfully');
-  //       alert('Success', 'Profile updated successfully');
-  //       await AsyncStorage.setItem('logged user', JSON.stringify(updatedFields));
-  //     } else {
-  //       console.error('Failed to update profile', result);
-  //       let errorMessage = Failed to update profile. ${result.message || ''};
-  //       if (result.status === 400) {
-  //         errorMessage += ' The server rejected the request. Please check your inputs.';
-  //       }
-  //       alert('Error', errorMessage);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error updating profile:', error);
-  //     alert('Error', An error occurred while updating the profile: ${error.message});
-  //   }
-  // };
 
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -245,13 +273,22 @@ export default function EditProfile() {
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="email-address"
-            value={user.emailAddress}
-            editable={false}
-          />
+          <View style={styles.emailContainer}>
+            <TextInput
+              style={styles.input}
+              keyboardType="email-address"
+              value={newEmail}
+              placeholder={user.emailAddress}
+              editable={isEmailEditble}
+              onChangeText={setNewEmail}
+            />
+          </View>
         </View>
+        <TouchableOpacity style={styles.editEmailButton}
+             onPress={toggleEmailEdit}>
+              <Text style={styles.editEmailButtontxt}>{isEmailEditble? 'Save':'Edit'}</Text>
+            </TouchableOpacity>
+
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Birthdate:</Text>
           <View style={styles.inputContainer}>
@@ -273,7 +310,7 @@ export default function EditProfile() {
           <Text style={styles.label}>Address:</Text>
           <GooglePlacesAutocomplete
             ref={googlePlacesRef}
-            placeholder= {user.address}
+            placeholder={user.address}
             fetchDetails={true}
             query={{
               key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
@@ -308,20 +345,6 @@ export default function EditProfile() {
             }}
           />
         </View>
-
-        {/* <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Radius Range:</Text>
-          <View style={styles.searchRadiusContainer}>
-            <TextInput
-              style={[styles.input, styles.searchRadiusInput]}
-              placeholder={user.searchRadius.toString()}
-              value={user.searchRadius.toString()}
-              onChangeText={(text) => handleInputChange('searchRadius', text)}
-              keyboardType="numeric"
-            />
-            <Text style={styles.kmLabel}>km</Text>
-          </View>
-        </View> */}
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Radius Range:</Text>
@@ -363,9 +386,6 @@ export default function EditProfile() {
           </Modal>
         </View>
       </View>
-      {/* <TouchableOpacity style={styles.UpdateButton} onPress={handleUpdate}>
-        <Text style={styles.UpdateButtonText}>Update</Text>
-      </TouchableOpacity> */}
       <TouchableOpacity style={styles.UpdateButton} onPress={handleUpdate}>
         <Text style={styles.UpdateButtonText}>Update</Text>
       </TouchableOpacity>
@@ -540,5 +560,27 @@ const styles = StyleSheet.create({
   kmLabel: {
     fontSize: 16,
     color: '#111851',
-  },
+  },
+  emailContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 250,
+  },
+  emailInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  editEmailButton: {
+    backgroundColor: 'white',
+    padding: 5,
+    borderRadius: 10,
+    borderWidth:1,
+    borderColor:'#31A1E5',
+    width:60,
+    marginLeft:180
+  },
+  editEmailButtontxt: {
+    color: 'black',
+    textAlign:'center'
+  },
 });

@@ -66,10 +66,10 @@ namespace InventoryEyeBack.Users
             return dbs.UpdateUserDBS(user);
         }
 
-        public int UpdateUserEmail()
+        public int UpdateUserEmail(int id, string emailAddress)
         {
             UsersDBS dbs = new UsersDBS();
-            return dbs.UpdateUserEmailDBS(id,emailAddress);
+            return dbs.UpdateUserEmailDBS(id, emailAddress);
         }
 
         public int UpdateUserPassword()

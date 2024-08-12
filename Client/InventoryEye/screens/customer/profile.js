@@ -91,7 +91,11 @@ export default function Profile() {
       <View style={styles.info}>
         <View style={styles.frame}>
           <View style={styles.inner}>
-            <Info fullName={user.fullName} profileImage={{ uri: user.image }} email={user.emailAddress} birthdate={formatDate(new Date(user.birthDate))} city={user.address}></Info>
+            <Info fullName={user.fullName} 
+            profileImage={{ uri: user.image }} 
+            email={user.emailAddress}
+             birthdate={formatDate(new Date(user.birthDate))} 
+             city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>
                 <AntDesign name="edit" size={24} color="#111851" onPress={() => navigation.navigate('Edit Profile')} />

@@ -70,10 +70,11 @@ namespace InventoryEyeBack.Users
         }
 
         //PUT Update user email api/<UsersController>/5
-        [HttpPut]
-        public IActionResult PutEmail([FromBody] UsersModel user)
+        [HttpPut("/api/Users/UpdateEmail/{id}")]
+        public IActionResult PutEmail([FromBody] UserUpdateModel user)
         {
-            int status = user.UpdateUserEmail();
+            UsersModel usersModel = new UsersModel();
+            int status = usersModel.UpdateUserEmail(user.Id, user.EmailAddress);
             if (status == 1)
             {
                 return Ok();
