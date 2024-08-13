@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform ,TouchableOpacity, Text} from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 import Details from '../../components/post/details';
 import NewComment from '../../components/post/newComment';
 import Comment from '../../components/post/comment';
@@ -10,12 +10,16 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute } from '@react-navigation/native';
 
+
 export default function Post() {
   const route = useRoute();
   const { postId } = route.params;
   const navigation = useNavigation();
   const [comments, setComments] = useState([]);
   const [parsedTags, setParsedTags] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
+  const [ratingData, setRatingData] = useState({ commentId: null, publishedBy: null });
   const [user, setUser] = useState({
     id: 0,
     role: 0,
@@ -60,7 +64,6 @@ export default function Post() {
           ...userData,
           id: userData.id
         });
-        console.log('user:',userData)
       } else {
         console.error('No user data found in AsyncStorage');
       }
@@ -75,10 +78,9 @@ export default function Post() {
 
   const fetchPostData = async () => {
     try {
-      const response = await GET(`Posts/${postId}`);
+      const response = await GET(`Posts/PostId/${postId}`);
       if (response) {
         setPostData(response);
-
         if (response.tags) {
           try {
             const tagsArray = JSON.parse(response.tags);
@@ -87,7 +89,6 @@ export default function Post() {
             console.error('Error parsing tags:', parseError);
           }
         }
-
         try {
           await AsyncStorage.setItem(`post_${postId}`, JSON.stringify(response));
         } catch (storageError) {
@@ -158,17 +159,15 @@ export default function Post() {
   useEffect(() => {
   }, [comments]);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
-  const [ratingData, setRatingData] = useState({ publishedBy: null, ratedBy: null });
-  const handleOpenRatingModal = (commentUserId) => {
+
+  const handleOpenRatingModal = (commentId, userId) => {
     setRatingData({
-      publishedBy: commentUserId,
-      ratedBy: user.id  // This is the ID of the logged-in user
+      commentId: commentId,
+      publishedBy: userId
     });
     setIsRatingModalVisible(true);
   };
-  
+
   const handleCloseRatingModal = () => {
     setIsRatingModalVisible(false);
   };
@@ -179,8 +178,8 @@ export default function Post() {
         <Details
           fullName={postData.userName}
           profileImage={{ uri: postData.image }}
-          pDate={formatDate(postData.createAt)}
-          pHour={formatTime(postData.createAt)}
+          pDate={formatDate(postData.editedAt)}
+          pHour={formatTime(postData.editedAt)}
           category={postData.categoryDesc}
           size={parsedTags[2]}
           pName={postData.productName}
@@ -211,28 +210,31 @@ export default function Post() {
               quality={comment.bought ? comment.productQuality : undefined}
               datepurch={comment.bought ? formatDate(comment.boughtDate) : ''}
               rank={comment.bought ? comment.satisfaction : undefined}
+              commentId={comment.commentId}
+              userId={comment.userId}
               onRatePress={handleOpenRatingModal}
-              commentUserId={comment.userId} 
             />
           </View>
         ))}
 
       </ScrollView>
-      <NewComment fullName={'Yarden Assulin'} onPress={() => setModalVisible(true)} />
+      <NewComment fullName={postData.userName} onPress={() => setModalVisible(true)} />
       <ResponseModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        fullName={'Yarden Assulin'}
+        fullName={postData.userName}
         postId={postId}
+        categoryId={postData.category}
         onCommentPosted={refreshComments}
       />
 
       <RateModal
         visible={isRatingModalVisible}
         onClose={handleCloseRatingModal}
+        commentId={ratingData.commentId}
         publishedBy={ratingData.publishedBy}
-        ratedBy={ratingData.ratedBy}
         postId={postId}
+        publishedName={postData.userName}
       />
     </View>
 

@@ -17,24 +17,7 @@ export default function SuccessResetPassword() {
         Password recovery instructions have been sent to your email
         </Text>
       </View>
-      <View style={styles.buttonsContainer}>
-        <Button
-          title="Resend"
-          buttonStyle={{
-            height:50,
-            backgroundColor: 'white',
-            borderWidth: 1,
-            borderColor: '#31a1e5',
-            borderRadius: 30,
-          }}
-          containerStyle={{
-            width: 230,
-            marginHorizontal: 50,
-            marginVertical: 10,
-          }}
-          titleStyle={{ fontWeight: 'bold', color: '#111851', fontSize:23 }}
-        />
-      </View>
+  
       <View style={styles.buttonsContainer}>
         <Button
           title="Login"

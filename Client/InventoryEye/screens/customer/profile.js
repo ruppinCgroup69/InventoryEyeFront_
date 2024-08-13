@@ -1,12 +1,12 @@
 import { View, ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import React from 'react'
+import React, { useCallback } from 'react'
 import Info from '../../components/profile/info'
 import Score from '../../components/profile/score'
 import PostsHistory from '../../components/profile/postsHistory'
 import CuponsHistory from '../../components/profile/cuponsHistory'
 import bonusImage from '../../images/bonusImage.png';
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 import { formatDate } from '../../utils';
@@ -40,11 +40,13 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
+  useFocusEffect(useCallback(()=>{
     fetchUserData().then(() => {
       fetchUserPosts(user.id);
     });
-  }, [user.id]);
+  },[user.id]));
+
+
 
   const handleLogout = async () => {
     try {

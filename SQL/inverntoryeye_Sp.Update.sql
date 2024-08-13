@@ -359,23 +359,23 @@ GO
 -- Create date: <02/06/2024>
 -- Description:	<Update User Password>
 -- =============================================
-Alter PROCEDURE [dbo].[SP_InEye_UpdateUserPassword]
+ALTER PROCEDURE [dbo].[SP_InEye_UpdateUserPassword]
 
-	@id int,
+	@email nvarchar (max),
 	@password nvarchar (max)
 
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF NOT EXISTS (SELECT [Id] FROM Users WHERE [Id] = @id)
+    IF NOT EXISTS (SELECT [EmailAddress] FROM Users WHERE [EmailAddress] = @email)
     BEGIN
         RETURN 0;
     END;
 
     -- Update statements for procedure here
     UPDATE Users SET [Password] = @password
-    WHERE [Id] = @id
+    WHERE [EmailAddress] = @email
 
     RETURN 1;
 END;

@@ -30,6 +30,30 @@ export function distance(lat1, lon1, lat2, lon2) {
         dist = dist * 180 / Math.PI;
         dist = dist * 60 * 1.1515;
         dist = dist * 1.609344
-        return dist;
+        return dist / 1000;
     }
+}
+
+export function generateCustomPassword(length) {
+    const getRandomChar = () => {
+        const charSets = [
+            [48, 57],  // Numbers (0-9)
+            [65, 90],  // Uppercase letters (A-Z)
+            [97, 122], // Lowercase letters (a-z)
+            [33, 47],  // Special characters (!"#$%&()*+,-./)
+        ];
+        // Select a random character set
+        const charSet = charSets[Math.floor(Math.random() * charSets.length)];
+        // Generate a random character code from the selected set
+        const charCode = Math.floor(Math.random() *
+            (charSet[1] - charSet[0] + 1)) + charSet[0];
+        // Convert the character code to a character
+        return String.fromCharCode(charCode);
+    };
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += getRandomChar();
+    }
+
+    return password;
 }

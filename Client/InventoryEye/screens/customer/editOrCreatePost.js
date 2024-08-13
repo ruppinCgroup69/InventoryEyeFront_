@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, Keyboard, Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, KeyboardAvoidingView } from 'react-native';
 import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
 import { GET, POST } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,6 +26,10 @@ export default function EditOrCreatePost() {
   const [overallError, setOverallError] = useState('');
   const [errors, setErrors] = useState({});
   const [size, setSize] = useState('');
+  const [addressUpdated, setAddressUpdated] = useState(false);
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
   const [postData, setPostData] = useState({
     postId: 0,
     userId: 0,
@@ -33,16 +37,16 @@ export default function EditOrCreatePost() {
     userImage: '',
     createAt: new Date(),
     editedAt: new Date(),
-    productName: "",
-    content: "",
-    image: "",
-    tags: "",
+    productName: '',
+    content: '',
+    image: '',
+    tags: '',
     category: 0,
     pickUpFromUser: '',
     pickUpLat: 0,
-    picUpLng: 0,
-    pickUpAddress: "",
-    categoryDesc: "",
+    pickUpLng: 0,
+    pickUpAddress: '',
+    categoryDesc: '',
     score: 0
   });
   const PostSchema = yup.object({
@@ -52,17 +56,31 @@ export default function EditOrCreatePost() {
     company: yup.string().required('Company is required'),
     image: yup.string().required('Please select an image'),
   });
-
-
   useEffect(() => {
   }, [userData]);
 
   useEffect(() => {
     if (postData.pickUpAddress && googlePlacesRef.current) {
+      console.log('postData.pickUpAddress',postData.pickUpAddress);
+      console.log('googlePlacesRef.current',googlePlacesRef.current);
+      console.log(postData.pickUpAddress && googlePlacesRef.current);
+
       googlePlacesRef.current.setAddressText(postData.pickUpAddress);
+      console.log(postData.pickUpAddress)
     }
   }, [postData.pickUpAddress]);
 
+   useEffect(() => {
+    if (userData && userData.address) {
+      setPostData(prevData => ({
+        ...prevData,
+        pickUpFromUser: userData.address,
+        pickUpAddress: userData.address,
+        pickUpLat: userData.lat,
+        pickUpLng: userData.lng,
+      }));
+    }
+  }, [userData]);
 
   const fetchUserData = async () => {
     try {
@@ -70,12 +88,13 @@ export default function EditOrCreatePost() {
       if (jsonValue != null) {
         const user = JSON.parse(jsonValue);
         setUserData(user);
+        console.log(user);
         setPostData(prevData => ({
           ...prevData,
           pickUpFromUser: user.address,
           pickUpLat: user.lat,
           pickUpLng: user.lng,
-          pickUpAddress: user.address,
+          pickUpAddress: user.address
         }));
       } else {
         console.error('No user data found in AsyncStorage');
@@ -177,18 +196,6 @@ export default function EditOrCreatePost() {
     );
   };
 
-  // const IconTextInput = ({ icon, placeholder, value, onChangeText, style }) => (
-  //   <View style={[styles.iconTextInputContainer, style]}>
-  //     {icon}
-  //     <TextInput
-  //       style={[styles.iconTextInput, { flex: 1 }]} 
-  //       placeholder={placeholder}
-  //       value={value}
-  //       onChangeText={onChangeText}
-  //     />
-  //   </View>
-  // );
-
   const isFashionCategorySelected = () => {
     if (!selectedCategory) {
       return false;
@@ -197,7 +204,6 @@ export default function EditOrCreatePost() {
     const fashionCategory = categories.find(category => category.categoryDesc === 'Clothing&Fashion');
     return fashionCategory && selectedCategory.categoryDesc === fashionCategory.categoryDesc;
   };
-
 
   const handleExit = () => {
     if (previousScreen) {
@@ -226,6 +232,16 @@ export default function EditOrCreatePost() {
       });
   }
 
+  const handleAddressChange = (data, details = null) => {
+    setAddressUpdated(true);
+    setPostData(prev => ({
+      ...prev,
+      pickUpAddress: data.description,
+      pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
+      pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
+    }));
+  };
+
   const handleUploadPost = async () => {
     if (!userData) {
       alert('Error: User data is not available. Please try again.');
@@ -239,7 +255,7 @@ export default function EditOrCreatePost() {
         content: postData.content,
         color: color,
         company: company,
-        image:  postData.image,
+        image: postData.image,
       };
       await PostSchema.validate(postToValidate, { abortEarly: false });
       if (!selectedCategory) {
@@ -260,7 +276,8 @@ export default function EditOrCreatePost() {
         tags: tagsString,
         category: selectedCategory.categoryId,
         categoryDesc: selectedCategory.categoryDesc,
-        pickUpFromUser: userData.address,
+        pickUpFromUser: userData.address, // This remains unchanged
+        pickUpAddress: addressUpdated ? postData.pickUpAddress : userData.address,
         score: userData.score
       };
       const response = await POST('Posts', finalPostData)
@@ -291,182 +308,140 @@ export default function EditOrCreatePost() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <View style={styles.exit}>
-          <TouchableOpacity onPress={handleExit}>
-            <Feather name="x" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.title}>
-          <Text style={styles.createHeader}>Create New Post</Text>
-        </View>
-        <View style={styles.uploadIcon}>
-          <TouchableOpacity onPress={handleUploadPost}>
-            <Feather name="upload" size={30} color="#111851" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.center}>
-
-
-        <View style={styles.profile}>
-          <View style={styles.imageContainer}>
-            {userData && userData.image ? (
-              <Image source={{ uri: userData.image }} style={styles.image} />
-            ) : (
-              <View style={[styles.image, styles.placeholderImage]} />
-            )}
-          </View>
-          <View>
-            <Text style={styles.userName}>
-              {userData ? userData.fullName : 'Loading...'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.content}>
-          <TextInput
-            multiline
-            style={styles.contentText}
-            placeholder='What product are you looking for ?'
-            value={postData.content}
-            onChangeText={(text) => setPostData({ ...postData, content: text })}
-          />
-          {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
-        </View>
-      </View>
-
-      <KeyboardAwareScrollView
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
-        contentContainerStyle={styles.scrollContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardShouldPersistTaps="handeld"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
+        <View style={styles.top}>
+          <View style={styles.exit}>
+            <TouchableOpacity onPress={handleExit}>
+              <Feather name="x" size={30} color="#111851" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.Header}>Create New Post</Text>
+          </View>
+          <View style={styles.uploadIcon}>
+            <TouchableOpacity onPress={handleUploadPost}>
+              <Feather name="upload" size={30} color="#111851" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        <View style={styles.bottom}>
-          <View style={styles.inputItem}>
-            <View style={styles.imageSelectionContainer}>
-              {
-                postData.image ? (
-                  <Image source={{ uri: postData.image }} style={styles.selectedImage} />
-                ) : (
-                  <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
-                    <Text style={styles.imgText}> <FontAwesome5 name="image" style={styles.camIcon} size={24} color="#111851" />  Upload Image</Text>
-                  </TouchableOpacity>
-                )
-              }
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <View style={styles.mainContent}>
+            <View style={styles.center}>
+              <View style={styles.profile}>
+                <View style={styles.imageContainer}>
+                  {userData && userData.image ? (
+                    <Image source={{ uri: userData.image }} style={styles.image} />
+                  ) : (
+                    <View style={styles.image} />
+                  )}
+                </View>
+                <View>
+                  <Text style={styles.userName}>
+                    {userData ? userData.fullName : 'Loading...'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.content}>
+                <TextInput
+                  multiline
+                  style={styles.contentText}
+                  placeholder='What are you looking for today ?'
+                  value={postData.content}
+                  onChangeText={(text) => setPostData({ ...postData, content: text })}
+                />
+                {errors.content && <Text style={styles.errorText}>{errors.content}</Text>}
+              </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.input, styles.categoryButton]}
-              onPress={showActionSheet}
-            >
-              <MaterialIcons name="category" size={24} color="#111851" />
-              <Text style={styles.categoryButtonText}>
-                {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.bottom}>
+              <View style={styles.inputItem}>
+                <GooglePlacesAutocomplete
+                  icon={<Octicons name="search" size={24} color="#111851" />}
+                  ref={googlePlacesRef}
+                  placeholder={postData.pickUpAddress || userData?.address || 'Enter address'}
+                  onPress={handleAddressChange}
+                  query={{
+                    key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+                    language: 'en',
+                  }}
+                  styles={{
+                    container: {
+                      flex: 0,
+                      width: '100%',
+                    },
+                    textInput: styles.input,
+                    listView: styles.autocompleteListView,
+                    row: styles.autocompleteRow,
+                  }}
+                  enablePoweredByContainer={false}
+                  fetchDetails={true}
+                  onFail={error => console.error(error)}
+                />
 
-            {/* <IconTextInput
-              icon={<FontAwesome name="pencil" size={24} color="#111851" style={styles.inputIcon} />}
-              placeholder="Product name"
-              value={postData.productName}
-              onChangeText={(text) => setPostData({ ...postData, productName: text })}
-              style={styles.input}
-            />
+                <TouchableOpacity
+                  style={[styles.input, styles.categoryButton]}
+                  onPress={showActionSheet}
+                >
+                  <Text style={styles.categoryButtonText}>
+                    {selectedCategory ? selectedCategory.categoryDesc : 'Select Category'}
+                  </Text>
+                </TouchableOpacity>
 
-            <IconTextInput
-              icon={<Ionicons name="color-palette-outline" size={24} color="#111851" />}
-              placeholder="Color"
-              value={color}
-              onChangeText={setColor}
-              style={styles.input}
-            />
+                <TextInput
+                  placeholder="Product name"
+                  value={postData.productName}
+                  onChangeText={(text) => setPostData({ ...postData, productName: text })}
+                  style={styles.input}
+                />
 
-            {isFashionCategorySelected() && (
-              <IconTextInput
-                icon={<Entypo name="ruler" size={24} color="#111851" />}
-                style={[styles.input, styles.sizeInput]}
-                placeholder='Size'
-                value={size}
-                onChangeText={setSize}
-              />
-            )}
+                <TextInput
+                  placeholder="Color"
+                  value={color}
+                  onChangeText={setColor}
+                  style={styles.input}
+                />
 
-            <IconTextInput
-              icon={<FontAwesome name="building-o" size={24} color="#111851" />}
-              placeholder="Company"
-              value={company}
-              onChangeText={setCompany}
-              style={styles.input}
-            /> */}
+                {isFashionCategorySelected() && (
+                  <TextInput
+                    style={[styles.input, styles.sizeInput]}
+                    placeholder='Size'
+                    value={size}
+                    onChangeText={setSize}
+                  />
+                )}
 
-            <TextInput
-              placeholder="Product name"
-              value={postData.productName}
-              onChangeText={(text) => setPostData({ ...postData, productName: text })}
-              style={styles.input}
-            />
+                <TextInput
+                  placeholder="Company"
+                  value={company}
+                  onChangeText={setCompany}
+                  style={styles.input}
+                />
 
-            <TextInput
-              placeholder="Color"
-              value={color}
-              onChangeText={setColor}
-              style={styles.input}
-            />
+                <View style={postData.image ? null : styles.inputImage}>
+                  {postData.image ? (
+                    <TouchableOpacity onPress={toggleModal}>
+                      <Image source={{ uri: postData.image }} style={styles.selectedImage} />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity style={styles.imgBtn} onPress={toggleModal}>
+                      <Text style={styles.imgText}>
+                        <FontAwesome5 name="image" size={24} color="#111851" /> Upload Image
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            </View>
 
-            {isFashionCategorySelected() && (
-              <TextInput
-                style={[styles.input, styles.sizeInput]}
-                placeholder='Size'
-                value={size}
-                onChangeText={setSize}
-              />
-            )}
-
-            <TextInput
-              placeholder="Company"
-              value={company}
-              onChangeText={setCompany}
-              style={styles.input}
-            />
-
-
-            <GooglePlacesAutocomplete
-              icon={<Octicons name="search" size={24} color="#111851" />}
-              ref={googlePlacesRef}
-              placeholder={postData.pickUpAddress}
-              onPress={(data, details = null) => {
-                setPostData(prev => ({
-                  ...prev,
-                  pickUpAddress: data.description,
-                  pickUpLat: details?.geometry?.location?.lat || prev.pickUpLat,
-                  pickUpLng: details?.geometry?.location?.lng || prev.pickUpLng,
-                }));
-              }}
-              query={{
-                key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
-                language: 'en',
-              }}
-              styles={{
-                container: {
-                  flex: 0,
-                  width: '100%',
-                },
-                textInput: styles.input,
-                listView: styles.autocompleteListView,
-                row: styles.autocompleteRow,
-              }}
-              enablePoweredByContainer={false}
-              fetchDetails={true}
-              onFail={error => console.error(error)}
-            />
           </View>
-        </View>
-        {overallError ? <Text style={styles.overallErrorText}>{overallError}</Text> : null}
-      </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
       <Modal
         visible={modalVisible}
@@ -480,7 +455,7 @@ export default function EditOrCreatePost() {
               <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                   <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
-                    <Text style={styles.buttonText}>OPEN GALLERY</Text>
+                    <Text style={styles.buttonText}>OPEN GALLERY </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
                     <Text style={styles.buttonText}>OPEN CAMERA</Text>
@@ -491,66 +466,24 @@ export default function EditOrCreatePost() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </SafeAreaView >
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#EAF0F3',
-    paddingTop: 38
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    alignItems: 'left',
-    justifyContent: 'flex-start',
-    backgroundColor: '#F0F6FE',
 
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalButton: {
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    backgroundColor: '#31A1E5',
-    padding: 15,
-    borderRadius: 10,
-  },
-  buttonText: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  center: {
-    flex: 1,
-    width: '100%',
+  container: {
+    height: '100%'
   },
   top: {
     flexDirection: 'row',
-    height: 60,
-    width: '100%',
+    justifyContent: 'space-between',
+    height: '10%',
     backgroundColor: '#C8DFEA',
     alignItems: 'center',
     borderBottomColor: 'white',
     borderBottomWidth: 2,
-  },
-  placeholderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  icon: {
-    marginRight: 7,
-  },
-  placeholderText: {
-    color: '#111851',
-    fontSize: 16,
+    // marginTop: 35,
   },
   exit: {
     width: '15%',
@@ -558,9 +491,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    width: '70%',
-    height: '100%',
+  Header: {
+    fontSize: 20,
+    color: '#111851',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  titleContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -570,24 +508,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  createHeader: {
-    color: '#111851',
-    fontWeight: 'bold',
-    fontSize: 25,
+  mainContent: {
+    flex: 1,
   },
   center: {
     flex: 1,
-    width: '100%',
-  },
-  profile: {
-    flexDirection: 'row',
-    width: '100%',
-    paddingVertical: 10,
-    alignItems: 'center',
-    height: 80,
+    height: '30%',
   },
   imageContainer: {
-    alignItems: 'center',
+    alignItems: 'right',
   },
   image: {
     width: 70,
@@ -601,52 +530,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#111851',
     fontWeight: 'bold',
+    paddingLeft: 8
   },
-  content: {
-    flex: 1,
+  profile: {
+    flexDirection: 'row',
     width: '100%',
-    padding: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    height: 85,
   },
   contentText: {
-    fontSize: 18,
-    color: 'black',
+    // backgroundColor: 'white'
   },
   bottom: {
-    flex: 1,
-    alignItems: 'left',
-    flexDirection: 'row',
+    height: '60%',
     backgroundColor: '#F0F6FE',
-    paddingVertical: 10,
-    //paddingHorizontal: 15,
-    borderTopWidth: 1,
-    borderColor: '#ffff',
-    height: 10,
-    paddingTop: 20,
-    justifyContent: 'flex-start',
+    // backgroundColor: 'yellow'
   },
   inputItem: {
     alignItems: 'left',
     justifyContent: 'flex-start',
     width: '80%',
     paddingHorizontal: 15,
-  },
-  iconTextInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#31a1e5',
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    paddingHorizontal: 10,
-    marginVertical: 10,
-    marginBottom: -5,
-    height: 40,
-    width: '100%',
-  },
-  iconTextInput: {
-    marginLeft: 10,
-    fontSize: 16,
-    flex: 1,
+    //  backgroundColor: 'red',
+    marginVertical: 30
   },
   input: {
     alignText: 'left',
@@ -664,61 +571,27 @@ const styles = StyleSheet.create({
     marginBottom: -5,
     fontSize: 16
   },
-  sizeInput: {
-    marginTop: 10, // Increase this value to add more space above the Size input
-  },
-  imgText: {
-    fontSize: 16,
-    color: '#111851',
-    marginBottom: 10,
-    backgroundColor: '#F0F6FE',
-    borderWidth: 1,
-    borderColor: '#31a1e5',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    width: 'auto',
-    textAlign: 'left',
-    paddingLeft: 10
-
-  },
-  imgContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%'
-  },
-  imgBtn: {
-    width: '100%',
-  },
-  categoryButton: {
-    backgroundColor: '#ffff',
-    borderWidth: 1,
-    borderColor: '#31a1e5',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: -5,
-    marginVertical: 10,
-    width: '100%',
-  },
   categoryButtonText: {
     color: 'rgba(17, 24, 81, 0.3)',
     fontSize: 16,
     textAlign: 'left',
-    marginLeft: 7
-  },
-  modalbtn: {
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    backgroundColor: '#31a1e5',
-    padding: 10,
-    borderRadius: 10,
+    marginLeft: 0
   },
   imageSelectionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: -15,
     width: '100%',
+  },
+  selectedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginVertical: 10,
+    marginHorizontal: 90,
+    borderColor: '#31a1e5',
+    borderWidth: 1,
+    borderRadius: 10,
   },
   modalContainer: {
     width: '80%',
@@ -727,11 +600,9 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  buttonText: {
-    textAlign: 'center',
-    color: '#111851',
-    fontSize: 11,
-    fontWeight: 'bold'
+  modalContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   modalOverlay: {
     flex: 1,
@@ -739,42 +610,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  selectedImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginVertical: 10
-  },
-  autocompleteContainer: {
-    zIndex: 3,
-    width: '100%',
-    marginBottom: 10,
-  },
-  autocompleteListView: {
-    position: 'absolute',
-    top: 40,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#31a1e5',
-    borderRadius: 5,
-    zIndex: 1000,
-    elevation: 3,
-  },
-  autocompleteRow: {
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    backgroundColor: '#31A1E5',
     padding: 15,
-    fontSize: 15,
+    borderRadius: 10,
   },
-  overallErrorText: {
-    color: 'red',
+  buttonText: {
     fontSize: 16,
-    marginTop: 10,
     textAlign: 'center',
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
+  imgText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  inputImage: {
+    alignText: 'left',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    width: '60%',
+    borderColor: '#31a1e5',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    paddingTop: 8,
+    marginVertical: 10,
+    height: 40,
+    marginBottom: -5,
+    fontSize: 16
+  }
 
 });
+

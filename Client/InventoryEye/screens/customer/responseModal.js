@@ -28,7 +28,7 @@ const reverseQualityMapping = {
   3: 'High'
 };
 
-export default function ResponseModal({ visible, onClose, fullName, postId, onCommentPosted  }) {
+export default function ResponseModal({ visible, onClose, fullName, postId, onCommentPosted,categoryId  }) {
   const [respnseContent, setRespnseContent] = useState('');
   const [inEyeDate, setInEyeDate] = useState(new Date());
   const [location, setLocation] = useState('');
@@ -61,18 +61,25 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
     satisfaction: 0
   });
 
-  useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const response = await GET('Stores');
+  const fetchStores = async () => {
+    try {
+      const response = await GET(`StoreCategories/CategoryId/${categoryId}`);
+      if (Array.isArray(response)) {
         setStores(response);
-      } catch (error) {
-        console.error('Error fetching stores:', error);
+      } else {
+        console.error('Unexpected response format:', response);
+        setStores([]); 
       }
-    };
-    fetchStores();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching stores:', error);
+      setStores([]); 
+    }
+  };
 
+  useEffect(() => {
+    fetchStores();
+  }, [categoryId]);
+  
   useEffect(() => {
     const fetchStockLevels = async () => {
       try {
@@ -91,7 +98,6 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
         const userData = await AsyncStorage.getItem('logged user');
         if (userData) {
           const user = JSON.parse(userData);
-          console.log('Fetched User Data:', user);
           setResponseData((prevData) => ({
             ...prevData,
             userId: user.id,
@@ -124,12 +130,8 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
       satisfaction: satisfaction ? parseInt(satisfaction, 10) : 0,
     };
 
-    console.log('Post ID:', postId);
-    console.log('Updated Response Data:', updatedResponseData);
-
     try {
       const response = await POST('Comments', updatedResponseData);
-      console.log('Comment posted successfully:', response);
       onCommentPosted();
       onClose();
     } catch (error) {
@@ -137,18 +139,19 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
     }
   };
 
-
   const showActionSheet = () => {
     Alert.alert(
       "Select Store",
       "",
       [
-        ...stores.map(store => ({
+        ...(Array.isArray(stores) && stores.length > 0 ? stores.map(store => ({
           text: store.storeName,
           onPress: () => {
-            setSelectedStore(store)
+            setSelectedStore(store);
           }
-        })),
+        })) : [
+          { text: "No stores available", style: "cancel" }
+        ]),
         {
           text: "Cancel",
           style: "cancel"
@@ -156,6 +159,8 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
       ]
     );
   };
+  
+  
 
 
   return (

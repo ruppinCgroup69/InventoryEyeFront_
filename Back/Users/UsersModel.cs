@@ -75,7 +75,7 @@ namespace InventoryEyeBack.Users
         public int UpdateUserPassword()
         {
             UsersDBS dbs = new UsersDBS();
-            return dbs.UpdateUserPasswordDBS(id, password);
+            return dbs.UpdateUserPasswordDBS(emailAddress, password);
         }
 
         public bool DeleteUser(string email)

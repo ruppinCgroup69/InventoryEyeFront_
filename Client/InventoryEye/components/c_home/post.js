@@ -8,7 +8,7 @@ export default function Post({ fullName, profileImage, score, productImage, publ
     <View style={styles.container}>
       <View style={styles.left}>
         <View style={styles.info}>
-        <View style={styles.profileImage} >
+          <View style={styles.profileImage} >
             <Image source={productImage} style={styles.myImg} />
             <View style={[styles.score, { left: 7 }]}>
               <Text style={styles.scoretext}>{score}</Text>
@@ -20,8 +20,12 @@ export default function Post({ fullName, profileImage, score, productImage, publ
               <Text style={styles.publish}>{publishedDate} ,{publishedHour}</Text>
             </View>
             <View style={styles.productInfo}>
-              <Text style={styles.categoryName}>Category: <Text style={{ color: 'black' }}>{category}</Text></Text>
-              <Text style={styles.pName}>Product name: <Text style={{ color: 'black' }}>{productName}</Text></Text>
+              <Text style={styles.categoryName} numberOfLines={1} ellipsizeMode="tail">
+                Category: <Text style={styles.truncatedText}>{category}</Text>
+              </Text>
+              <Text style={styles.pName} numberOfLines={1} ellipsizeMode="tail">
+                Product name: <Text style={styles.truncatedText}>{productName}</Text>
+                </Text>
             </View>
           </View>
 
@@ -85,7 +89,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    //borderWidth: 1,
     width: '100%',
     height: '40%',
   },
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
     //borderWidth: 1,
   },
   name: {
-    marginTop:2,
+    marginTop: 2,
     textAlign: 'left',
     marginRight: 4,
     color: '#111851',
@@ -142,6 +145,9 @@ const styles = StyleSheet.create({
   },
   categoryName: {
     color: '#111851',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   pName: {
     color: '#111851',
@@ -152,7 +158,13 @@ const styles = StyleSheet.create({
   more: {
     alignItems: 'center',
   },
-  contenttext:{
-    paddingLeft:5,
+  contenttext: {
+    paddingLeft: 5,
+  },
+  truncatedText: {
+    color: 'black',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
 })

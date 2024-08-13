@@ -210,7 +210,7 @@ namespace InventoryEyeBack.Users
         }
 
         //-------------Update User Password-------------//
-        public int UpdateUserPasswordDBS(int id, string password)
+        public int UpdateUserPasswordDBS(string email, string password)
         {
             SqlConnection con;
             SqlCommand cmd;
@@ -225,7 +225,7 @@ namespace InventoryEyeBack.Users
                 throw (ex);
             }
 
-            cmd = CreateUpdatetUserPasswordlWithStoredProcedure("SP_InEye_UpdateUserPassword", con, id, password); // create the command
+            cmd = CreateUpdatetUserPasswordlWithStoredProcedure("SP_InEye_UpdateUserPassword", con, email, password); // create the command
 
             try
             {
@@ -248,7 +248,7 @@ namespace InventoryEyeBack.Users
                 }
             }
         }
-        private SqlCommand CreateUpdatetUserPasswordlWithStoredProcedure(String spName, SqlConnection con, int id, string password)
+        private SqlCommand CreateUpdatetUserPasswordlWithStoredProcedure(String spName, SqlConnection con, string email, string password)
         {
 
             SqlCommand cmd = new SqlCommand(); // create the command object
@@ -261,7 +261,7 @@ namespace InventoryEyeBack.Users
 
             cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
 
-            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@password", password);
             return cmd;
         }

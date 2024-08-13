@@ -7,7 +7,20 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PUT, GET } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
+import * as yup from 'yup';
 
+const ReviewSchema = yup.object({
+  newPassword: yup
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('newPassword'), null], 'Passwords must match')
+    .required('Please confirm your password'),
+});
 
 export default function EditProfile() {
   const currentDate = new Date();
@@ -15,11 +28,16 @@ export default function EditProfile() {
   const minDate = new Date(currentDate.getFullYear() - 120, currentDate.getMonth(), currentDate.getDate());
   const googlePlacesRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const toggleModal = () => setModalVisible(!modalVisible);
   const [changedFields, setChangedFields] = useState({});
   const [isEmailEditble, setIsEmailEditble] = useState(false);
   const [newEmail, setNewEmail] = useState('');
-  
+  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
+  const togglePasswordModal = () => setPasswordModalVisible(!passwordModalVisible);
+  const toggleModal = () => setModalVisible(!modalVisible);
+
   const [user, setUser] = useState({
     id: 0,
     role: 0,
@@ -110,7 +128,7 @@ export default function EditProfile() {
       };
       const result = await PUT(`Users/${user.emailAddress}`, updatedFields);
 
-      if (result && result.emailAddress) {
+      if (result.ok) {
         alert('Your details were changed successfully!');
         const updatedUser = {
           ...user,
@@ -136,49 +154,72 @@ export default function EditProfile() {
     }
   };
 
-  const handleEmailUpdate = async () => {
-    console.log('newEmail', newEmail)
-    if (!newEmail || newEmail === user.emailAddress) {
-        setIsEmailEditble(false)
-        return
-    }
+  const handlUpdatePassword = async () => {
+    setErrors({});
+    console.log(newPassword)
+    console.log(confirmPassword)
     try {
-        const result = await PUT(`Users/UpdateEmail/${user.id}`, { emailAddress: newEmail, fullName: '', address: '', image: '' });
-        console.log('result', result)
-        if (result && result.ok) {
-            setUser(prevUser => ({ ...prevUser, emailAddress: newEmail }));
-            console.log('user', user)
-            try {
-                const storedUser = await AsyncStorage.getItem('logged user');
-                console.log('storedUser', storedUser)
-                if (storedUser !== null) {
-                    const parsedUser = JSON.parse(storedUser);
-                    console.log('parsedUser', parsedUser)
-                    parsedUser.emailAddress = newEmail;
-                    console.log('parsedUser.emailAddress', parsedUser.emailAddress)
-                    await AsyncStorage.setItem('logged user', JSON.stringify(parsedUser));
-                    console.log('AsyncStorage updated with new email')
-                }
-            }
-            catch (storageErr) {
-                console.error('error updating AsyncStorage: ', storageErr)
-            }
-            alert('Success', 'email updated')
-            setIsEmailEditble(false)
-        }
-        else {
-            alert('error', 'failed to update email')
-        }
+      await ReviewSchema.validate({ newPassword, confirmPassword }, { abortEarly: false });
+      console.log(user.emailAddress)
+      const result = await PUT(`Users/UpdatePassword`, { emailAddress: user.emailAddress, password: newPassword, fullName: '', address: '', image: '' });
+      console.log(result)
+      if (result.ok) {
+        alert('success')
+        togglePasswordModal()
+      }
     }
     catch (err) {
-        console.error('error updating email: ', err)
-        alert('Error', 'An error occurred while updating email.')
+      if (err instanceof yup.ValidationError) {
+        const newErrors = {};
+        err.inner.forEach((error) => {
+          newErrors[error.path] = error.message;
+        });
+        setErrors(newErrors);
+        console.log("Validation errors:", newErrors);
+      } else {
+        console.log("Unexpected error:", err);
+      }
     }
-    finally {
-        setIsEmailEditble(false);
-    }
-};
+  }
 
+  const handleEmailUpdate = async () => {
+    console.log('newEmail', newEmail);
+    if (!newEmail || newEmail === user.emailAddress) {
+      setIsEmailEditble(false);
+      return;
+    }
+
+    try {
+      const result = await PUT(`Users/UpdateEmail/${user.id}`, { id: user.id, emailAddress: newEmail, fullName: '', address: '', image: '' });
+      console.log('result', result);
+
+      if (result.ok == true) {
+        setUser(prevUser => ({ ...prevUser, emailAddress: newEmail }));
+        console.log('user', user);
+        try {
+          const storedUser = await AsyncStorage.getItem('logged user');
+          console.log('storedUser', storedUser);
+          if (storedUser !== null) {
+            const parsedUser = JSON.parse(storedUser);
+            parsedUser.emailAddress = newEmail;
+            await AsyncStorage.setItem('logged user', JSON.stringify(parsedUser));
+            console.log('AsyncStorage updated with new email');
+          }
+        } catch (storageErr) {
+          console.error('error updating AsyncStorage: ', storageErr);
+        }
+        alert('Success', 'email updated');
+        setIsEmailEditble(false);
+      } else {
+        alert('error', 'failed to update email');
+      }
+    } catch (err) {
+      console.error('error updating email: ', err);
+      alert('Error', 'An error occurred while updating email.');
+    } finally {
+      setIsEmailEditble(false);
+    }
+  };
 
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -285,9 +326,9 @@ export default function EditProfile() {
           </View>
         </View>
         <TouchableOpacity style={styles.editEmailButton}
-             onPress={toggleEmailEdit}>
-              <Text style={styles.editEmailButtontxt}>{isEmailEditble? 'Save':'Edit'}</Text>
-            </TouchableOpacity>
+          onPress={toggleEmailEdit}>
+          <Text style={styles.editEmailButtontxt}>{isEmailEditble ? 'Save' : 'Edit'}</Text>
+        </TouchableOpacity>
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Birthdate:</Text>
@@ -359,6 +400,60 @@ export default function EditProfile() {
             <Text style={styles.kmLabel}>km</Text>
           </View>
         </View>
+        <View style={styles.changeFieldContainer}>
+          <TouchableOpacity style={styles.changePass} onPress={togglePasswordModal}>
+            <Text>Change Password</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.changePref}>
+            <Text>Change Preferences</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Modal
+          visible={passwordModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={togglePasswordModal}
+        >
+          <TouchableWithoutFeedback onPress={togglePasswordModal}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="New Password"
+                      secureTextEntry
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                    />
+                    {errors.newPassword && <Text style={styles.errorText}>{errors.newPassword}</Text>}
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Confirm Password"
+                      secureTextEntry
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                    />
+                    {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+                    <View style={styles.modalButtonContainer}>
+                      <TouchableOpacity onPress={handlUpdatePassword} >
+                        <View style={styles.modalPasButton} >
+                          <Text style={styles.buttonPasText}>Save</Text>
+                        </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={togglePasswordModal}>
+                        <View style={styles.modalPasButton}>
+                          <Text style={styles.buttonPasText}>Cancel</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
 
         <View style={styles.imageContainer}>
           <Modal
@@ -368,15 +463,15 @@ export default function EditProfile() {
             onRequestClose={toggleModal}
           >
             <TouchableWithoutFeedback onPress={toggleModal}>
-              <View style={styles.modalOverlay}>
+              <View style={styles.modalImageOverlay}>
                 <TouchableWithoutFeedback>
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                      <TouchableOpacity style={styles.modalButton} onPress={pickFromGallery}>
-                        <Text style={styles.buttonText}>OPEN GALLERY</Text>
+                  <View style={styles.modalImageContainer}>
+                    <View style={styles.modalImageContent}>
+                      <TouchableOpacity style={styles.modalImageButton} onPress={pickFromGallery}>
+                        <Text style={styles.buttonImageText}>OPEN GALLERY </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.modalButton} onPress={pickFromCamera}>
-                        <Text style={styles.buttonText}>OPEN CAMERA</Text>
+                      <TouchableOpacity style={styles.modalImageButton} onPress={pickFromCamera}>
+                        <Text style={styles.buttonImageText}>OPEN CAMERA</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -423,6 +518,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginBottom: 10,
+  },
+  changeFieldContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  changePass: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#31A1E5',
+    width: 180,
+    marginTop: 15,
+    //marginRight: 5
+  },
+  changePref: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#31A1E5',
+    width: 180,
+    marginLeft: 5,
+    marginTop: 15
+
   },
   input: {
     width: 250,
@@ -477,7 +601,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#31A1E5',
     width: 180,
-    marginTop: 55
+    marginTop: 30
   },
   UpdateButtonText: {
     color: '#111851',
@@ -520,7 +644,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     width: '80%',
@@ -530,22 +653,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
   },
   modalButton: {
-    flex: 1,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    backgroundColor: '#31A1E5',
-    padding: 15,
+    marginTop: 15,
+    borderColor: '#31a1e5',
+    borderWidth: 1,
     borderRadius: 10,
+    backgroundColor: 'white',
+    width: 80,
   },
   buttonText: {
-    fontSize: 18,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#111851',
+    textAlign: 'center'
   },
   searchRadiusContainer: {
     flexDirection: 'row',
@@ -574,13 +696,69 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 5,
     borderRadius: 10,
-    borderWidth:1,
-    borderColor:'#31A1E5',
-    width:60,
-    marginLeft:180
+    borderWidth: 1,
+    borderColor: '#31A1E5',
+    width: 60,
+    marginLeft: 180
   },
   editEmailButtontxt: {
     color: 'black',
-    textAlign:'center'
+    textAlign: 'center'
+  },
+  modalPasButton: {
+    marginTop: 15,
+    borderColor: '#31a1e5',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    width: 80,
+  },
+  buttonPasText: {
+    fontSize: 16,
+    color: '#111851',
+    textAlign: 'center'
+  },
+  modalButtonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalImageContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalImageContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalImageOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalImageButton: {
+    flex: 1,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    backgroundColor: '#31A1E5',
+    padding: 15,
+    borderRadius: 10,
+  },
+  buttonImageText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: -20,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
   },
 });

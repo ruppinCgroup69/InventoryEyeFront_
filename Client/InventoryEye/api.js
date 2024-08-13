@@ -13,9 +13,9 @@ export async function POST(url, obj) {
 
         console.log('data ==> ', res);
         if (res.status == 200 || res.status == 201) {
-            return {date:res.data,ok:true}
+            return { date: res.data, ok: true }
         }
-        else{
+        else {
             return false
         }
 
@@ -58,24 +58,24 @@ export async function PUT(url, obj) {
             },
             body: JSON.stringify(obj)
         });
-
+        console.log('res', res)
+        // Check if the status is not in the 200 range
         if (!res.ok) {
             console.log({ res });
-            return { ok: false }; // Return an object with ok: false for error responses
+            return null;
         }
 
-        // Check if the response body exists before parsing
+        // If there is a response body, parse it
         let data = null;
         if (res.headers.get('Content-Length') !== '0') {
             data = await res.json();
         }
 
-        // Return the parsed data along with the ok status
-        return { ok: true, data };
+        return {data,ok:res.ok};
 
     } catch (error) {
         console.error({ error });
-        return { ok: false }; // Return an object with ok: false in case of a catch error
+        return null;
     }
 }
 
@@ -91,10 +91,10 @@ export async function DELETE(url) {
             });
 
         console.log('data ==> ', res);
-        if (res.status == 200 ) {
-            return {date:res.data,ok:true}
+        if (res.status == 200) {
+            return { date: res.data, ok: true }
         }
-        else{
+        else {
             return false
         }
 

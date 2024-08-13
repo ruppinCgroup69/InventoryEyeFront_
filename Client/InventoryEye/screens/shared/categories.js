@@ -5,7 +5,6 @@ import Search from '../../components/c_home/search'
 import { GET } from '../../api'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { StackActions } from '@react-navigation/native';
 
 export default function Categories() {
   const [user, setUser] = useState({});
@@ -13,12 +12,12 @@ export default function Categories() {
   const navigation = useNavigation();
 
   const handleCategoryPress = (categoryId) => {
+    console.log('categoryId', categoryId);
     navigation.navigate('UserTabs', {
       screen: 'Home',
-      params: { category: categoryId } 
+      params: { categoryP: categoryId }
     });
-  };
-  
+  };  
 
   useEffect(() => {
     const fetchUserData = async () => {
