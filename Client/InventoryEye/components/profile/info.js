@@ -6,7 +6,12 @@ export default function Info({fullName, profileImage,email,birthdate,city}) {
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-      {profileImage&&profileImage!=''&&<Image source={profileImage} style={styles.image}/>} 
+      {profileImage && profileImage !== '' && (
+          <Image 
+            source={typeof profileImage === 'string' ? { uri: profileImage } : profileImage} 
+            style={styles.image}
+          />
+        )} 
       </View>
       <View style={styles.info}>
       <Text style={styles.name}>{fullName}</Text>
@@ -52,3 +57,4 @@ const styles = StyleSheet.create({
     marginBottom: '5%'
   },
 })
+

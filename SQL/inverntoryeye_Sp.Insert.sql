@@ -301,3 +301,39 @@ BEGIN
 
 END
 
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <24/05/2024>
+-- Description:	<Insert Bonus>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertBonus]
+
+	@userId int,
+	@createAt date ,
+	@editedAt datetime,
+	@name nvarchar(max),
+	@description nvarchar(max) ,
+	@image nvarchar(max) ,
+@minScore int,
+@numDownloads int,
+@category int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO Bonus ([UserId],[CreateAt],[EditedAt],[Name],[Description],[Image],[MinScore],[NumDownloads],[Category])
+VALUES (@userId,@createAt,@editedAt,@name,@description,@image,@minScore,@numDownloads,@category);
+return 1
+
+END
+
+-- =============================================

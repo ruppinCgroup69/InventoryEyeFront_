@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import { POST } from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 export default function Login() {
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +17,13 @@ export default function Login() {
         if (response?.ok) {
             try {
                 await AsyncStorage.setItem("logged user", JSON.stringify(response.date));
-                navigation.navigate('UserTabs', { screen: 'Home', params: { user: response.date } });
+                if (response.date.role === 2) {
+                  navigation.navigate('UserTabs', { screen: 'Home', params: { user: response.date } });
+              } else if (response.date.role === 3) {
+                  navigation.navigate('SupplierTabs', { screen: 'Home', params: { user: response.date } });
+              } else {
+                  alert('Unknown user type.');
+              }
             } catch (storageError) {
                 console.error('AsyncStorage error:', storageError);
             }

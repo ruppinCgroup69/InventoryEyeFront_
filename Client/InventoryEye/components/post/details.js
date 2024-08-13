@@ -20,18 +20,18 @@ export default function Details({
   productImage,
   postUserId,
   currentUserId,
-  postId }) {
+  postId,
+  postDataFields}) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-
   const toggleModal = () => setModalVisible(!modalVisible);
-
   const isCurrentUserPost = postUserId === currentUserId;
 
+  
   const handleDelete = async () => {
     try {
-      const response = await DELETE(`Posts/PostId/${postId}`);
-  
+      const response = await DELETE(`Posts/${postId}`);
+
       if (response.ok) {
         toggleModal();
         navigation.navigate('Home');
@@ -42,7 +42,27 @@ export default function Details({
       console.error('Failed to delete post:', error);
     }
   };
+
+  const handleEdit = () => {
+    navigation.navigate('New Post', { 
+      screen: 'EditOrCreatePostScreen',
+      params: {
+        postDataFields: {
+          ...postDataFields,
+          productName: pName,
+          content: content,
+          pickUpAddress: location,
+          category: category,
+          image: productImage.uri,
+          tags: JSON.stringify([color, company, size])
+        },
+        isEditing: true
+      }
+    });
+  };
+
   
+
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -51,7 +71,7 @@ export default function Details({
             <Ionicons name="chevron-back" size={24} color="#111851" />
           </TouchableOpacity>
           <View style={styles.profileImg}>
-            <Image source={profileImage} style={styles.image} />
+          {profileImage && <Image source={profileImage} style={styles.image} />}
           </View>
         </View>
         <View style={styles.right}>
@@ -71,40 +91,44 @@ export default function Details({
               </View>
             )}
             <View style={styles.upLeft}>
-              <TouchableOpacity>
-                <AntDesign name="edit" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={toggleModal}>
-                <AntDesign name="delete" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
-              </TouchableOpacity>
+              {isCurrentUserPost && (
+                <>
+                  <TouchableOpacity onPress={handleEdit} >
+                    <AntDesign name="edit" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={toggleModal}>
+                    <AntDesign name="delete" size={24} color="rgba(17, 24, 81, 0.7)" style={styles.icon} />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </View>
           <View style={styles.down}>
-  <View style={styles.category}>
-    <Text style={{ color: '#111851' }}>Category: <Text style={{ color: 'black' }}>{category}</Text></Text>
-  </View>
-  <View style={styles.row}>
-    <View style={styles.product}>
-      <Text style={{ color: '#111851' }}>Product: <Text style={{ color: 'black' }}>{pName}</Text></Text>
-    </View>
-    <View style={styles.color}>
-      <Text style={{ color: '#111851' }}>Color: <Text style={{ color: 'black' }}>{color}</Text></Text>
-    </View>
-  </View>
-  <View style={styles.row}>
-    <View style={styles.company}>
-      <Text style={{ color: '#111851' }}>Company: <Text style={{ color: 'black' }}>{company}</Text></Text>
-    </View>
-    {category === 'Clothing&Fashion' && (
-      <View style={styles.size}>
-        <Text style={{ color: '#111851' }}>Size: <Text style={{ color: 'black' }}>{size}</Text></Text>
-      </View>
-    )}
-  </View>
-  <View style={styles.location}>
-    <Text style={{ color: '#111851' }}>Location: <Text style={{ color: 'black' }}>{location}</Text></Text>
-  </View>
-</View>
+            <View style={styles.category}>
+              <Text style={{ color: '#111851' }}>Category: <Text style={{ color: 'black' }}>{category}</Text></Text>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.product}>
+                <Text style={{ color: '#111851' }}>Product: <Text style={{ color: 'black' }}>{pName}</Text></Text>
+              </View>
+              <View style={styles.color}>
+                <Text style={{ color: '#111851' }}>Color: <Text style={{ color: 'black' }}>{color}</Text></Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.company}>
+                <Text style={{ color: '#111851' }}>Company: <Text style={{ color: 'black' }}>{company}</Text></Text>
+              </View>
+              {category === 'Clothing&Fashion' && (
+                <View style={styles.size}>
+                  <Text style={{ color: '#111851' }}>Size: <Text style={{ color: 'black' }}>{size}</Text></Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.location}>
+              <Text style={{ color: '#111851' }}>Location: <Text style={{ color: 'black' }}>{location}</Text></Text>
+            </View>
+          </View>
 
         </View>
       </View>
@@ -112,7 +136,7 @@ export default function Details({
         <Text style={styles.contentText}>{content}</Text>
       </View>
       <View style={styles.picture}>
-        <Image source={productImage} style={styles.productImage} />
+        {productImage && <Image source={productImage} style={styles.productImage} />}
       </View>
       <Modal
         visible={modalVisible}
@@ -146,7 +170,7 @@ const styles = StyleSheet.create({
   },
   info: {
     flexDirection: 'row',
-    paddingTop: '2%',
+    paddingTop: '2%', 
   },
   left: {
     width: '22%',
@@ -161,12 +185,12 @@ const styles = StyleSheet.create({
 
   upRight: {
     width: '50%',
-    marginLeft: '2%'
+    marginLeft: '2%', 
   },
   upLeft: {
     flexDirection: 'row',
     width: '30%',
-    marginRight: '30%'
+    marginRight: '30%', 
   },
   icon: {
     marginRight: '5%',
@@ -204,7 +228,7 @@ const styles = StyleSheet.create({
   third: {
     marginLeft: '2%',
     flexDirection: 'row',
-    alignContent:'space-between'
+    alignContent: 'space-between'
   },
   category: {
     marginLeft: '2%',
@@ -231,7 +255,7 @@ const styles = StyleSheet.create({
   },
   content: {
     marginHorizontal: '2%',
-    marginTop:2,
+    marginTop: 2,
   },
   picture: {
     height: 180, // Set a fixed height for the image view
@@ -247,7 +271,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover', // Ensure the image fills the container proportionally
     alignSelf: 'center',
   },
-  
+
   modalContainer: {
     position: 'absolute',
     top: '15%',
@@ -283,3 +307,4 @@ const styles = StyleSheet.create({
   }
 
 })
+

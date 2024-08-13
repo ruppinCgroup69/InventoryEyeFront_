@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, ScrollView, Modal, TouchableWithoutFeedback, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Keyboard } from 'react-native';
-import { GET, POST } from '../../api';
+import { GET, POST, PUT } from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 const Option = ({ label, isSelected, onPress }) => (
   <TouchableOpacity
@@ -28,7 +29,7 @@ const reverseQualityMapping = {
   3: 'High'
 };
 
-export default function ResponseModal({ visible, onClose, fullName, postId, onCommentPosted,categoryId  }) {
+export default function ResponseModal({ visible, onClose, fullName, postId, onCommentPosted, categoryId, editingCommentId, commentData }) {
   const [respnseContent, setRespnseContent] = useState('');
   const [inEyeDate, setInEyeDate] = useState(new Date());
   const [location, setLocation] = useState('');
@@ -41,6 +42,8 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
   const [selectedStore, setSelectedStore] = useState(null);
   const [stores, setStores] = useState([]);
   const [stockLevels, setStockLevels] = useState([]);
+  const googlePlacesRef = useRef(null);
+  const [commentToEdit, setCommentToEdit] = useState(commentData);
   const [responseData, setResponseData] = useState({
     postId: 0,
     userId: 0,
@@ -61,6 +64,7 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
     satisfaction: 0
   });
 
+
   const fetchStores = async () => {
     try {
       const response = await GET(`StoreCategories/CategoryId/${categoryId}`);
@@ -68,18 +72,18 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
         setStores(response);
       } else {
         console.error('Unexpected response format:', response);
-        setStores([]); 
+        setStores([]);
       }
     } catch (error) {
       console.error('Error fetching stores:', error);
-      setStores([]); 
+      setStores([]);
     }
   };
 
   useEffect(() => {
     fetchStores();
   }, [categoryId]);
-  
+
   useEffect(() => {
     const fetchStockLevels = async () => {
       try {
@@ -131,11 +135,15 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
     };
 
     try {
-      const response = await POST('Comments', updatedResponseData);
+      if (editingCommentId) {
+        await PUT(`Comments/${editingCommentId}`, updatedResponseData);
+      } else {
+        await POST('Comments', updatedResponseData);
+      }
       onCommentPosted();
       onClose();
     } catch (error) {
-      console.error('Error posting comment:', error);
+      console.error('Error posting/updating comment:', error);
     }
   };
 
@@ -159,8 +167,31 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
       ]
     );
   };
-  
-  
+
+  useEffect(() => {
+      if (editingCommentId && commentData) {
+        setRespnseContent(commentData.content);
+        setInEyeDate(new Date(commentData.inventoryEye));
+        setLocation(commentData.storeLocation);
+        setSelectedStockLevel(commentData.stockLevel);
+        setPurchased(commentData.bought ? 'Yes' : 'No');
+        setSelectedQuality(reverseQualityMapping[commentData.productQuality]);
+        setPurchDate(new Date(commentData.boughtDate));
+        setSatisfaction(commentData.satisfaction);
+        setSelectedStore(stores.find(store => store.storeId === commentData.storeId));
+      } else {
+        // Reset form fields
+        setRespnseContent('');
+        setInEyeDate(new Date());
+        setLocation('');
+        setSelectedStockLevel('');
+        setPurchased('No');
+        setSelectedQuality('');
+        setPurchDate(new Date());
+        setSatisfaction('');
+        setSelectedStore(null);
+      }
+  }, [editingCommentId, commentData, visible]);
 
 
   return (
@@ -174,125 +205,160 @@ export default function ResponseModal({ visible, onClose, fullName, postId, onCo
         <View style={styles.modalContainer}>
           <TouchableWithoutFeedback>
             <View style={styles.modalContent}>
-              <ScrollView>
-                <Text style={styles.title}>Respond to {fullName}</Text>
-                <TextInput
-                  style={[styles.input, { height: inputHeight }]}
-                  placeholder="Type your response here..."
-                  multiline={true}
-                  onContentSizeChange={(event) => {
-                    setInputHeight(event.nativeEvent.contentSize.height);
-                  }}
-                  onChangeText={setRespnseContent}
-                />
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.inEyeLabel}>I kept an eye on it on:</Text>
-                  <View style={styles.optionsContainer}>
-                    <DateTimePicker
-                      style={styles.date}
-                      testID="dateTimePicker"
-                      mode="date"
-                      value={inEyeDate}
-                      maximumDate={new Date()}
-                      onChange={(event, selectedDate) => setInEyeDate(selectedDate || date)}
-                    />
-                  </View>
-                </View>
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.label}>Location:</Text>
-                  <TextInput
-                    style={[styles.input, { flex: 1 }]}
-                    value={location}
-                    onChangeText={setLocation}
+               <ScrollView> 
+              <Text style={styles.title}>{editingCommentId ? 'Edit Response' : `Respond to ${fullName}`}</Text>
+              <TextInput
+                style={[styles.input, { height: inputHeight }]}
+                placeholder="Type your response here..."
+                multiline={true}
+                onContentSizeChange={(event) => {
+                  setInputHeight(event.nativeEvent.contentSize.height);
+                }}
+                onChangeText={setRespnseContent}
+              />
+              <View style={styles.fieldContainer}>
+                <Text style={styles.inEyeLabel}>I kept an eye on it on:</Text>
+                <View style={styles.optionsContainer}>
+                  <DateTimePicker
+                    style={styles.date}
+                    testID="dateTimePicker"
+                    mode="date"
+                    value={inEyeDate}
+                    maximumDate={new Date()}
+                    onChange={(event, selectedDate) => setInEyeDate(selectedDate || date)}
                   />
                 </View>
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.label}>Store Name:</Text>
-                  <TouchableOpacity
-                    style={[styles.input, { flex: 1 }]}
-                    onPress={showActionSheet}
-                  >
-                    <Text style={styles.storeButtonText}>
-                      {selectedStore ? selectedStore.storeName : 'Select Store'}
-                    </Text>
-                  </TouchableOpacity>
+              </View>
+              <View style={[styles.fieldContainer, styles.spacedField]}>
+                <Text style={styles.label}>Location:</Text>
+                <View style={styles.autocompleteContainer}>
+                  <GooglePlacesAutocomplete
+                    ref={googlePlacesRef}
+                    placeholder='Enter location'
+                    onPress={(data, details = null) => {
+                      setLocation(data.description);
+                      googlePlacesRef.current?.setAddressText(data.description);
+                    }}
+                    query={{
+                      key: 'AIzaSyDxno5alotlZg-JxKYB30wq-6WWJXS0A6M',
+                      language: 'en',
+                    }}
+                    styles={{
+                      textInput: styles.autocompleteInput,
+                      container: {
+                        flex: 1,
+                      },
+                      listView: {
+                        position: 'absolute',
+                        top: 40,
+                        left: 0,
+                        right: 0,
+                        backgroundColor: 'white',
+                        borderRadius: 5,
+                        borderWidth: 1,
+                        borderColor: 'white',
+                        elevation: 3,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 1,
+                        shadowRadius: 2,
+                        zIndex: 1000,
+                      },
+                    }}
+                    textInputProps={{
+                      value: location,
+                      onChangeText: (text) => setLocation(text),
+                    }}
+                  />
                 </View>
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.label}>Stock Level:</Text>
-                  <View style={styles.optionsContainer}>
-                    {stockLevels.map((level) => (
-                      <Option
-                        key={level.stockId}
-                        label={level.stockDesc}
-                        isSelected={selectedStockLevel === level.stockDesc}
-                        onPress={() => setSelectedStockLevel(level.stockDesc)}
-                      />
-                    ))}
-                  </View>
+              </View>
+              <View style={[styles.fieldContainer, styles.spacedField]}>
+                <Text style={styles.label}>Store Name:</Text>
+                <TouchableOpacity
+                  style={[styles.input, { flex: 1 }]}
+                  onPress={showActionSheet}
+                >
+                  <Text style={styles.storeButtonText}>
+                    {selectedStore ? selectedStore.storeName : 'Select Store'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Stock Level:</Text>
+                <View style={styles.optionsContainer}>
+                  {stockLevels.map((level) => (
+                    <Option
+                      key={level.stockId}
+                      label={level.stockDesc}
+                      isSelected={selectedStockLevel === level.stockDesc}
+                      onPress={() => setSelectedStockLevel(level.stockDesc)}
+                    />
+                  ))}
                 </View>
-                <View style={styles.fieldContainer}>
-                  <Text style={styles.label}>Purchased:</Text>
-                  <View style={styles.optionsContainer}>
-                    {['Yes', 'No'].map((option) => (
-                      <Option
-                        key={option}
-                        label={option}
-                        isSelected={purchased === option}
-                        onPress={() => setPurchased(option)}
-                      />
-                    ))}
-                  </View>
+              </View>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Purchased:</Text>
+                <View style={styles.optionsContainer}>
+                  {['Yes', 'No'].map((option) => (
+                    <Option
+                      key={option}
+                      label={option}
+                      isSelected={purchased === option}
+                      onPress={() => setPurchased(option)}
+                    />
+                  ))}
                 </View>
+              </View>
 
-                {purchased === 'Yes' && (
-                  <>
-                    <View style={styles.fieldContainer}>
-                      <Text style={styles.label}>Product Quality:</Text>
-                      <View style={styles.optionsContainer}>
-                        {['Low', 'Medium', 'High'].map((quality) => (
-                          <Option
-                            key={quality}
-                            label={quality}
-                            isSelected={selectedQuality === quality}
-                            onPress={() => setSelectedQuality(quality)}
-                          />
-                        ))}
-                      </View>
-                    </View>
-                    <View style={styles.fieldContainer}>
-                      <Text style={styles.label}>Purchase Date:</Text>
-                      <View style={styles.optionsContainer}>
-                        <DateTimePicker
-                          style={styles.date}
-                          testID="dateTimePicker"
-                          mode="date"
-                          value={purchDate}
-                          maximumDate={new Date()}
-                          onChange={(event, selectedDate) => setPurchDate(selectedDate || purchDate)}
+              {purchased === 'Yes' && (
+                <>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Product Quality:</Text>
+                    <View style={styles.optionsContainer}>
+                      {['Low', 'Medium', 'High'].map((quality) => (
+                        <Option
+                          key={quality}
+                          label={quality}
+                          isSelected={selectedQuality === quality}
+                          onPress={() => setSelectedQuality(quality)}
                         />
-                      </View>
+                      ))}
                     </View>
-                    <View style={styles.fieldContainer}>
-                      <Text style={styles.label}>Satisfaction:</Text>
-                      <Text style={styles.satisfactionLabel}>Low</Text>
-                      <View style={styles.optionsRankContainer}>
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <Option
-                            key={level}
-                            label={String(level)}
-                            isSelected={satisfaction === level}
-                            onPress={() => setSatisfaction(level)}
-                          />
-                        ))}
-                      </View>
-                      <Text style={styles.satisfactionLabel}>High</Text>
+                  </View>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Purchase Date:</Text>
+                    <View style={styles.optionsContainer}>
+                      <DateTimePicker
+                        style={styles.date}
+                        testID="dateTimePicker"
+                        mode="date"
+                        value={purchDate}
+                        maximumDate={new Date()}
+                        onChange={(event, selectedDate) => setPurchDate(selectedDate || purchDate)}
+                      />
                     </View>
-                  </>
-                )}
-                <View style={styles.buttons}>
-                  <Button title="Comment" onPress={handleSend} style={styles.button} />
-                  <Button title="Close" onPress={onClose} style={styles.closeButton} />
-                </View>
+                  </View>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.label}>Satisfaction:</Text>
+                    <Text style={styles.satisfactionLabel}>Low</Text>
+                    <View style={styles.optionsRankContainer}>
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <Option
+                          key={level}
+                          label={String(level)}
+                          isSelected={satisfaction === level}
+                          onPress={() => setSatisfaction(level)}
+                        />
+                      ))}
+                    </View>
+                    <Text style={styles.satisfactionLabel}>High</Text>
+                  </View>
+                </>
+              )}
+              <View style={styles.buttons}>
+                <Button title="Comment" onPress={handleSend} style={styles.button} />
+                <Button title="Close" onPress={onClose} style={styles.closeButton} />
+              </View>
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>
@@ -410,4 +476,31 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingTop: 5
   },
+  autocompleteContainer: {
+    flex: 1,
+    zIndex: 1,
+  },
+  autocompleteInput: {
+    borderColor: '#31A1E5',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    height: 40,
+    fontSize: 16,
+  },
+  fieldContainer: {
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  spacedField: {
+    marginBottom: 30, // Increase this value to add more space
+  },
+  autocompleteContainer: {
+    flex: 1,
+    zIndex: 1,
+  },
 });
+
+

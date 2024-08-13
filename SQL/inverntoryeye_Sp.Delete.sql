@@ -261,3 +261,27 @@ BEGIN
     END
 
 END
+
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <24/05/2024>
+-- Description:	<Delete Bonus>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_DeleteBonus]
+
+@id int
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+    -- Insert statements for procedure here
+	Delete from [dbo].[Bonus] where [BonusId]=@id
+END

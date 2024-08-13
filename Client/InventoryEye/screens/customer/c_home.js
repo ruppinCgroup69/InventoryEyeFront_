@@ -99,14 +99,6 @@ export default function C_home() {
     getPosts();
   },[category])
 
-  // useEffect(() => {
-  //   if (route.params?.category) {
-  //     setCategory(route.params.category);
-  //   } else {
-  //     setCategory('');
-  //   }
-  // }, [route.params?.category]);
-
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });
   };
@@ -178,7 +170,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
   },
-
   middle: {
     flexDirection: 'row',
     justifyContent: 'space-between',

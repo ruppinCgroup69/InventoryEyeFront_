@@ -80,7 +80,6 @@ namespace InventoryEyeBack.Posts
             return dbs.DeletePostDBS(postId);
         }
 
-
         public List<PostsModel> ReadAllPosts(int id)
         {
             PostsDBS dbs = new PostsDBS();

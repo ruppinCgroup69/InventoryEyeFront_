@@ -291,7 +291,6 @@ export default function EditProfile() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.formContainer}>
-
         <Text style={styles.header}>Edit Profile</Text>
         <TouchableOpacity onPress={toggleModal} style={styles.imageContainer}>
           {user.image ? (
@@ -303,7 +302,6 @@ export default function EditProfile() {
         </TouchableOpacity>
 
         <View style={styles.fieldContainer}>
-
           <Text style={styles.label}>Full Name:</Text>
           <TextInput
             style={styles.input}
@@ -348,6 +346,19 @@ export default function EditProfile() {
           </View>
         </View>
         <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Radius Range:</Text>
+          <View style={styles.searchRadiusContainer}>
+            <TextInput
+              style={[styles.input, styles.searchRadiusInput]}
+              placeholder={user.searchRadius.toString()}
+              value={parseFloat(user.searchRadius)}
+              onChangeText={(text) => handleInputChange('searchRadius', text)}
+              keyboardType="numeric"
+            />
+            <Text style={styles.kmLabel}>km</Text>
+          </View>
+        </View>
+        <View style={styles.fieldContainer}>
           <Text style={styles.label}>Address:</Text>
           <GooglePlacesAutocomplete
             ref={googlePlacesRef}
@@ -386,21 +397,9 @@ export default function EditProfile() {
             }}
           />
         </View>
-
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Radius Range:</Text>
-          <View style={styles.searchRadiusContainer}>
-            <TextInput
-              style={[styles.input, styles.searchRadiusInput]}
-              placeholder={user.searchRadius.toString()}
-              value={parseFloat(user.searchRadius)}
-              onChangeText={(text) => handleInputChange('searchRadius', text)}
-              keyboardType="numeric"
-            />
-            <Text style={styles.kmLabel}>km</Text>
-          </View>
-        </View>
-        <View style={styles.changeFieldContainer}>
+      </View>
+      
+      <View style={styles.changeFieldContainer}>
           <TouchableOpacity style={styles.changePass} onPress={togglePasswordModal}>
             <Text>Change Password</Text>
           </TouchableOpacity>
@@ -408,7 +407,7 @@ export default function EditProfile() {
             <Text>Change Preferences</Text>
           </TouchableOpacity>
         </View>
-
+        
         <Modal
           visible={passwordModalVisible}
           transparent={true}
@@ -480,7 +479,6 @@ export default function EditProfile() {
             </TouchableWithoutFeedback>
           </Modal>
         </View>
-      </View>
       <TouchableOpacity style={styles.UpdateButton} onPress={handleUpdate}>
         <Text style={styles.UpdateButtonText}>Update</Text>
       </TouchableOpacity>

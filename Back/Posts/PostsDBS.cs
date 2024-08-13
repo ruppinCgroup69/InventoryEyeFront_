@@ -64,7 +64,6 @@ namespace InventoryEyeBack.Posts
                 }
             }
         }
-
         private SqlCommand CreateInsertPostWithStoredProcedure(String spName, SqlConnection con, PostsModel post)
         {
 

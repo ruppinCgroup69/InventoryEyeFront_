@@ -2,13 +2,18 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 
-export default function PostsHistory({Post, postId }) {
+export default function PostsHistory({ Post, postId }) {
   const navigation = useNavigation();
 
   return (
     <View>
       <TouchableOpacity onPress={() => navigation.navigate('Post_Det', { postId })}>
-        <Image source={{ uri: Post }} style={styles.productimage} />
+        {Post && (
+          <Image
+            source={typeof Post === 'string' ? { uri: Post } : Post}
+            style={styles.productimage}
+          />
+        )}
       </TouchableOpacity>
     </View>
   )
@@ -21,8 +26,9 @@ const styles = StyleSheet.create({
     borderRadius: 27.5,
     borderColor: '#111851',
     borderWidth: 1,
-    marginLeft: '3%', 
-    marginTop:'5%'
+    marginLeft: '3%',
+    marginTop: '5%'
   },
 
 })
+

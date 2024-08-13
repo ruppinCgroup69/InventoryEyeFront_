@@ -535,4 +535,123 @@ SELECT *
 FROM [Survey]
 WHERE [UserId] = @id;
 END
+-- =============================================
 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read all Bonus>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAllBonus]
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+
+	SELECT * from  [dbo].[BonusView]
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Bonus by min score>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadBonusByMinScore]
+
+@minScore int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [MinScore]=@minScore
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Bonus by category>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadBonusByCategory]
+
+@category int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [Category]=@category
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Bonus by user id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadBonusByUserId]
+
+@userId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [UserId]=@userId
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Bonus by bonus id>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadBonusByBonusId]
+
+@bonusId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [BonusId]=@bonusId
+END

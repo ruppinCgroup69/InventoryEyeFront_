@@ -21,7 +21,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Insert Comment Score-------------//
         public int InsertCommentScoreDBS(CommentScoreModel commentScore)
-    {
+        {
             SqlConnection con;
             SqlCommand cmd;
 
@@ -83,7 +83,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Update Comment Score-------------//
         public int UpdateCommentScoreDBS(CommentScoreModel commentScore)
-    {
+        {
             SqlConnection con;
             SqlCommand cmd;
 
@@ -143,7 +143,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Delete Comment Score -------------//
         public int DeleteCommentScoreDBS(int commentId, int ratedBy)
-    {
+        {
 
             SqlConnection con;
             SqlCommand cmd;
@@ -158,7 +158,7 @@ namespace InventoryEyeBack.CommentScore
                 throw (ex);
             }
 
-            cmd = CreateDeleteCommentScoreWithStoredProcedure("SP_InEye_DeleteCommentScore", con, commentId,ratedBy); // create the command
+            cmd = CreateDeleteCommentScoreWithStoredProcedure("SP_InEye_DeleteCommentScore", con, commentId, ratedBy); // create the command
 
             try
             {
@@ -202,7 +202,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Read Comment Score by comment id -------------//
         public CommentScoreModel ReadCommentScoreByCommentIdByCommentIdDBS(int commentId)
-    {
+        {
             SqlConnection con;
             SqlCommand cmd;
 
@@ -261,7 +261,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Read Comment Score by Published User Id -------------//
         public CommentScoreModel ReadCommentScoreByPublishedUserIdDBS(int publishedBy)
-    {
+        {
             SqlConnection con;
             SqlCommand cmd;
 
@@ -320,7 +320,7 @@ namespace InventoryEyeBack.CommentScore
 
         //-------------Read Comment Score by Rated By User Id -------------//
         public CommentScoreModel ReadCommentScoreByRatedUserIdDBS(int ratedBy)
-         {
+        {
             SqlConnection con;
             SqlCommand cmd;
 
@@ -376,5 +376,7 @@ namespace InventoryEyeBack.CommentScore
             cmd.Parameters.AddWithValue("@ratedBy", ratedBy);
             return cmd;
         }
+
     }
+    
 }

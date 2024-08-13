@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
 import { useEffect, useState } from 'react'
 import C_header from '../../components/c_home/c_header'
+import S_header from '../../components/s_home/s_header'
 import Search from '../../components/c_home/search'
 import { GET } from '../../api'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,12 +13,19 @@ export default function Categories() {
   const navigation = useNavigation();
 
   const handleCategoryPress = (categoryId) => {
-    console.log('categoryId', categoryId);
-    navigation.navigate('UserTabs', {
-      screen: 'Home',
-      params: { categoryP: categoryId }
-    });
-  };  
+    if (user.role === 2) {
+      navigation.navigate('UserTabs', {
+        screen: 'Home',
+        params: { categoryP: categoryId }
+      });
+    } else if (user.role === 3) {
+      navigation.navigate('SupplierTabs', {
+        screen: 'Home',
+        params: { categoryP: categoryId }
+      });
+    }
+  };
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -50,7 +58,11 @@ export default function Categories() {
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <C_header fullName={user.fullName} notiNum={12} profileImage={{ uri: user.image }} userScore={user.score} />
+        {user.role === 2 ? (
+          <C_header fullName={user.fullName} notiNum={12} profileImage={{ uri: user.image }} userScore={user.score} />
+        ) : user.role === 3 ? (
+          <S_header fullName={user.fullName} profileImage={{ uri: user.image }} />
+        ) : null}
       </View>
       <View style={styles.middleContainer}>
         <Search />
@@ -64,7 +76,7 @@ export default function Categories() {
             <TouchableOpacity
               key={index}
               onPress={() => handleCategoryPress(category.categoryId)}
-              >
+            >
               <View style={styles.categoriesContainer}>
                 <Text style={styles.categoryText}>{category.categoryDesc}</Text>
                 <Image source={{ uri: category.categoryImage }} style={styles.image} />
@@ -79,7 +91,7 @@ export default function Categories() {
             <TouchableOpacity
               key={index}
               onPress={() => handleCategoryPress(category.categoryId)}
-              >
+            >
               <View style={styles.categoriesContainer}>
                 <Text style={styles.categoryText}>{category.categoryDesc}</Text>
                 <Image source={{ uri: category.categoryImage }} style={styles.image} />

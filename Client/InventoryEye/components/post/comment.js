@@ -1,32 +1,58 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { Modal, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
+import { useState } from 'react';
 
-export default function Comment({ profilepic, score, fullName, content, inventoryeye, location, bought, store, stock, datepub, datepurch, quality, rank, onRatePress,commentId, userId }) {
+export default function Comment({ profilepic, score, fullName, content, inventoryeye, location, bought, store, stock, datepub, datepurch, quality, rank, onRatePress, commentId, userId, supplier, currentUserId, onEditPress, onDeletePress }) {
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const canModify = userId === currentUserId;
+
+  const toggleDeleteModal = () => {
+    setIsDeleteModalVisible(!isDeleteModalVisible);
+  };
+
+  const handleDelete = () => {
+    onDeletePress(commentId);
+    toggleDeleteModal();
+  };
   return (
     <View style={styles.container}>
       <View style={styles.left}>
         <View style={styles.leftUp}>
-          <Image source={profilepic} style={styles.myImg} />
+          {profilepic && <Image source={profilepic} style={styles.myImg} />}
           <View style={styles.scoreContainer}>
             <AntDesign name="star" size={22} color="#31A1E5" />
             <Text style={styles.scoreText}>{score}</Text>
           </View>
         </View>
-        <View style={styles.leftDown}>
-          <TouchableOpacity
-            style={styles.relativeContainer}
-            onPress={() => onRatePress(commentId,userId)}
-          >
-            <AntDesign name="star" size={26} color="#31A1E5" style={styles.starIcon} />
-            <View style={styles.Plus}>
-              <Text style={styles.plusText}>+</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        {!supplier && (
+          <View style={styles.leftDown}>
+            <TouchableOpacity
+              style={styles.relativeContainer}
+              onPress={() => onRatePress(commentId, userId)}
+            >
+              <AntDesign name="star" size={26} color="#31A1E5" style={styles.starIcon} />
+              <View style={styles.Plus}>
+                <Text style={styles.plusText}>+</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       <View style={styles.right}>
-        <Text style={styles.fullNameText}>{fullName}</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.fullNameText}>{fullName}</Text>
+          {canModify && (
+            <View style={styles.actionIcons}>
+              <TouchableOpacity onPress={() => onEditPress(commentId)} style={styles.iconButton}>
+                <AntDesign name="edit" size={20} color="#31A1E5" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleDeleteModal} style={styles.iconButton}>
+                <AntDesign name="delete" size={20} color="#31A1E5" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
         <Text style={styles.contentText}>{content}</Text>
         <Text style={{ fontSize: 13, color: "#111851" }}>I kept an eye on it on: <Text style={{ fontSize: 13, color: "black" }}>{inventoryeye}</Text></Text>
         <Text style={{ fontSize: 13, color: "#111851" }}>Location: <Text style={{ fontSize: 13, color: "black" }}>{location}</Text></Text>
@@ -48,11 +74,30 @@ export default function Comment({ profilepic, score, fullName, content, inventor
         </View>
         <View style={{ flexDirection: 'row', marginTop: '2%' }}>
           <Text style={{ color: '#B0B0B0', fontSize: 10 }}>{datepub}</Text>
-          <TouchableOpacity style={{ marginLeft: '5%' }}>
-            <Text style={{ color: '#B0B0B0', fontSize: 10 }}>Reply</Text>
-          </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={toggleDeleteModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.deleteText}>Are you sure you want to delete this comment?</Text>
+            <Text style={styles.deleteText}>This action cannot be undone</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity style={styles.modalbtn} onPress={toggleDeleteModal}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalbtn} onPress={handleDelete}>
+                <Text style={styles.buttonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -139,5 +184,55 @@ const styles = StyleSheet.create({
   },
   contentright: {
     marginLeft: '2%'
-  }
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'left',
+    marginRight: 15,
+    marginTop: 5
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: 15,
+    marginTop: 5,
+  },
+  actionIcons: {
+    flexDirection: 'row',
+  },
+  iconButton: {
+    marginLeft: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  deleteText: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalbtn: {
+    backgroundColor: '#31A1E5',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });
+
+

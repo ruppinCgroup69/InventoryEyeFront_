@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function header() {
+export default function My_Cuppons() {
   return (
     <View>
-      <Text>header</Text>
+      <Text>chooseCupons</Text>
     </View>
   )
 }

@@ -9,11 +9,12 @@ import { AntDesign } from '@expo/vector-icons';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
-import { formatDate } from '../../utils';
 import { GET } from '../../api';
 
 export default function Profile() {
   const navigation = useNavigation();
+  const [userPosts, setUserPosts] = useState([]);
+  const [userBonus, setUserBonus] = useState([]);
   const [user, setUser] = useState({
     id: 0,
     role: 0,
@@ -29,8 +30,6 @@ export default function Profile() {
     createdAt: '',
     score: 0,
   });
-  const [userPosts, setUserPosts] = useState([]);
-
   const fetchUserPosts = async (userId) => {
     try {
       const posts = await GET(`Posts/UserID/${userId}`);
@@ -45,8 +44,6 @@ export default function Profile() {
       fetchUserPosts(user.id);
     });
   },[user.id]));
-
-
 
   const handleLogout = async () => {
     try {
@@ -96,7 +93,6 @@ export default function Profile() {
             <Info fullName={user.fullName} 
             profileImage={{ uri: user.image }} 
             email={user.emailAddress}
-             birthdate={formatDate(new Date(user.birthDate))} 
              city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>

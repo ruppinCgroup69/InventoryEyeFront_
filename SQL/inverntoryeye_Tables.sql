@@ -38,6 +38,27 @@ CREATE TABLE [Post] (
 	PRIMARY KEY ([Id])
 );
 
+CREATE TABLE [Bonus] (
+	[BonusId] int IDENTITY(1,1) NOT NULL UNIQUE,
+	[UserId] int NOT NULL,
+	[CreateAt] date NOT NULL,
+	[EditedAt] datetime NOT NULL,
+	[Name] nvarchar(max) NOT NULL,
+	[Description] nvarchar(max) NOT NULL,
+	[Image] nvarchar(max) NOT NULL,
+	[MinScore] int NOT NULL,
+	[NumDownloads] int NOT NULL,
+	[Category] int NOT NULL,
+	PRIMARY KEY ([BonusId])
+);
+
+CREATE TABLE [UserBonus] (
+	[BonusId] int foreign key references Bonus (BonusId),
+	[UserId] int foreign key references Users (Id),
+	[CreateAt] datetime default getDate(),
+	PRIMARY KEY ([BonusId],[UserId])
+);
+
 CREATE TABLE [Category] (
 	[Id] int IDENTITY(1,1) NOT NULL UNIQUE,
 	[CategoryDesc] nvarchar(max) NOT NULL,
@@ -110,6 +131,10 @@ ALTER TABLE [Users] ADD CONSTRAINT [Users_fk1] FOREIGN KEY ([Role]) REFERENCES [
 ALTER TABLE [Post] ADD CONSTRAINT [Post_fk1] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]);
 
 ALTER TABLE [Post] ADD CONSTRAINT [Post_fk8] FOREIGN KEY ([Category]) REFERENCES [Category]([Id]);
+
+ALTER TABLE[Bonus] ADD CONSTRAINT [Bonus_fk2] FOREIGN KEY ([UserId]) REFERENCES [Users]([Id]);
+
+ALTER TABLE [Bonus] ADD CONSTRAINT [Bonus_fk1] FOREIGN KEY ([Category]) REFERENCES [Category]([Id]);
 
 ALTER TABLE [Comments] ADD CONSTRAINT [Comments_fk0] FOREIGN KEY ([PostId]) REFERENCES [Post]([Id]);
 

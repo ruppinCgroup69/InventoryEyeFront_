@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView, ScrollView, Keyboard, Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, KeyboardAvoidingView } from 'react-native';
-import { Feather, FontAwesome5, MaterialIcons, Ionicons, FontAwesome, Octicons } from '@expo/vector-icons';
+import { SafeAreaView, Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, KeyboardAvoidingView } from 'react-native';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { GET, POST } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as yup from 'yup';
-import Entypo from '@expo/vector-icons/Entypo';
 
 export default function EditOrCreatePost() {
   const [categories, setCategories] = useState([]);
@@ -61,8 +59,8 @@ export default function EditOrCreatePost() {
 
   useEffect(() => {
     if (postData.pickUpAddress && googlePlacesRef.current) {
-      console.log('postData.pickUpAddress',postData.pickUpAddress);
-      console.log('googlePlacesRef.current',googlePlacesRef.current);
+      console.log('postData.pickUpAddress', postData.pickUpAddress);
+      console.log('googlePlacesRef.current', googlePlacesRef.current);
       console.log(postData.pickUpAddress && googlePlacesRef.current);
 
       googlePlacesRef.current.setAddressText(postData.pickUpAddress);
@@ -70,7 +68,7 @@ export default function EditOrCreatePost() {
     }
   }, [postData.pickUpAddress]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (userData && userData.address) {
       setPostData(prevData => ({
         ...prevData,

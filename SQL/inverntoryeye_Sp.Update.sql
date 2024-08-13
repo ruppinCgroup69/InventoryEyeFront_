@@ -415,3 +415,49 @@ BEGIN
     RETURN 1;
 END;
 
+-- =============================================
+
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <25/04/2024>
+-- Description:	<Update Bonus>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_UpdateBonus]
+    @userId int,
+    @createAt date,
+    @editedAt datetime,
+    @name nvarchar(max),
+    @description nvarchar(max),
+    @image nvarchar(max),
+@minScore int,
+@numDownloads int,
+@category int
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT [UserId] FROM Bonus WHERE [UserId] = @userId)
+    BEGIN
+        RETURN 0;
+    END;
+
+    -- Update statements for procedure here
+    UPDATE Bonus
+    SET [EditedAt] = @editedAt,
+        [Name] = @name,
+        [Description] = @description,
+        [Image] = @image,
+        [Category] = @category,
+[MinScore]=@minScore,
+[NumDownloads]=@numDownloads
+    WHERE [UserId] = @userId;
+
+    RETURN 1;
+END;
+

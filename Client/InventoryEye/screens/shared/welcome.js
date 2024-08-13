@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 import MyHeader from '../../components/shared/myHeader';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDraggable } from 'react-native-actions-sheet/dist/src/hooks/use-scroll-handlers';
 
 export default function Welcome() {
   const navigation = useNavigation();
@@ -16,7 +17,15 @@ export default function Welcome() {
       const userData = await AsyncStorage.getItem("logged user");
       if (userData) {
         const user = JSON.parse(userData);
-        navigation.navigate('UserTabs', { screen: 'Home', params: { user: user } });
+        if (user.role === 2) {
+          navigation.navigate('UserTabs', { screen: 'Home', params: { user: user } });
+        }
+        else if (user.role === 3) {
+          navigation.navigate('SupplierTabs', { screen: 'Home', params: { user: user } });
+        }
+        else {
+          alert('Unknown user type.');
+        }
       }
     } catch (error) {
       console.error('Error checking for saved user:', error);

@@ -1,7 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TextInput} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Search() {
   return (
@@ -13,9 +12,6 @@ export default function Search() {
           placeholder="Search"
           placeholderTextColor="#888"
         />
-        <TouchableOpacity>
-        <MaterialIcons name="image-search" size={20} color="#888" style={styles.searchImage} />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -36,9 +32,6 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 10,
-  },
-  searchImage: {
-   marginLeft: 10,
   },
   input: {
     flex: 1,

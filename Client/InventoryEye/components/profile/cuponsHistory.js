@@ -1,12 +1,17 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image  } from 'react-native'
 import React from 'react'
 
 //recives props (Number of bonus, bonus)
-export default function CuponsHistory({  bonusPic }) {
+export default function CuponsHistory({  bonusPic,onBonusPress }) {
   return (
     <View>
-      <TouchableOpacity>
-        <Image source={bonusPic} style={styles.bonusimage} />
+      <TouchableOpacity onPress={onBonusPress}>
+      {bonusPic && (
+          <Image
+            source={typeof bonusPic === 'string' ? { uri: bonusPic } : bonusPic}
+            style={styles.bonusimage}
+          />
+        )}
       </TouchableOpacity>
     </View>
   )

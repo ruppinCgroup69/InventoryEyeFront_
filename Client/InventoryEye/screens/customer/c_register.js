@@ -96,7 +96,6 @@ export default function C_Register() {
         rePassword: rePassword,
       }, { abortEarly: false });
 
-      console.log('Sending user data to the server:', updatedUser);
       const response = await POST('Users', updatedUser);
       if (response != "good") {
         alert('Failed to register user: No response from server');
@@ -105,7 +104,6 @@ export default function C_Register() {
       navigation.navigate('Login');
     }
     catch (err) {
-      console.error('Error in handleCustomerRegister:', err);
       alert('An error occurred during registration. Please try again.');
       if (err instanceof yup.ValidationError) {
         const newErrors = {};
