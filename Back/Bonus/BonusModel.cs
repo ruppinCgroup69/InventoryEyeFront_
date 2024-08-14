@@ -91,5 +91,18 @@ namespace InventoryEyeBack.Bonus
             BonusDBS dbs = new BonusDBS();
             return dbs.ReadBonusByMinScoreIdDBS(minScore);
         }
+
+        public List<BonusModel> ReadBonusAvilable(int clientAvilableId)
+        {
+            BonusDBS dbs = new BonusDBS();
+            return dbs.ReadBonusAvilabledDBS(clientAvilableId);
+        }
+
+        public List<BonusModel> ReadBonusUsed(int clientUsed)
+        {
+            BonusDBS dbs = new BonusDBS();
+            return dbs.ReadBonusUsedDBS(clientUsed);
+        }
+
     }
 }

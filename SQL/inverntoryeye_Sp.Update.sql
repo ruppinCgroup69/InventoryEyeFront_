@@ -428,35 +428,37 @@ GO
 -- Create date: <25/04/2024>
 -- Description:	<Update Bonus>
 -- =============================================
-Alter PROCEDURE [dbo].[SP_InEye_UpdateBonus]
+ALTER PROCEDURE [dbo].[SP_InEye_UpdateBonus]
+    @bonusId int,
     @userId int,
     @createAt date,
     @editedAt datetime,
     @name nvarchar(max),
     @description nvarchar(max),
     @image nvarchar(max),
-@minScore int,
-@numDownloads int,
-@category int
+    @minScore int,
+    @numDownloads int,
+    @category int
 AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Check if the User exists
     IF NOT EXISTS (SELECT [UserId] FROM Bonus WHERE [UserId] = @userId)
     BEGIN
         RETURN 0;
     END;
 
-    -- Update statements for procedure here
+    -- Update Bonus details
     UPDATE Bonus
     SET [EditedAt] = @editedAt,
         [Name] = @name,
         [Description] = @description,
         [Image] = @image,
         [Category] = @category,
-[MinScore]=@minScore,
-[NumDownloads]=@numDownloads
-    WHERE [UserId] = @userId;
+        [MinScore] = @minScore,
+        [NumDownloads] = @numDownloads
+    WHERE [BonusId] = @bonusId;
 
     RETURN 1;
 END;

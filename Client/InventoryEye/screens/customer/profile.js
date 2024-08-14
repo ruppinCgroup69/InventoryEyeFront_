@@ -6,7 +6,7 @@ import PostsHistory from '../../components/profile/postsHistory'
 import CuponsHistory from '../../components/profile/cuponsHistory'
 import bonusImage from '../../images/bonusImage.png';
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation,useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 import { GET } from '../../api';
@@ -39,11 +39,11 @@ export default function Profile() {
     }
   };
 
-  useFocusEffect(useCallback(()=>{
+  useFocusEffect(useCallback(() => {
     fetchUserData().then(() => {
       fetchUserPosts(user.id);
     });
-  },[user.id]));
+  }, [user.id]));
 
   const handleLogout = async () => {
     try {
@@ -53,7 +53,7 @@ export default function Profile() {
       console.error("Error logging out:", error);
     }
   };
-  
+
   const fetchUserData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('logged user');
@@ -90,10 +90,10 @@ export default function Profile() {
       <View style={styles.info}>
         <View style={styles.frame}>
           <View style={styles.inner}>
-            <Info fullName={user.fullName} 
-            profileImage={{ uri: user.image }} 
-            email={user.emailAddress}
-             city={user.address}></Info>
+            <Info fullName={user.fullName}
+              profileImage={user.image || null}
+              email={user.emailAddress}
+              city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>
                 <AntDesign name="edit" size={24} color="#111851" onPress={() => navigation.navigate('Edit Profile')} />
@@ -113,7 +113,7 @@ export default function Profile() {
         </View>
         <View style={styles.postsHistory}>
           <View style={styles.postsText}>
-            <Text style={{ textAlign: 'left', marginLeft: '9%' , marginTop:'2%'}}>
+            <Text style={{ textAlign: 'left', marginLeft: '9%', marginTop: '2%' }}>
               Post's History </Text>
           </View>
           <ScrollView horizontal contentContainerStyle={styles.postsList}>
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
-    borderWidth:2,
-    borderColor:'#31A1E5'
+    borderWidth: 2,
+    borderColor: '#31A1E5'
   },
   logoutButtonText: {
     color: '#111851',

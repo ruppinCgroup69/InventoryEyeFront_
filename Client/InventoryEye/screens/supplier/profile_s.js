@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity,Modal  } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useCallback } from 'react'
 import Info from '../../components/profile/info'
 import CuponsHistory from '../../components/profile/cuponsHistory'
@@ -7,14 +7,15 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 import { formatDate } from '../../utils';
-import { GET } from '../../api';
+import { GET, DELETE } from '../../api';
+import BonusDetailsModal from './bonusModal';
 
 export default function S_profile() {
     const navigation = useNavigation();
     const [userBonus, setUserBonus] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedBonus, setSelectedBonus] = useState(null);
-    const [benefitDetails, setBenefitDetails] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [user, setUser] = useState({
         id: 0,
         role: 0,
@@ -32,7 +33,8 @@ export default function S_profile() {
     });
 
     useFocusEffect(useCallback(() => {
-        fetchUserData()
+        fetchUserData();
+        fetchCategories();
     }, [user.id]));
 
     const handleLogout = async () => {
@@ -86,6 +88,16 @@ export default function S_profile() {
         fetchUserData();
     }, []);
 
+    const fetchCategories = async () => {
+        try {
+            const response = await GET('Categories');
+            setCategories(response);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+
     const handleBonusPress = async (bonusId) => {
         try {
             const response = await GET(`Bonus/bonusId/${bonusId}`);
@@ -93,6 +105,16 @@ export default function S_profile() {
             setModalVisible(true);
         } catch (error) {
             console.error('Error fetching bonus details:', error);
+        }
+    };
+
+    const handleDelete = async (bonusId) => {
+        try {
+            await DELETE(`Bonus/${bonusId}`);
+            setModalVisible(false);
+            fetchUserBonus(user.id);
+        } catch (error) {
+            console.error('Error deleting bonus:', error);
         }
     };
 
@@ -138,33 +160,16 @@ export default function S_profile() {
                 </TouchableOpacity>
             </View>
             {selectedBonus && (
-    <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-    >
-        <View style={styles.modalView}>
-            <ScrollView contentContainerStyle={styles.modalContent}>
-                <Text style={styles.modalTitle}>{selectedBonus.name}</Text>
-                <Text style={styles.modalText}>Published Date: {formatDate(new Date(selectedBonus.editedAt))}</Text>
-                <Text style={styles.modalText}>Description: {selectedBonus.description}</Text>
-                <Text style={styles.modalText}>Category: {selectedBonus.category}</Text>
-                <Text style={styles.modalText}>Minimum Score: {selectedBonus.minScore}</Text>
-                <Text style={styles.modalText}>Number of Downloads: {selectedBonus.numDownloads}</Text>
-                <TouchableOpacity
-                    style={styles.closeButton}
-                    onPress={() => setModalVisible(false)}
-                >
-                    <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-            </ScrollView>
+                <BonusDetailsModal
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onDelete={handleDelete}
+                    bonus={selectedBonus}
+                    categories={categories}  
+                />
+            )}
         </View>
-    </Modal>
-)}
-
-        </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -204,7 +209,7 @@ const styles = StyleSheet.create({
     second: {
         flex: 1,
         alignItems: 'center',
-        marginTop:50
+        marginTop: 50
     },
     bonusHistory: {
         backgroundColor: '#ADD8E6',
@@ -214,30 +219,30 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         marginHorizontal: '12%',
         marginBottom: '10%',
-      },
+    },
     bonusList: {
         flexDirection: 'row',
         marginLeft: '5%'
-      },
-      logoutButtonContainer: {
+    },
+    logoutButtonContainer: {
         position: 'absolute',
         top: 50,
         right: 20,
-      },
-      logoutButton: {
+    },
+    logoutButton: {
         backgroundColor: 'white',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
-        borderWidth:2,
-        borderColor:'#31A1E5'
-      },
-      logoutButtonText: {
+        borderWidth: 2,
+        borderColor: '#31A1E5'
+    },
+    logoutButtonText: {
         color: '#111851',
         fontSize: 16,
         fontWeight: 'bold',
-      },
-      modalView: {
+    },
+    modalView: {
         position: 'absolute',
         top: '45%',
         flex: 1,
@@ -276,3 +281,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 })
+
+

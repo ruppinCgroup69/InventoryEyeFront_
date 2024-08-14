@@ -337,3 +337,29 @@ return 1
 END
 
 -- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <24/05/2024>
+-- Description:	<Insert User Bonus>
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_InsertUserBonus]
+
+	@bonusId int,
+	@userId int,
+	@createAt date 
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+INSERT INTO [UserBonus] ([BonusId],[UserId],[CreateAt])
+VALUES (@bonusId,@userId,@createAt);
+return 1
+
+END

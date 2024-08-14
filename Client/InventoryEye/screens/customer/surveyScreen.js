@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import Checkbox from 'expo-checkbox';
 import appLogo from '../../images/appLogo.png';
-import { useNavigation, useRoute  } from '@react-navigation/native';
-import { GET,POST } from '../../api';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { GET, POST, PUT } from '../../api';
 
 export default function Survey() {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = route.params;
+  const { Change } = route.params;
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [stores, setStores] = useState({});
@@ -103,6 +104,9 @@ export default function Survey() {
   };
 
   const handleFinalSubmit = async () => {
+    const method = Change ? 'PUT' : 'POST';
+    const apiEndpoint = Change ? `SURVEY/${user.id}` : 'Survey';
+
     try {
       // Loop through each selected category
       for (const categoryId of selectedCategories) {
@@ -114,22 +118,21 @@ export default function Survey() {
             favCategory: categoryId,
             favStore: storeId
           };
-            
-          const result = await POST('Survey', postData);
+
+          const result = method === 'PUT' ? await PUT(apiEndpoint, postData) : await POST(apiEndpoint, postData);
           if (result.ok) {
-            navigation.navigate('Home', { user })
+            navigation.navigate('Home', { user });
           } else {
             console.log('Failed to submit survey data');
           }
         }
       }
-  
+
     } catch (error) {
       console.error('An error occurred while submitting survey data:', error);
     }
   };
-  
-  
+
   const handleBack = () => {
     setStep(1);
   };
@@ -281,3 +284,4 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
 });
+

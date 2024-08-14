@@ -42,6 +42,22 @@ namespace InventoryEyeBack.Bonus
             return bonus.ReadBonusByUserId(userId);
         }
 
+        // GET: Read Bonus Avilable api/<BonusController>/5
+        [HttpGet("ClientAvilable/{clientAvilableId}")]
+        public List<BonusModel> GetBonusAvilable(int clientAvilableId)
+        {
+            BonusModel bonus = new BonusModel();
+            return bonus.ReadBonusAvilable(clientAvilableId);
+        }
+
+        // GET: Read Bonus Used api/<BonusController>/5
+        [HttpGet("ClientUsed/{clientUsed}")]
+        public List<BonusModel> GetBonusUsed(int clientUsed)
+        {
+            BonusModel bonus = new BonusModel();
+            return bonus.ReadBonusUsed(clientUsed);
+        }
+
         // GET: Read Bonus by minScore api/<BonusController>/5
         [HttpGet("MinScore/{minScore}")]
         public List<BonusModel> GetByMinScore(int minScore)

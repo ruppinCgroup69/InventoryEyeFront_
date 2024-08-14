@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Platform, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Platform, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AntDesign } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PUT, GET } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import * as yup from 'yup';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const ReviewSchema = yup.object({
   newPassword: yup
@@ -20,6 +21,14 @@ const ReviewSchema = yup.object({
     .string()
     .oneOf([yup.ref('newPassword'), null], 'Passwords must match')
     .required('Please confirm your password'),
+});
+
+const updateSchema = yup.object().shape({
+  fullName: yup.string().required('Full name is required'),
+  emailAddress: yup
+    .string()
+    .email('Invalid email format')
+    .required('Email is required'),
 });
 
 export default function EditProfile() {
@@ -37,6 +46,13 @@ export default function EditProfile() {
   const [errors, setErrors] = useState({});
   const togglePasswordModal = () => setPasswordModalVisible(!passwordModalVisible);
   const toggleModal = () => setModalVisible(!modalVisible);
+  const [fullNameError, setFullNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const navigation = useNavigation();
+  const [preferences, setPreferences] = useState({
+    favCategory: 0,
+    favStore: 0,
+  });
 
   const [user, setUser] = useState({
     id: 0,
@@ -54,6 +70,19 @@ export default function EditProfile() {
     score: 0,
     searchRadius: 0,
   });
+
+  const fetchPreferencesData = async (userId) => {
+    try {
+      const response = await GET(`Survey/${userId}`);
+      if (response) {
+        setPreferences(response);
+      } else {
+        console.error('No preferences data returned from GET request');
+      }
+    } catch (error) {
+      console.error('Error retrieving preferences data:', error);
+    }
+  };
 
   const fetchUserData = async () => {
     try {
@@ -113,6 +142,14 @@ export default function EditProfile() {
 
   const handleUpdate = async () => {
     try {
+      await updateSchema.validate({
+        fullName: user.fullName,
+        emailAddress: user.emailAddress
+      }, { abortEarly: false });
+
+      setFullNameError('');
+      setEmailError('');
+
       const updatedFields = {
         role: user.role,
         lastSeen: new Date().toISOString(),
@@ -129,7 +166,7 @@ export default function EditProfile() {
       const result = await PUT(`Users/${user.emailAddress}`, updatedFields);
 
       if (result.ok) {
-        alert('Your details were changed successfully!');
+        Alert.alert('Success!', 'Your details were changed successfully!');
         const updatedUser = {
           ...user,
           ...updatedFields,
@@ -150,7 +187,18 @@ export default function EditProfile() {
         console.error(errorMessage);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      if (error instanceof yup.ValidationError) {
+        error.inner.forEach((err) => {
+          if (err.path === 'fullName') {
+            setFullNameError(err.message);
+          } else if (err.path === 'emailAddress') {
+            setEmailError(err.message);
+          }
+        });
+      } else {
+        console.error('Error updating profile:', error);
+        alert('An unexpected error occurred while updating your profile.');
+      }
     }
   };
 
@@ -306,22 +354,29 @@ export default function EditProfile() {
           <TextInput
             style={styles.input}
             value={user.fullName}
-            onChangeText={(text) => handleInputChange('fullName', text)}
+            onChangeText={(text) => {
+              handleInputChange('fullName', text);
+              setFullNameError('');
+            }}
             onBlur={() => console.log('Current fullName:', user.fullName)}
           />
         </View>
+        {fullNameError ? <Text style={styles.errorText}>{fullNameError}</Text> : null}
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Email:</Text>
           <View style={styles.emailContainer}>
             <TextInput
               style={styles.input}
               keyboardType="email-address"
-              value={newEmail}
-              placeholder={user.emailAddress}
-              editable={isEmailEditble}
-              onChangeText={setNewEmail}
+              value={user.emailAddress}
+              onChangeText={(text) => {
+                handleInputChange('emailAddress', text);
+                setEmailError('');
+              }}
+              onBlur={() => console.log('Current email:', user.emailAddress)}
             />
           </View>
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         </View>
         <TouchableOpacity style={styles.editEmailButton}
           onPress={toggleEmailEdit}>
@@ -398,87 +453,89 @@ export default function EditProfile() {
           />
         </View>
       </View>
-      
+
       <View style={styles.changeFieldContainer}>
-          <TouchableOpacity style={styles.changePass} onPress={togglePasswordModal}>
-            <Text>Change Password</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.changePref}>
-            <Text>Change Preferences</Text>
-          </TouchableOpacity>
-        </View>
-        
+        <TouchableOpacity style={styles.changePass} onPress={togglePasswordModal}>
+          <Text>Change Password</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('UserTabs', { screen: 'Survey', params: { Change: 'Change', user: user, } })}
+          style={styles.changePref}>
+          <Text>Change Preferences</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Modal
+        visible={passwordModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={togglePasswordModal}
+      >
+        <TouchableWithoutFeedback onPress={togglePasswordModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="New Password"
+                    secureTextEntry
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                  />
+                  {errors.newPassword && <Text style={styles.errorText}>{errors.newPassword}</Text>}
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirm Password"
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                  />
+                  {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+                  <View style={styles.modalButtonContainer}>
+                    <TouchableOpacity onPress={handlUpdatePassword} >
+                      <View style={styles.modalPasButton} >
+                        <Text style={styles.buttonPasText}>Save</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={togglePasswordModal}>
+                      <View style={styles.modalPasButton}>
+                        <Text style={styles.buttonPasText}>Cancel</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <View style={styles.imageContainer}>
         <Modal
-          visible={passwordModalVisible}
+          visible={modalVisible}
           transparent={true}
           animationType="slide"
-          onRequestClose={togglePasswordModal}
+          onRequestClose={toggleModal}
         >
-          <TouchableWithoutFeedback onPress={togglePasswordModal}>
-            <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={toggleModal}>
+            <View style={styles.modalImageOverlay}>
               <TouchableWithoutFeedback>
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="New Password"
-                      secureTextEntry
-                      value={newPassword}
-                      onChangeText={setNewPassword}
-                    />
-                    {errors.newPassword && <Text style={styles.errorText}>{errors.newPassword}</Text>}
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Confirm Password"
-                      secureTextEntry
-                      value={confirmPassword}
-                      onChangeText={setConfirmPassword}
-                    />
-                    {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
-                    <View style={styles.modalButtonContainer}>
-                      <TouchableOpacity onPress={handlUpdatePassword} >
-                        <View style={styles.modalPasButton} >
-                          <Text style={styles.buttonPasText}>Save</Text>
-                        </View>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={togglePasswordModal}>
-                        <View style={styles.modalPasButton}>
-                          <Text style={styles.buttonPasText}>Cancel</Text>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
+                <View style={styles.modalImageContainer}>
+                  <View style={styles.modalImageContent}>
+                    <TouchableOpacity style={styles.modalImageButton} onPress={pickFromGallery}>
+                      <Text style={styles.buttonImageText}>OPEN GALLERY </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.modalImageButton} onPress={pickFromCamera}>
+                      <Text style={styles.buttonImageText}>OPEN CAMERA</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </TouchableWithoutFeedback>
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-
-        <View style={styles.imageContainer}>
-          <Modal
-            visible={modalVisible}
-            transparent={true}
-            animationType="slide"
-            onRequestClose={toggleModal}
-          >
-            <TouchableWithoutFeedback onPress={toggleModal}>
-              <View style={styles.modalImageOverlay}>
-                <TouchableWithoutFeedback>
-                  <View style={styles.modalImageContainer}>
-                    <View style={styles.modalImageContent}>
-                      <TouchableOpacity style={styles.modalImageButton} onPress={pickFromGallery}>
-                        <Text style={styles.buttonImageText}>OPEN GALLERY </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.modalImageButton} onPress={pickFromCamera}>
-                        <Text style={styles.buttonImageText}>OPEN CAMERA</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-        </View>
+      </View>
       <TouchableOpacity style={styles.UpdateButton} onPress={handleUpdate}>
         <Text style={styles.UpdateButtonText}>Update</Text>
       </TouchableOpacity>
@@ -755,7 +812,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     fontWeight: 'bold',
-    marginTop: -20,
+    marginTop: 2,
     marginBottom: 10,
     alignSelf: 'flex-start',
   },

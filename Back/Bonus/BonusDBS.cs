@@ -197,7 +197,7 @@ namespace InventoryEyeBack.Bonus
         private SqlCommand CreateUpdateBonusWithStoredProcedure(String spName, SqlConnection con, BonusModel bonus)
         {
 
-            SqlCommand cmd = new SqlCommand(); // create the command object
+            SqlCommand cmd = new SqlCommand(spName, con); // create the command object
 
             cmd.Connection = con;              // assign the connection to the command object
 
@@ -205,18 +205,18 @@ namespace InventoryEyeBack.Bonus
 
             cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
 
-            cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+            cmd.CommandType = CommandType.StoredProcedure; ; // the type of the command, can also be text
 
             cmd.Parameters.AddWithValue("@bonusId", bonus.BonusId);
             cmd.Parameters.AddWithValue("@userId", bonus.UserId);
-            cmd.Parameters.AddWithValue("@createAt", DateTime.Now);
-            cmd.Parameters.AddWithValue("@editedAt", DateTime.Now);
+            cmd.Parameters.AddWithValue("@createAt", bonus.CreateAt);
+            cmd.Parameters.AddWithValue("@editedAt", DateTime.Now); 
             cmd.Parameters.AddWithValue("@name", bonus.Name);
             cmd.Parameters.AddWithValue("@description", bonus.Description);
             cmd.Parameters.AddWithValue("@image", bonus.Image);
             cmd.Parameters.AddWithValue("@minScore", bonus.MinScore);
-            cmd.Parameters.AddWithValue("@category", bonus.Category);
             cmd.Parameters.AddWithValue("@numDownloads", bonus.NumDownloads);
+            cmd.Parameters.AddWithValue("@category", bonus.Category);
 
             return cmd;
         }
@@ -556,6 +556,146 @@ namespace InventoryEyeBack.Bonus
             cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
 
             cmd.Parameters.AddWithValue("@minScore", minScore);
+            return cmd;
+        }
+
+        //-------------Read Avilable Bonus -------------//
+        public List<BonusModel> ReadBonusAvilabledDBS(int clientAvilableId)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("MySqlConnectionString"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            // creat users list
+            List<BonusModel> bonus = new List<BonusModel>();
+
+            // create a Command with the connection to use, name of stored procedure and its parameters
+            cmd = buildReadAvilableBonusdStoredProcedureCommand(con, "SP_InEye_ReadAvilableBonusForUser", clientAvilableId);
+
+            // call the stored procedure (using the cmd) and get results to DataReader
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            // iterate over the results, next moves to the next record
+            while (dataReader.Read())
+            {
+                BonusModel b = new BonusModel();
+                b.BonusId = Convert.ToInt32(dataReader["BonusId"].ToString());
+                b.UserId = Convert.ToInt32(dataReader["UserId"].ToString());
+                b.UserName = dataReader["FullName"].ToString();
+                b.UserImage = dataReader["UserImage"].ToString();
+                b.CreateAt = Convert.ToDateTime(dataReader["CreateAt"].ToString());
+                b.EditedAt = Convert.ToDateTime(dataReader["EditedAt"].ToString());
+                b.Name = dataReader["Name"].ToString();
+                b.Description = dataReader["Description"].ToString();
+                b.Image = dataReader["Image"].ToString();
+                b.MinScore = Convert.ToInt32(dataReader["MinScore"].ToString());
+                b.NumDownloads = Convert.ToInt32(dataReader["NumDownloads"].ToString());
+                b.Category = Convert.ToInt32(dataReader["Category"].ToString());
+
+                bonus.Add(b);
+
+            }
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+
+            return bonus;
+        }
+        private SqlCommand buildReadAvilableBonusdStoredProcedureCommand(SqlConnection con, String spName, int clientAvilableId)
+        {
+
+            SqlCommand cmd = new SqlCommand(); // create the command object
+
+            cmd.Connection = con;              // assign the connection to the command object
+
+            cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+
+            cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+
+            cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+            cmd.Parameters.AddWithValue("@clientId", clientAvilableId);
+            return cmd;
+        }
+
+        //-------------Read Used Bonus -------------//
+        public List<BonusModel> ReadBonusUsedDBS(int clientUsed)
+        {
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = connect("MySqlConnectionString"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            // creat users list
+            List<BonusModel> bonus = new List<BonusModel>();
+
+            // create a Command with the connection to use, name of stored procedure and its parameters
+            cmd = buildReadUsedBonusdStoredProcedureCommand(con, "SP_InEye_ReadUsedBonusForUser", clientUsed);
+
+            // call the stored procedure (using the cmd) and get results to DataReader
+            SqlDataReader dataReader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+            // iterate over the results, next moves to the next record
+            while (dataReader.Read())
+            {
+                BonusModel b = new BonusModel();
+                b.BonusId = Convert.ToInt32(dataReader["BonusId"].ToString());
+                b.UserId = Convert.ToInt32(dataReader["UserId"].ToString());
+                b.UserName = dataReader["FullName"].ToString();
+                b.UserImage = dataReader["UserImage"].ToString();
+                b.CreateAt = Convert.ToDateTime(dataReader["CreateAt"].ToString());
+                b.EditedAt = Convert.ToDateTime(dataReader["EditedAt"].ToString());
+                b.Name = dataReader["Name"].ToString();
+                b.Description = dataReader["Description"].ToString();
+                b.Image = dataReader["Image"].ToString();
+                b.MinScore = Convert.ToInt32(dataReader["MinScore"].ToString());
+                b.NumDownloads = Convert.ToInt32(dataReader["NumDownloads"].ToString());
+                b.Category = Convert.ToInt32(dataReader["Category"].ToString());
+
+                bonus.Add(b);
+
+            }
+            if (con != null)
+            {
+                // close the db connection
+                con.Close();
+            }
+
+            return bonus;
+        }
+        private SqlCommand buildReadUsedBonusdStoredProcedureCommand(SqlConnection con, String spName, int clientUsed)
+        {
+
+            SqlCommand cmd = new SqlCommand(); // create the command object
+
+            cmd.Connection = con;              // assign the connection to the command object
+
+            cmd.CommandText = spName;      // can be Select, Insert, Update, Delete 
+
+            cmd.CommandTimeout = 10;           // Time to wait for the execution' The default is 30 seconds
+
+            cmd.CommandType = System.Data.CommandType.StoredProcedure; // the type of the command, can also be text
+
+            cmd.Parameters.AddWithValue("@clientId", clientUsed);
             return cmd;
         }
     }

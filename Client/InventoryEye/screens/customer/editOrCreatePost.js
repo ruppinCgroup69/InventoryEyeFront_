@@ -360,7 +360,6 @@ export default function EditOrCreatePost() {
             <View style={styles.bottom}>
               <View style={styles.inputItem}>
                 <GooglePlacesAutocomplete
-                  icon={<Octicons name="search" size={24} color="#111851" />}
                   ref={googlePlacesRef}
                   placeholder={postData.pickUpAddress || userData?.address || 'Enter address'}
                   onPress={handleAddressChange}

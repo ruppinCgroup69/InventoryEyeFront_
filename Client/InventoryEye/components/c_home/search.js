@@ -1,8 +1,15 @@
 import React from 'react';
 import { StyleSheet, View, TextInput} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {useState } from 'react';
 
-export default function Search() {
+export default function Search({ onSearch }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+    onSearch(text);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -11,6 +18,8 @@ export default function Search() {
           style={styles.input}
           placeholder="Search"
           placeholderTextColor="#888"
+          value={searchTerm}
+          onChangeText={handleSearch}
         />
       </View>
     </View>

@@ -17,6 +17,7 @@ export default function C_home() {
   const [user, setUser] = useState(route.params?.user || {});
   const [category, setCategory] = useState(route.params?.categoryP);
   const [posts, setPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const dynamicMargin = category ? 0 : '25%';
   const dynamicPadding = category ? 3 : 20;
 
@@ -35,16 +36,14 @@ export default function C_home() {
 
   const getPosts = async () => {
     try {
-      // Determine the URL based on whether a category is provided
-   
-      let url = ''
-      if (category == undefined || category == '') {
-        url = `Posts/${user.id}`
+      let url = '';
+      if (searchTerm) {
+        url = `Posts/Search/${searchTerm}`;
+      } else if (category) {
+        url = `Posts/Category/${category}`;
+      } else {
+        url = `Posts/${0}`;
       }
-      else {
-        url = `Posts/Category/${category}` 
-      }
-
       let postsData = await GET(url);
 
       // If searchRadius is not 0, filter posts by distance
@@ -55,7 +54,6 @@ export default function C_home() {
           return calculatedDistance <= user.searchRadius;
         });
       } else {
-        // If searchRadius is 0, skip filtering
         console.log('SearchRadius is 0, showing all posts');
       }
 
@@ -68,9 +66,9 @@ export default function C_home() {
   };
 
   useFocusEffect(useCallback(() => {
-    console.log('hello')
-    //getPosts()
-    setCategory(route.params?.categoryP);
+    if (route.params?.categoryP !== undefined) {
+      setCategory(route.params.categoryP);
+    }
   }, [route.params?.categoryP]))
 
   useEffect(() => {
@@ -94,10 +92,10 @@ export default function C_home() {
     fetchUserData();
   }, [route.params?.user, category]);
 
-  useEffect(() =>{
+  useEffect(() => {
     console.log('first');
     getPosts();
-  },[category])
+  }, [category, searchTerm])
 
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });
@@ -109,7 +107,15 @@ export default function C_home() {
 
   const clearFilter = () => {
     setCategory('');
-    getPosts()
+    setSearchTerm('');
+    getPosts();
+  };
+
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+    if (category) {
+      setCategory('');
+    }
   };
 
   return (
@@ -118,18 +124,20 @@ export default function C_home() {
         <C_header fullName={user.fullName} notiNum={12} profileImage={{ uri: user.image }} userScore={user.score} />
       </View>
       <View style={styles.searchView}>
-        <Search />
+        <Search onSearch={handleSearch} />
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={[styles.middle, { paddingHorizontal: dynamicPadding }]}>
-          <Text style={[styles.inEye, { marginLeft: dynamicMargin }]}>{category ? `Category: ${posts.length > 0 ? posts[0].categoryDesc : 'Loading...'}`
-            : 'Keep an eye on...'}</Text>
+          <Text style={[styles.inEye, { marginLeft: dynamicMargin }]}>
+            {searchTerm ? `Search results for: ${searchTerm}` :
+              (category ? `Category: ${category}` : 'Keep an eye on...')}
+          </Text>
           <TouchableOpacity
             style={styles.filterContainer}
-            onPress={() => category ? clearFilter() : handleNoCategoryPress()}
+            onPress={() => (category || searchTerm) ? clearFilter() : handleNoCategoryPress()}
           >
-            <Text style={styles.filterBy}>{category ? 'Clear filter' : 'Filter by'}</Text>
-            <Feather name={category ? 'x' : 'filter'} size={20} color="rgba(17, 24, 81, 0.6)" />
+            <Text style={styles.filterBy}>{(category || searchTerm) ? 'Clear filter' : 'Filter by'}</Text>
+            <Feather name={(category || searchTerm) ? 'x' : 'filter'} size={20} color="rgba(17, 24, 81, 0.6)" />
           </TouchableOpacity>
 
         </View>

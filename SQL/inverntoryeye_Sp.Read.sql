@@ -655,3 +655,60 @@ SELECT *
 FROM [dbo].[BonusView]
 WHERE [BonusId]=@bonusId
 END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Avilable Bonus for user >
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadAvilableBonusForUser]
+
+@clientId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [BonusId] not in (select [BonusId]
+						from UserBonus
+						where UserId=@clientId)
+				and MinScore <=(select [dbo].[CalcUserScore](@clientId))
+								
+END
+
+-- =============================================
+USE [igroup169_test2]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Yarden and Sharon>
+-- Create date: <13-06-2024>
+-- Description:	<Read Used Bonus for user >
+-- =============================================
+Alter PROCEDURE [dbo].[SP_InEye_ReadUsedBonusForUser]
+
+@clientId int
+
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+SELECT *
+FROM [dbo].[BonusView]
+WHERE [BonusId]  in (select [BonusId]
+						from UserBonus
+						where UserId=@clientId)
+								
+END

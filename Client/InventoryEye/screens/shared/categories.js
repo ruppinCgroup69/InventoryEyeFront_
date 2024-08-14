@@ -64,9 +64,6 @@ export default function Categories() {
           <S_header fullName={user.fullName} profileImage={{ uri: user.image }} />
         ) : null}
       </View>
-      <View style={styles.middleContainer}>
-        <Search />
-      </View>
       <View style={styles.inEye}>
         <Text style={styles.keepEyeText}>Keep an eye on ... </Text>
       </View>

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import { Star } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { POST } from '../../api.js';
+import { POST, PUT, GET } from '../../api.js';
 
-export default function RateModal({ visible, onClose, commentId, publishedBy,publishedName }) {
+export default function RateModal({ visible, onClose, commentId, publishedBy, publishedName }) {
   const [date, setDate] = useState('');
   const [fullName, setFullName] = useState('');
   const [bought, setBought] = useState(null);
@@ -12,7 +12,7 @@ export default function RateModal({ visible, onClose, commentId, publishedBy,pub
   const [generalRating, setGeneralRating] = useState(0);
   const [content, setContent] = useState('');
   const [ratedBy, setRatedBy] = useState(null);
-
+  
   useEffect(() => {
     const currentDate = new Date().toLocaleDateString('en-US');
     setDate(currentDate);
@@ -68,6 +68,7 @@ export default function RateModal({ visible, onClose, commentId, publishedBy,pub
     return true;
   };
 
+
   const handleSubmit = async () => {
     if (!validateInputs()) return;
 
@@ -90,7 +91,48 @@ export default function RateModal({ visible, onClose, commentId, publishedBy,pub
 
       if (response && response.ok) {
         console.log('Rating submitted successfully:', response.date);
-        Alert.alert('Success', 'Rating submitted successfully');
+        
+        // Update the CommentScore
+        try {
+          console.log('commentId', commentId);
+          const updateResponse = await PUT(`CommentScore/${commentId}`, requestBody);
+          if (updateResponse && updateResponse.ok) {
+            console.log('CommentScore updated successfully');
+            
+            // Retrieve updated user data
+            try {
+              const userResponse = await GET(`Users/${publishedBy}`);
+              
+              if (userResponse && userResponse.ok) {
+                const userData = await userResponse.json();
+                console.log('User data retrieved successfully:', userData);
+                
+                // Save updated user data to AsyncStorage
+                try {
+                  await AsyncStorage.setItem('logged user', JSON.stringify(userData));
+                  console.log('User data saved to AsyncStorage');
+                  Alert.alert('Success', 'Rating submitted, score updated, and user data saved successfully');
+                } catch (storageError) {
+                  console.error('Error saving user data to AsyncStorage:', storageError);
+                  Alert.alert('Warning', 'Rating submitted and score updated, but failed to save user data locally');
+                }
+              } else {
+                console.error('Failed to retrieve user data:', userResponse);
+                Alert.alert('Warning', 'Rating submitted and score updated, but failed to retrieve latest user data');
+              }
+            } catch (userError) {
+              console.error('Error retrieving user data:', userError);
+              Alert.alert('Warning', 'Rating submitted and score updated, but failed to retrieve latest user data');
+            }
+          } else {
+            console.error('Failed to update CommentScore:', updateResponse);
+            Alert.alert('Warning', 'Rating submitted but failed to update score. Please try again later.');
+          }
+        } catch (updateError) {
+          console.error('Error updating CommentScore:', updateError);
+          Alert.alert('Warning', 'Rating submitted but failed to update score. Please try again later.');
+        }
+
         onClose();
       } else {
         console.error('Failed to submit rating:', response);
@@ -116,8 +158,7 @@ export default function RateModal({ visible, onClose, commentId, publishedBy,pub
         } else {
           errorMessage += `Server responded with status code ${error.response.status}.`;
         }
-ר
-        // Log the response text if available
+
         if (error.response.data) {
           console.log('Error response text:', JSON.stringify(error.response.data));
         }
@@ -140,9 +181,9 @@ export default function RateModal({ visible, onClose, commentId, publishedBy,pub
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.modalContent}>
-            <Text style={styles.nameText}>You are rating: 
-              <Text style={{fontWeight:'bold',fontSize: 18,marginBottom: 20,color:'#111851'}}> {publishedName}</Text>
-              </Text>
+            <Text style={styles.nameText}>You are rating:
+              <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 20, color: '#111851' }}> {publishedName}</Text>
+            </Text>
             <View style={styles.purchaseContainer}>
               <Text style={styles.labelText}>Did you buy the product?</Text>
               <View style={styles.buttonContainer}>
