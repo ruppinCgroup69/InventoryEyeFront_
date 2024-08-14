@@ -11,7 +11,7 @@ export async function POST(url, obj) {
                 }
             });
 
-        console.log('data ==> ', res);
+        // console.log('data ==> ', res);
         if (res.status == 200 || res.status == 201) {
             return { date: res.data, ok: true }
         }

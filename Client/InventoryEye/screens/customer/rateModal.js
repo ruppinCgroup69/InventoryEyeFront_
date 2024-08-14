@@ -12,7 +12,7 @@ export default function RateModal({ visible, onClose, commentId, publishedBy, pu
   const [generalRating, setGeneralRating] = useState(0);
   const [content, setContent] = useState('');
   const [ratedBy, setRatedBy] = useState(null);
-  
+
   useEffect(() => {
     const currentDate = new Date().toLocaleDateString('en-US');
     setDate(currentDate);
@@ -90,49 +90,25 @@ export default function RateModal({ visible, onClose, commentId, publishedBy, pu
       console.log('Full response:', response);
 
       if (response && response.ok) {
-        console.log('Rating submitted successfully:', response.date);
-        
-        // Update the CommentScore
-        try {
-          console.log('commentId', commentId);
-          const updateResponse = await PUT(`CommentScore/${commentId}`, requestBody);
-          if (updateResponse && updateResponse.ok) {
-            console.log('CommentScore updated successfully');
-            
-            // Retrieve updated user data
-            try {
-              const userResponse = await GET(`Users/${publishedBy}`);
-              
-              if (userResponse && userResponse.ok) {
-                const userData = await userResponse.json();
-                console.log('User data retrieved successfully:', userData);
-                
-                // Save updated user data to AsyncStorage
-                try {
-                  await AsyncStorage.setItem('logged user', JSON.stringify(userData));
-                  console.log('User data saved to AsyncStorage');
-                  Alert.alert('Success', 'Rating submitted, score updated, and user data saved successfully');
-                } catch (storageError) {
-                  console.error('Error saving user data to AsyncStorage:', storageError);
-                  Alert.alert('Warning', 'Rating submitted and score updated, but failed to save user data locally');
-                }
-              } else {
-                console.error('Failed to retrieve user data:', userResponse);
-                Alert.alert('Warning', 'Rating submitted and score updated, but failed to retrieve latest user data');
-              }
-            } catch (userError) {
-              console.error('Error retrieving user data:', userError);
-              Alert.alert('Warning', 'Rating submitted and score updated, but failed to retrieve latest user data');
-            }
-          } else {
-            console.error('Failed to update CommentScore:', updateResponse);
-            Alert.alert('Warning', 'Rating submitted but failed to update score. Please try again later.');
-          }
-        } catch (updateError) {
-          console.error('Error updating CommentScore:', updateError);
-          Alert.alert('Warning', 'Rating submitted but failed to update score. Please try again later.');
-        }
 
+        try {
+          const userResponse = await GET(`Users/${publishedBy}`);
+
+          if (userResponse) {
+            console.log('User data retrieved successfully:', userData);
+
+            // Save updated user data to AsyncStorage
+            try {
+              await AsyncStorage.setItem('logged user', JSON.stringify(userData));
+              console.log('User data saved to AsyncStorage');
+              Alert.alert('Success', 'Rating submitted, score updated, and user data saved successfully');
+            } catch (storageError) {
+              console.error('Error saving user data to AsyncStorage:', storageError);
+            }
+          }
+        } catch (userError) {
+          console.error('Error retrieving user data:', userError);
+        }
         onClose();
       } else {
         console.error('Failed to submit rating:', response);

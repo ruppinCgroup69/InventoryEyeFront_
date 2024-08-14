@@ -14,6 +14,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
         const response = await POST('Users/login', { emailAddress, password, fullName: '', address: '', image: '' });
+        console.log('response', response);
         if (response?.ok) {
             try {
                 await AsyncStorage.setItem("logged user", JSON.stringify(response.date));
