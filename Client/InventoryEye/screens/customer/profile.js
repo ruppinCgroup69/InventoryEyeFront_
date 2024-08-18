@@ -10,11 +10,15 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 import { GET } from '../../api';
+import CBonusModal from './cBonusModal';
 
 export default function Profile() {
   const navigation = useNavigation();
   const [userPosts, setUserPosts] = useState([]);
   const [userBonus, setUserBonus] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBonus, setSelectedBonus] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [user, setUser] = useState({
     id: 0,
     role: 0,
@@ -39,9 +43,35 @@ export default function Profile() {
     }
   };
 
+  const fetchUserBonus = async (userId) => {
+    try {
+      const bonuses = await GET(`Bonus/ClientUsed/${userId}`);
+      setUserBonus(bonuses);
+    } catch (error) {
+      console.error('Error retrieving user bonuses:', error);
+    }
+  };
+
+  const handleBonusPress = useCallback((bonus) => {
+    console.log('Bonus pressed:', bonus);
+    setSelectedBonus(bonus);
+    setModalVisible(true);
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await GET('Categories');
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error('Error retrieving categories:', error);
+    }
+  };
+
   useFocusEffect(useCallback(() => {
     fetchUserData().then(() => {
       fetchUserPosts(user.id);
+      fetchUserBonus(user.id);
+      fetchCategories();
     });
   }, [user.id]));
 
@@ -130,16 +160,31 @@ export default function Profile() {
         <View style={styles.bonusHistory}>
           <View style={styles.bonusText}>
             <Text style={{ textAlign: 'left', marginLeft: '9%' }}>
-              Bonus History </Text>
+              Bonus History
+            </Text>
           </View>
-          <View style={styles.bonusList} >
-            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-            <CuponsHistory bonusPic={bonusImage}></CuponsHistory>
-          </View>
+          <ScrollView horizontal contentContainerStyle={styles.bonusList}>
+          {userBonus.map((bonus) => (
+            <CuponsHistory
+              key={bonus.bonusId}
+              bonusPic={bonus.image}
+              onPress={() => handleBonusPress(bonus)}
+            />
+          ))}
+        </ScrollView>
         </View>
+        {selectedBonus && (
+      <CBonusModal
+      visible={modalVisible}
+      onClose={() => setModalVisible(false)}
+      onChoose={(id) => {/* Handle choose action if needed */}}
+      bonus={selectedBonus}
+      categories={categories}
+      isAccepted={selectedBonus?.isAccepted}
+    />
+        )}
       </View>
+
       <View style={styles.logoutButtonContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
