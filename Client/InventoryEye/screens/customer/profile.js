@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect } from 'react';
 import { GET } from '../../api';
 import CBonusModal from './cBonusModal';
+import { formatDate } from '../../utils';
 
 export default function Profile() {
   const navigation = useNavigation();
@@ -120,9 +121,11 @@ export default function Profile() {
       <View style={styles.info}>
         <View style={styles.frame}>
           <View style={styles.inner}>
-            <Info fullName={user.fullName}
+            <Info 
+              fullName={user.fullName}
               profileImage={user.image || null}
               email={user.emailAddress}
+              birthdate={formatDate(new Date(user.birthDate))}
               city={user.address}></Info>
             <View style={styles.editIcon}>
               <TouchableOpacity>
@@ -176,7 +179,7 @@ export default function Profile() {
         {selectedBonus && (
       <CBonusModal
       visible={modalVisible}
-      onClose={() => setModalVisible(false)}
+      onClose={() => setModalVisible(false)}r
       onChoose={(id) => {/* Handle choose action if needed */}}
       bonus={selectedBonus}
       categories={categories}

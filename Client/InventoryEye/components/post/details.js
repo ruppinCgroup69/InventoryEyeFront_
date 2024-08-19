@@ -21,13 +21,13 @@ export default function Details({
   postUserId,
   currentUserId,
   postId,
-  postDataFields}) {
+  postDataFields }) {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const toggleModal = () => setModalVisible(!modalVisible);
   const isCurrentUserPost = postUserId === currentUserId;
 
-  
+
   const handleDelete = async () => {
     try {
       const response = await DELETE(`Posts/${postId}`);
@@ -61,8 +61,6 @@ export default function Details({
     });
   };
 
-  
-
   return (
     <View style={styles.container}>
       <View style={styles.info}>
@@ -71,7 +69,7 @@ export default function Details({
             <Ionicons name="chevron-back" size={24} color="#111851" />
           </TouchableOpacity>
           <View style={styles.profileImg}>
-          {profileImage && <Image source={profileImage} style={styles.image} />}
+            {profileImage && <Image source={profileImage} style={styles.image} />}
           </View>
         </View>
         <View style={styles.right}>
@@ -170,7 +168,7 @@ const styles = StyleSheet.create({
   },
   info: {
     flexDirection: 'row',
-    paddingTop: '2%', 
+    paddingTop: '2%',
   },
   left: {
     width: '22%',
@@ -185,12 +183,12 @@ const styles = StyleSheet.create({
 
   upRight: {
     width: '50%',
-    marginLeft: '2%', 
+    marginLeft: '2%',
   },
   upLeft: {
     flexDirection: 'row',
     width: '30%',
-    marginRight: '30%', 
+    marginRight: '30%',
   },
   icon: {
     marginRight: '5%',

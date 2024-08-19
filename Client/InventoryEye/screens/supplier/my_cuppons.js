@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import S_header from '../../components/s_home/s_header';
 import Cupon from '../../components/s_cupons/cupon';
@@ -6,6 +6,7 @@ import { GET, DELETE } from '../../api';
 import { formatDate, formatTime } from '../../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BonusDetailsModal from './bonusModal';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function My_Cuppons() {
   const [user, setUser] = useState({});
@@ -28,6 +29,11 @@ export default function My_Cuppons() {
       console.error('Error retrieving user data:', error);
     }
   };
+  
+
+  useFocusEffect(useCallback(() => {
+    fetchUserData();
+  }, []))
 
   const fetchCategories = async () => {
     try {

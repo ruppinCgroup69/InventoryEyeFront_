@@ -67,14 +67,17 @@ export default function ChooseCupons() {
         alert('Error', 'Invalid bonus selected');
         return;
       }
-
-      const response = await POST('BonusUser', {
+      console.log('this bonus id', bonusId);
+      console.log('this user id:', user.id);
+      console.log('this created at', new Date().toISOString());
+      const response = await POST(`BonusUser`, {
         bonusId: bonusId,
         userId: user.id,
-        createAt: new Date().toISOString()
+        createAt: new Date()
       });
       
       console.log('POST response:', response);
+
 
       if (response && response.ok) {
         console.log('Bonus chosen successfully');

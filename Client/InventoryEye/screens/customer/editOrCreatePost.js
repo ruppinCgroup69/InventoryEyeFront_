@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView, Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, KeyboardAvoidingView } from 'react-native';
+import { Keyboard, SafeAreaView, Modal, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, TouchableWithoutFeedback, Platform, Alert, KeyboardAvoidingView } from 'react-native';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
-import { GET, POST } from '../../api';
+import { GET, POST, PUT } from '../../api';
 import * as ImagePicker from 'expo-image-picker';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +25,8 @@ export default function EditOrCreatePost() {
   const [errors, setErrors] = useState({});
   const [size, setSize] = useState('');
   const [addressUpdated, setAddressUpdated] = useState(false);
+
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -79,6 +81,7 @@ export default function EditOrCreatePost() {
       }));
     }
   }, [userData]);
+
 
   const fetchUserData = async () => {
     try {
@@ -304,6 +307,76 @@ export default function EditOrCreatePost() {
       }
     }
   };
+
+  //new code 
+  // const handleUploadPost = async () => {
+  //   if (!userData) {
+  //     alert('Error: User data is not available. Please try again.');
+  //     return;
+  //   }
+  //   setErrors({});
+  //   setOverallError('');
+  //   try {
+  //     const postToValidate = {
+  //       productName: postData.productName,
+  //       content: postData.content,
+  //       color: color,
+  //       company: company,
+  //       image: postData.image,
+  //     };
+  //     await PostSchema.validate(postToValidate, { abortEarly: false });
+  //     if (!selectedCategory) {
+  //       throw new Error('Please select a category before uploading.');
+  //     }
+  //     const tagsArray = [color, company, size].filter(tag => tag !== '');
+  //     const tagsString = JSON.stringify(tagsArray);
+  //     const finalPostData = {
+  //       ...postData,
+  //       userId: userData.id,
+  //       userName: userData.fullName,
+  //       userImage: userData.image,
+  //       createAt: isEditing ? postData.createAt : new Date(),
+  //       editedAt: new Date(),
+  //       productName: postData.productName,
+  //       content: postData.content,
+  //       image: postData.image,
+  //       //tags: JSON.stringify([color, company, size]),
+  //       tags: tagsString,
+  //       category: selectedCategory.categoryId,
+  //       categoryDesc: selectedCategory.categoryDesc,
+  //       pickUpFromUser: userData.address,
+  //       pickUpAddress: addressUpdated ? postData.pickUpAddress : userData.address,
+  //       score: userData.score
+  //     };
+
+  //     let response;
+  //     if (isEditing) {
+  //       console.log('Updating post with ID:', postId);
+  //       response = await PUT(`Posts/${postId}`, finalPostData);
+  //     } else {
+  //       response = await POST('Posts', finalPostData);
+  //     }
+
+  //     if (response && response.ok) {
+  //       navigation.navigate('Home');
+  //     } else {
+  //       alert(`An error occurred while ${isEditing ? 'updating' : 'uploading'} the post. Please try again.`);
+  //     }
+  //   } catch (err) {
+  //     if (err instanceof yup.ValidationError) {
+  //       const newErrors = {};
+  //       err.inner.forEach((error) => {
+  //         newErrors[error.path] = error.message;
+  //       });
+  //       setErrors(newErrors);
+  //       setOverallError('All fields must be filled in.');
+  //     } else if (err.message === 'Please select a category before uploading.') {
+  //       alert(err.message);
+  //     } else {
+  //       alert(`An error occurred while ${isEditing ? 'updating' : 'uploading'} the post. Please try again.`);
+  //     }
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>

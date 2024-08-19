@@ -97,7 +97,7 @@ export default function C_Register() {
       }, { abortEarly: false });
 
       const response = await POST('Users', updatedUser);
-      if (response != "good") {
+      if (response.ok==false) {
         alert('Failed to register user: No response from server');
         return;
       }

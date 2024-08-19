@@ -42,7 +42,7 @@ export default function C_home() {
       } else if (category) {
         url = `Posts/Category/${category}`;
       } else {
-        url = `Posts/${0}`;
+        url = `Posts/${user.id}`;
       }
       let postsData = await GET(url);
 
@@ -71,6 +71,10 @@ export default function C_home() {
     }
   }, [route.params?.categoryP]))
 
+  useFocusEffect(useCallback(() => {
+    getPosts();
+  }, []))
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -96,6 +100,7 @@ export default function C_home() {
     console.log('first');
     getPosts();
   }, [category, searchTerm])
+
 
   const handlePostPress = (post) => {
     navigation.navigate('Post_Det', { postId: post.postId });
